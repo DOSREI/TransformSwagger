@@ -1,0 +1,5012 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Default module",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Plataformas e Integrações"
+    },
+    {
+      "name": "Produtos"
+    },
+    {
+      "name": "Anuncios nos Marketplaces"
+    },
+    {
+      "name": "Pedidos"
+    }
+  ],
+  "paths": {
+    "/plataformas": {
+      "get": {
+        "summary": "Lista Plataformas",
+        "deprecated": false,
+        "description": "## Listagem das Plataformas que o Shopping de Preços possui Integração\n#### Esse método é responsável por buscar as informações de cada plataforma que o Shopping de Preços possui integração.",
+        "tags": [
+          "Plataformas e Integrações"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "quantidade": {
+                      "type": "integer"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "titulo": {
+                            "type": "string"
+                          },
+                          "ip": {
+                            "type": "string"
+                          },
+                          "tipo": {
+                            "type": "string"
+                          },
+                          "plataforma_pai_id": {
+                            "type": "null"
+                          },
+                          "ativo": {
+                            "type": "boolean"
+                          },
+                          "icone": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "titulo",
+                          "ip",
+                          "tipo",
+                          "ativo"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "id": 1,
+                      "titulo": "Mercado Livre",
+                      "tipo": "Marketplace",
+                      "plataforma_pai_id": null,
+                      "ativo": true,
+                      "icone": "https://app.shoppingdeprecos.com.br/assets/plataforma/1.png"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/integracoes": {
+      "get": {
+        "summary": "Lista Integrações",
+        "deprecated": false,
+        "description": "#### O Shopping de Preços é um sistema multiplataforma/multicontas e por isso trabalhamos com cada integração de forma separada. Esse método é responsável por buscar as informações de cada integração que o seller possui no Shopping de Preços.",
+        "tags": [
+          "Plataformas e Integrações"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "quantidade": {
+                      "type": "integer"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "integracao_id": {
+                            "type": "integer"
+                          },
+                          "descricao_plataforma": {
+                            "type": "string"
+                          },
+                          "plataforma_id": {
+                            "type": "integer"
+                          },
+                          "plataforma": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "integracao_id",
+                          "descricao_plataforma",
+                          "plataforma_id",
+                          "plataforma"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "integracao_id": 10000,
+                      "descricao_plataforma": "nomeExemplo1",
+                      "plataforma_id": 1,
+                      "plataforma": "Mercado Livre"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/produtos": {
+      "post": {
+        "summary": "Envio de Produtos com Variações - API V1",
+        "deprecated": false,
+        "description": "## Enviar produtos com Variações.\n#### Esse método é responsável por cadastrar ou atualizar produtos com variações no Shopping De Preços.\n---\n:::warning[]\n\n\n\n\n**OBSERVAÇÃO IMPORTANTE:** \nEsta requisição deve ser feita utilizando a URL **https://api.shoppingdeprecos.com.br** (sem o v2)\n\nCertifique-se de ajustar a base da URL corretamente para evitar erros de integração\n:::\n\n",
+        "tags": [
+          "Produtos"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtos": {
+                    "type": "string",
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-produto-com-variacoes) ",
+                    "example": ""
+                  }
+                },
+                "required": [
+                  "produtos"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "example": {
+                  "status": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/atualizaEstoqueProduto": {
+      "post": {
+        "summary": "Atualização de Estoque do Produto - API V1",
+        "deprecated": false,
+        "description": "## Atualizar estoque por produto.\n#### Esse método é responsável por enviar/atualizar os estoques dos produtos, individual ou massivamente.",
+        "tags": [
+          "Produtos"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtos": {
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-atualizacao-estoque-por-produto)",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "produtos"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "protocolo": {
+                      "type": "integer",
+                      "description": "Protocolo da atualização realizada."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "protocolo"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "protocolo": 123456789
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/atualizaPrecoProduto": {
+      "post": {
+        "summary": "Atualização de Preço do Produto - API V1",
+        "deprecated": false,
+        "description": "## Atualizar preço por produto.\n#### Esse método é responsável por enviar/atualizar os preços dos produtos, individual ou massivamente.",
+        "tags": [
+          "Produtos"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtos": {
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-atualizacao-preco-por-produto)",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "produtos"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "protocolo": {
+                      "type": "integer",
+                      "description": "Protocolo da atualização realizada."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "protocolo"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "protocolo": 123456789
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/categorias": {
+      "post": {
+        "summary": "Listagem de Categorias - API V1",
+        "deprecated": false,
+        "description": "## Retornar Categorias das Plataformas.\n#### Esse método é responsável por retornar as categorias disponíveis na plataforma para envio de produtos.\n---\n:::warning[]\n\n\n\n\n**OBSERVAÇÃO IMPORTANTE:** \nEsta requisição deve ser feita utilizando a URL **https://api.shoppingdeprecos.com.br** (sem o v2)\n\nCertifique-se de ajustar a base da URL corretamente para evitar erros de integração\n:::\n\n",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "IntegracaoID": {
+                    "type": "string",
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+                    "example": "11111"
+                  },
+                  "PlataformaID": {
+                    "description": "Código da plataforma no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+                    "example": "1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "IntegracaoID",
+                  "PlataformaID"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Código da Categoria"
+                          },
+                          "nome": {
+                            "type": "string",
+                            "description": "Nome da Categoria"
+                          },
+                          "departamento": {
+                            "type": "integer",
+                            "description": "Código do Departamento da Categoria"
+                          },
+                          "temFilhos": {
+                            "type": "boolean",
+                            "description": "Caso haja subcategorias, retornará **true**, caso contrário, retornará **false**."
+                          },
+                          "filhos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer",
+                                  "description": "Código da Subcategoria"
+                                },
+                                "nome": {
+                                  "type": "string",
+                                  "description": "Nome da Subcategoria"
+                                },
+                                "departamento": {
+                                  "type": "integer",
+                                  "description": "Código do Departamento da Subcategoria"
+                                },
+                                "temFilhos": {
+                                  "type": "boolean",
+                                  "description": "Caso haja subcategorias, retornará **true**, caso contrário, retornará **false**."
+                                },
+                                "filhos": {
+                                  "type": [
+                                    "array",
+                                    "null"
+                                  ],
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "nome",
+                                "departamento",
+                                "temFilhos",
+                                "filhos"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nome",
+                          "departamento",
+                          "temFilhos",
+                          "filhos"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "registros": [
+                    {
+                      "id": 100009,
+                      "nome": "Acessórios de Moda",
+                      "departamento": 100009,
+                      "temFilhos": true,
+                      "filhos": [
+                        {
+                          "id": 100036,
+                          "nome": "Outros",
+                          "departamento": 100009,
+                          "temFilhos": false,
+                          "filhos": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/marcas": {
+      "post": {
+        "summary": "Listagem de Marcas por Plataforma - API V1",
+        "deprecated": false,
+        "description": "## Listagem de Marcas por Plataforma\n#### Esse método é responsável por retornar as marcas disponíveis na plataforma informada para envio de produtos.\n---\n:::warning[]\n\n\n\n\n**OBSERVAÇÃO IMPORTANTE:** \nEsta requisição deve ser feita utilizando a URL **https://api.shoppingdeprecos.com.br** (sem o v2)\n\nCertifique-se de ajustar a base da URL corretamente para evitar erros de integração\n:::\n\n",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "IntegracaoID": {
+                    "type": "string",
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+                    "example": ""
+                  },
+                  "PlataformaID": {
+                    "description": "Código da plataforma no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "IntegracaoID",
+                  "PlataformaID"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros a ser retornado."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "ID/Identificador da marca."
+                          },
+                          "nome": {
+                            "type": "string",
+                            "description": "Nome da marca."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nome"
+                        ]
+                      },
+                      "description": "Array/Lista com os registros."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 3,
+                  "registros": [
+                    {
+                      "id": "123",
+                      "nome": "Marca 1"
+                    },
+                    {
+                      "id": "456",
+                      "nome": "Marca 2"
+                    },
+                    {
+                      "id": "789",
+                      "nome": "Marca 3"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/atributos": {
+      "post": {
+        "summary": "Listagem de Atributos por Plataforma - API V1",
+        "deprecated": false,
+        "description": "## Listagem de Atributos por Plataforma\n#### Esse método é responsável por retornar os atributos disponíveis na plataforma informada para envio de produtos.\n---\n:::warning[]\n\n\n\n\n**OBSERVAÇÃO IMPORTANTE:** \nEsta requisição deve ser feita utilizando a URL **https://api.shoppingdeprecos.com.br** (sem o v2)\n\nCertifique-se de ajustar a base da URL corretamente para evitar erros de integração\n:::\n\n",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "IntegracaoID": {
+                    "type": "string",
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+                    "example": ""
+                  },
+                  "PlataformaID": {
+                    "description": "Código da plataforma no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "CategoriaID": {
+                    "description": "Código da categoria que retorno da plataforma. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/listagem-categorias-plataforma)",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "IntegracaoID",
+                  "PlataformaID"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará true, e para caso de erros, retornará false."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "ID/Identificador do atributo."
+                          },
+                          "nome": {
+                            "type": "string",
+                            "description": "Nome/Descrição do atributo."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nome"
+                        ]
+                      },
+                      "description": "Array/Lista com registros retornados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 3,
+                  "registros": [
+                    {
+                      "id": "1",
+                      "nome": "Atributo 1"
+                    },
+                    {
+                      "id": "2",
+                      "nome": "Atributo 2"
+                    },
+                    {
+                      "id": "3",
+                      "nome": "Atributo 3"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/enviaProdutoPlataforma": {
+      "post": {
+        "summary": "Envio de produtos para a Plataforma - API V1",
+        "deprecated": false,
+        "description": "## Envio de Produtos para a Plataforma\n#### Esse método é responsável por enviar um produto para uma plataforma em específico.\n---\n\n:::highlight red 📌\n**OBSERVAÇÃO IMPORTANTE:** \nEsta requisição deve ser feita utilizando a URL **https://api.shoppingdeprecos.com.br** (sem o v2). Certifique-se de ajustar a base da URL corretamente para evitar erros de integração.\n\n:::warning[]\nO envio dos parâmetros é feito utilizando o **Content-Type application/x-www-form-urlencoded**, e não **application/json**.\n:::\n:::\n\n:::highlight blue 💡\nNo exemplo abaixo, temos o envio de um produto simples com um atributo. No caso do envio para as plataformas, o campo **Variacoes** é utilizado para incluir os atributos correspondentes ao produto, além de permitir a alteração do SKU que será enviado à plataforma.\n\nO campo **ProdutoID** deve ser idêntico ao SKU interno do shopping, seja para uma variação ou para o produto principal. Caso a plataforma não utilize atributos e não seja necessário enviar SKUs diferentes no anúncio, os campos **Variacoes** e **ProdutoID** podem ser enviados como **\"[]\"**.\n:::\n\n\n\n",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "IntegracaoID": {
+                    "type": "string",
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+                    "example": ""
+                  },
+                  "PlataformaID": {
+                    "description": "Código da plataforma no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "ProdutoID": {
+                    "description": "SKU do produto interno no Shopping de Preços.",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "SKU": {
+                    "description": "SKU a ser enviado para a integração/plataforma.",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "Preco": {
+                    "type": "number",
+                    "description": "Preço a ser enviado para a plataforma.",
+                    "example": 0
+                  },
+                  "Estoque": {
+                    "type": "integer",
+                    "description": "Estoque a ser enviado para a plataforma.",
+                    "example": 0
+                  },
+                  "MarcaID": {
+                    "type": "integer",
+                    "description": "ID da marca a ser enviado para a plataforma.",
+                    "example": 0
+                  },
+                  "CategoriaID": {
+                    "type": "integer",
+                    "description": "Código da categoria que retorna da plataforma. Podendo ser obrigatório dependendo da plataforma. [Saiba mais em como obter o ID da categoria clicando aqui](https://apidoc.shoppingdeprecos.com.br/listagem-categorias-plataforma)",
+                    "example": 0
+                  },
+                  "DepartamentoID": {
+                    "type": "number",
+                    "description": "Departamento da categoria que retorna da plataforma. Podendo ser obrigatório dependendo da plataforma. [Saiba mais em como obter o ID do Departamento da categoria clicando aqui](https://apidoc.shoppingdeprecos.com.br/listagem-categorias-plataforma)",
+                    "example": 0
+                  },
+                  "Categorias": {
+                    "type": "string",
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-categoria-envio-produto-plataforma) ",
+                    "example": ""
+                  },
+                  "Atributos": {
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-atributos-envio-produto-plataforma)",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "Variacoes": {
+                    "description": "[Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-variacoes-envio-produto-plataforma)",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "IntegracaoID",
+                  "PlataformaID",
+                  "SKU",
+                  "Preco",
+                  "Estoque"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará true, e para caso de erros, retornará false."
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "example": "{\r\n    \"status\": true,\r\n}"
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/produtos/{IntegracaoID}/estoque": {
+      "post": {
+        "summary": "Atualização de Estoque por Integração",
+        "deprecated": false,
+        "description": "## Atualizar estoque dos produtos.\n#### Esse método é responsável por enviar os estoques dos produtos, individual ou massivamente, para a integração informada.",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "11111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ProdutoID": {
+                          "type": "string",
+                          "description": "Código/SKU do produto no Shopping de Preços"
+                        },
+                        "SKU": {
+                          "type": "string",
+                          "description": "Código/SKU do produto na integração/plataforma."
+                        },
+                        "SKUPai": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Código/SKU do produto PAI (caso haja variações)."
+                        },
+                        "SKUVariacaoPai": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Código/SKU do produto FILHO (caso haja variações)."
+                        },
+                        "Estoque": {
+                          "type": "integer",
+                          "description": "Estoque a ser enviado."
+                        },
+                        "Docas": {
+                          "description": "Só enviar os depósitos caso a plataforma aceite. [Visualize aqui o modelo de dados](https://apidoc.shoppingdeprecos.com.br/schema-estoque-deposito)",
+                          "$ref": "#/components/schemas/Modelo%20de%20Envio%20Estoque%20para%20Depositos"
+                        },
+                        "DiasEntrega": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "description": "Dias de entrega."
+                        }
+                      },
+                      "required": [
+                        "ProdutoID",
+                        "SKU",
+                        "Estoque",
+                        "Docas"
+                      ],
+                      "description": "Array/Lista com os registros retornados."
+                    }
+                  }
+                },
+                "required": [
+                  "produtos"
+                ]
+              },
+              "example": {
+                "produtos": [
+                  {
+                    "ProdutoID": "10164",
+                    "SKU": "10164",
+                    "SKUPai": "",
+                    "SKUVariacaoPai": "",
+                    "Estoque": 1,
+                    "Docas": [],
+                    "DiasEntrega": 0
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ProdutoID": {
+                            "type": "string",
+                            "description": "Código/SKU do produto na integração/plataforma."
+                          },
+                          "SKU": {
+                            "type": "string",
+                            "description": "Código/SKU do produto na integração/plataforma."
+                          },
+                          "SKUPai": {
+                            "type": "null",
+                            "description": "Código/SKU do produto **PAI** (caso haja variação)."
+                          },
+                          "SKUVariacaoPai": {
+                            "type": "null",
+                            "description": "Código/SKU do produto **FILHO** (caso haja variação)."
+                          },
+                          "status": {
+                            "type": "boolean",
+                            "description": "Para caso de sucesso, retornará **true**, e para caso de erros, **false**."
+                          },
+                          "Docas": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Retornará as docas/depósitos que foram enviados.\n"
+                          },
+                          "DiasEntrega": {
+                            "type": "integer",
+                            "description": "Retornará os dias de entrega que foi informado."
+                          }
+                        }
+                      },
+                      "description": "Array/Lista com os registros retornados."
+                    },
+                    "protocolo": {
+                      "type": "integer",
+                      "description": "Identificador da atualização."
+                    }
+                  },
+                  "required": [
+                    "protocolo",
+                    "registros",
+                    "quantidade",
+                    "status"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "ProdutoID": "10164",
+                      "SKU": "10164",
+                      "SKUPai": null,
+                      "SKUVariacaoPai": null,
+                      "status": true,
+                      "Docas": [],
+                      "DiasEntrega": 0
+                    }
+                  ],
+                  "protocolo": 298052218
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "Consulta de estoques por integração",
+        "deprecated": false,
+        "description": "## Consultar estoque dos produtos de uma integração.\n#### Esse método é responsável por consultar os estoques de todos os produtos de uma integração específica.",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "11111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sku": {
+                            "type": "string",
+                            "description": "Código/SKU do produto na plataforma."
+                          },
+                          "estoque": {
+                            "type": "integer",
+                            "description": "Estoque do produto na plataforma."
+                          },
+                          "ultima_atualizacao": {
+                            "type": "string",
+                            "description": "Data da última atualização de estoque do produto na plataforma  (AAAA-MM-DD HH:MM:SS). "
+                          }
+                        },
+                        "required": [
+                          "sku",
+                          "estoque",
+                          "ultima_atualizacao"
+                        ]
+                      },
+                      "description": "Array/Lista com os registros retornados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "sku": "1096",
+                      "estoque": 0,
+                      "ultima_atualizacao": "2025-05-14 21:58:55"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/produtos/{IntegracaoID}/precos": {
+      "post": {
+        "summary": "Atualização de Preços por Integração",
+        "deprecated": false,
+        "description": "## Atualização dos preços dos produtos por integração.\n#### Esse método é responsável por enviar os preços de produtos, individual ou massivamente, para as plataformas integradas.\n\n",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "11111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ProdutoID": {
+                          "type": "string",
+                          "description": "Código/SKU do produto no Shopping de Preços."
+                        },
+                        "SKU": {
+                          "type": "string",
+                          "description": "Código/SKU do produto na integração/plataforma."
+                        },
+                        "SKUPai": {
+                          "type": "string",
+                          "description": "Código/SKU do produto **PAI** (caso haja variação)."
+                        },
+                        "SKUVariacaoPai": {
+                          "type": "string",
+                          "description": "Código/SKU do produto **FILHO** (caso haja variação)."
+                        },
+                        "Preco": {
+                          "type": "number",
+                          "description": "Preço a ser enviado."
+                        },
+                        "PrecoPromocao": {
+                          "type": "number",
+                          "description": "Preço promocional a ser enviado."
+                        },
+                        "InicioPromocao": {
+                          "type": "string",
+                          "description": "Data inicial da promoção (AAAA-MM-DD HH:MM:SS)."
+                        },
+                        "TerminoPromocao": {
+                          "type": "string",
+                          "description": "Data final da promoção (AAAA-MM-DD HH:MM:SS)."
+                        }
+                      },
+                      "required": [
+                        "Preco",
+                        "SKU",
+                        "ProdutoID"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "produtos"
+                ]
+              },
+              "example": {
+                "produtos": [
+                  {
+                    "ProdutoID": "10164",
+                    "SKU": "10164",
+                    "SKUPai": "",
+                    "SKUVariacaoPai": "",
+                    "Preco": 5000,
+                    "PrecoPromocao": 4000,
+                    "InicioPromocao": "2025-06-01 10:00:00",
+                    "TerminoPromocao": "2025-06-02 10:00:00"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ProdutoID": {
+                            "type": "string",
+                            "description": "Código/SKU do produto no Shopping de Preços."
+                          },
+                          "SKU": {
+                            "type": "string",
+                            "description": "Código/SKU do produto na integração/plataforma."
+                          },
+                          "SKUPai": {
+                            "type": "null",
+                            "description": "Código/SKU do produto **PAI** na plataforma (caso haja variações)."
+                          },
+                          "SKUVariacaoPai": {
+                            "type": "null",
+                            "description": "Código/SKU do produto **FILHO** na plataforma (caso haja variações)."
+                          },
+                          "status": {
+                            "type": "boolean",
+                            "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "ProdutoID",
+                          "SKU"
+                        ]
+                      },
+                      "description": "Array/Lista com os registros retornados."
+                    }
+                  },
+                  "required": [
+                    "registros",
+                    "quantidade",
+                    "status"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "ProdutoID": "10164",
+                      "SKU": "10164",
+                      "SKUPai": null,
+                      "SKUVariacaoPai": null,
+                      "status": true
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "Consulta de preços por integração",
+        "deprecated": false,
+        "description": "Esse método é responsável por consultar os estoques de todos os produtos de uma integração específica.",
+        "tags": [
+          "Anuncios nos Marketplaces"
+        ],
+        "parameters": [
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "11111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sku": {
+                            "type": "string",
+                            "description": "Código/SKU do produto na integração/plataforma."
+                          },
+                          "preco": {
+                            "type": "number",
+                            "description": "Preço a ser enviado."
+                          },
+                          "preco_promocao": {
+                            "type": "integer",
+                            "description": "Preço promocional a ser enviado."
+                          },
+                          "inicio_promocao": {
+                            "type": "null",
+                            "description": "Data inicial da promoção (AAAA-MM-DD HH:MM:SS). "
+                          },
+                          "termino_promocao": {
+                            "type": "null",
+                            "description": "Data final da promoção (AAAA-MM-DD HH:MM:SS). "
+                          },
+                          "ultima_atualizacao": {
+                            "type": "string",
+                            "description": "Data da ultima atualização do produto na integração/plataforma (AAAA-MM-DD HH:MM:SS). "
+                          }
+                        }
+                      },
+                      "description": "Array/Lista com os registros retornados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "sku": "1096",
+                      "preco": 99.92,
+                      "preco_promocao": 0,
+                      "inicio_promocao": null,
+                      "termino_promocao": null,
+                      "ultima_atualizacao": "2025-05-14 21:58:55"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/{pedidoID}/integracao/{IntegracaoID}": {
+      "post": {
+        "summary": "Atualizar Status",
+        "deprecated": false,
+        "description": "## Atualizar os dados de um pedido específico.\n#### Este método realiza a atualização dos dados de um pedido específico.",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "pedidoID",
+            "in": "path",
+            "description": "Código/ID do Pedido da integração no Shopping de Preços.",
+            "required": true,
+            "example": "MRP00000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "1000000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rastreio": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Código de rastreio.",
+                    "example": "AA100833276BR"
+                  },
+                  "serie": {
+                    "description": "Número da série da empresa que gerou a NFe.",
+                    "example": "1",
+                    "type": "string"
+                  },
+                  "nf": {
+                    "description": "Número da NFe gerada.",
+                    "example": "1234",
+                    "type": "string"
+                  },
+                  "especie": {
+                    "description": "Espécie da NFe gerada.",
+                    "example": "1",
+                    "type": "string"
+                  },
+                  "data": {
+                    "description": "Data da atualização (DD-MM-YYYY).",
+                    "example": "28/05/2025",
+                    "type": "string"
+                  },
+                  "chaveNFE": {
+                    "description": "Chave da NFe gerada.",
+                    "example": "0000000000000000010755000000061480787897454897498",
+                    "type": "string"
+                  },
+                  "produtoCFOP": {
+                    "description": "CFOP do produto vendido.",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "ie": {
+                    "description": "Inscrição estadual.",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "xmlNFE": {
+                    "type": "string",
+                    "description": "Arquivo XML caso enviado, obrigatoriamente deve ser enviado em base64.",
+                    "example": ""
+                  },
+                  "transportadora": {
+                    "description": "Transportadora que origiou no envio do pedido.",
+                    "example": "Correios",
+                    "type": "string"
+                  },
+                  "formaEnvio": {
+                    "description": "Forma de envio da transportadora que originou o envio do pedido.",
+                    "example": "PAC",
+                    "type": "string"
+                  },
+                  "rastreioURL": {
+                    "description": "URL de rastreio do pedido.",
+                    "example": "https://www2.correios.com.br/sistemas/rastreamento/default.cfm",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Status em que o pedido será atualizado, status disponíveis: FATURADO, ENVIADO, ENTREGUE, CANCELADO.",
+                    "example": "ENVIADO",
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "registros": [
+                    true
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/{pedidoID}/integracao/{integracaoID}/situacao-personalizada": {
+      "post": {
+        "summary": "Atualizar Situação Personalizada",
+        "deprecated": false,
+        "description": "## Atualizar situação personalizada de um pedido específico.\n#### Este método realiza a atualização da situação personalizada de um pedido específico.\n#### Para verificar suas situações personalizadas cadastradas, [confira aqui](https://apidoc.shoppingdeprecos.com.br/lista-situacoes-personalizadas).\n\n:::highlight blue 💡\n**OBSERVAÇÃO:** A situação personalizada é só um campo gerencial, esse campo não é refletido para os marketplaces ou e-commerces.\n:::",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "pedidoID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "integracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "1111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "situacao": {
+                    "type": "integer",
+                    "description": "ID da situação personalizada cadastrada. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)"
+                  }
+                }
+              },
+              "example": {
+                "situacao": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "example": {
+                  "status": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/etiquetas": {
+      "post": {
+        "summary": "Etiqueta nos Marketplaces - API V1",
+        "deprecated": false,
+        "description": "## Etiquetas de Outros Marketplaces.\n#### Este método retornará a etiqueta do pedido no Marketplace no formato informado.\n:::note[]\nLista de Plataformas que retornam a etiqueta\n\n- Skyhub\n- Amazon\n- Casas Bahia\n- Netshoes\n- Magazine Luiza\n- Shopee\n- Carrefour\n- Shopee\n- AliExpress\n- Decathlon\n- RD via Conecta-lá\n- Shophub\n- Shein\n:::",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "IntegracaoID",
+            "in": "query",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "11111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PlataformaID",
+            "in": "query",
+            "description": "Código da plataforma no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+            "required": true,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Pedidos",
+            "in": "query",
+            "description": "Lista de ID's de pedidos, separados por vírgula.",
+            "required": true,
+            "example": "5181819,5181820,5181821",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Formato",
+            "in": "query",
+            "description": "Formato do arquivo de resposta; ZPL ou PDF.",
+            "required": true,
+            "example": "PDF",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de eiquetas retornadas"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "PedidoID": {
+                            "type": "integer",
+                            "description": "Código do pedido na plataforma"
+                          },
+                          "PlataformaID": {
+                            "type": "string",
+                            "description": "ID da plataforma no Shopping de Preços"
+                          },
+                          "status": {
+                            "type": "boolean",
+                            "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                          },
+                          "body": {
+                            "type": "string",
+                            "description": "URL da etiqueta"
+                          }
+                        },
+                        "required": [
+                          "PedidoID",
+                          "PlataformaID",
+                          "status",
+                          "body"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": "{\r\n    \"status\": true,\r\n    \"quantidade\": 3,\r\n    \"registros\": [\r\n        {\r\n            \"PedidoID\": 5181819,\r\n            \"PlataformaID\": \"10\",\r\n            \"type\": 'url',\r\n            \"status\": true,\r\n            \"body\": \"url-da-etiqueta\"\r\n        },\r\n        {\r\n            \"PedidoID\": 5181820,\r\n            \"PlataformaID\": \"10\",\r\n            \"type\": 'url',\r\n            \"status\": true,\r\n            \"body\": \"url-da-etiqueta\"\r\n        },\r\n        {\r\n            \"PedidoID\": 5181821,\r\n            \"PlataformaID\": \"10\",\r\n            \"type\": 'url',\r\n            \"status\": true,\r\n            \"body\": \"url-da-etiqueta\"\r\n        }\r\n    ]\r\n}"
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/lista": {
+      "get": {
+        "summary": "Listagem de Pedidos",
+        "deprecated": false,
+        "description": "## **Listagem dos pedidos atualizados em um período**\n#### Esse método é responsável por buscar os pedidos que sofreram atualização entre as datas enviadas nos parâmetros de busca.\n---\n\n:::highlight blue 💡\n**OBSERVAÇÃO IMPORTANTE:** \nEsse método **considera exclusivamente a data de atualização do pedido**, e não a data de venda ou entrega. Sempre que houver uma alteração relevante no pedido (como mudança de status, cancelamento ou envio), essa data será atualizada.\n\nPortanto, ao realizar uma busca, **lembre-se de que o período máximo permitido é 3 dias entre a data Inicial e a Data Final**. Qualquer pesquisa fora desse intervalo será redefinida automaticamente.\n\n:::\n",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "dataIni",
+            "in": "query",
+            "description": "Data inicial de atualização do pedido.",
+            "required": true,
+            "example": "2025-01-01 00:00:00",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Data final de atualização do pedido.",
+            "required": true,
+            "example": "2025-04-02 20:00:00",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "integracaoID",
+            "in": "query",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": 444335,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "br",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Status da Solicitação"
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de Pedidos"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "plataforma_id": {
+                            "type": "integer",
+                            "description": "Código/ID da plataforma no Shopping de Preços."
+                          },
+                          "plataforma_nome": {
+                            "type": "string",
+                            "description": "Nome/Identificação da plataforma no Shopping de Preços."
+                          },
+                          "integracao_id": {
+                            "type": "integer",
+                            "description": "ID da Integração no Shopping de Preços."
+                          },
+                          "pedido_id": {
+                            "type": "string",
+                            "description": "ID do pedido no Shopping de Preços."
+                          },
+                          "ultima_atualizacao": {
+                            "type": "string",
+                            "description": "Data da última atualização."
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Status do pedido no Shopping de Preços."
+                          },
+                          "programa_envio": {
+                            "type": "string",
+                            "description": "Programa de envio do pedido retornado da plataforma."
+                          },
+                          "situacao_personalizada_id": {
+                            "type": "integer",
+                            "description": "ID da situação personalizada no Shopping de Preços."
+                          },
+                          "situacao_personalizada_nome": {
+                            "type": "string",
+                            "description": "Nome da situação personalizada no Shopping de Preços."
+                          },
+                          "tem_nf": {
+                            "type": "boolean",
+                            "description": "Caso **true** o pedido possui NFe, e caso **false**, não possui."
+                          }
+                        },
+                        "required": [
+                          "plataforma_id",
+                          "plataforma_nome",
+                          "integracao_id",
+                          "pedido_id",
+                          "ultima_atualizacao",
+                          "status",
+                          "programa_envio",
+                          "situacao_personalizada_id",
+                          "situacao_personalizada_nome",
+                          "tem_nf"
+                        ]
+                      },
+                      "description": "Array de Pedidos"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 2,
+                  "registros": [
+                    {
+                      "plataforma_id": 1,
+                      "plataforma_nome": "Mercado Livre",
+                      "integracao_id": 65629,
+                      "pedido_id": "2000011073291866",
+                      "ultima_atualizacao": "2025-03-30 20:26:15",
+                      "status": "Entregue",
+                      "programa_envio": "fulfillment",
+                      "situacao_personalizada_id": 1,
+                      "situacao_personalizada_nome": "Pedido Ativo",
+                      "tem_nf": false
+                    },
+                    {
+                      "plataforma_id": 1,
+                      "plataforma_nome": "Mercado Livre",
+                      "integracao_id": 65629,
+                      "pedido_id": "2000010875519116",
+                      "ultima_atualizacao": "2025-03-30 20:59:25",
+                      "status": "Entregue",
+                      "programa_envio": "cross_docking",
+                      "situacao_personalizada_id": 1,
+                      "situacao_personalizada_nome": "Pedido Ativo",
+                      "tem_nf": true
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/{pedidoID}/integracao/{IntegracaoID}/dados": {
+      "get": {
+        "summary": "Dados de um Pedido",
+        "deprecated": false,
+        "description": ":::highlight blue 💡\n#### Para consultar a listagem dos seus pedidos atualizados em um período, consulte o método Lista de Pedidos [clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-pedidos-atualizados).\n#### Este método realiza a busca dos dados de um pedido específico.\n\n---\n#### Status que podem retornar no pedido:\n- Aguardando Pagamento\n- Aprovado\n- Faturado\n- Enviado\n- Entregue\n- Cancelado\n- Devolvido\n\n\n\n",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "pedidoID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "1111",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade de registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "integracao_id": {
+                            "type": "integer",
+                            "description": "Código da integração no Shopping de Preços."
+                          },
+                          "observacoes": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Observações do pedido no Shopping de Preços."
+                          },
+                          "pedido_id": {
+                            "type": "string",
+                            "description": "ID do pedido no Shopping de Preços."
+                          },
+                          "tipo_me": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Para casos de pedidos **Mercado Livre**, retornará se o mesmo é ME1 ou ME2."
+                          },
+                          "carrinho_ml": {
+                            "type": "null",
+                            "description": "Para casos de pedidos **Mercado Livre**, retornará o carrinho atrelado ao pedido."
+                          },
+                          "data_pedido": {
+                            "type": "string",
+                            "description": "Data em que o pedido foi gerado na plataforma."
+                          },
+                          "ultima_atualizacao": {
+                            "type": "string",
+                            "description": "Data da última atualização do pedido na plataforma."
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Status do pedido no Shopping de Preços. **(Possíveis valores: Aguardando Pagamento, Aprovado, Faturado, Enviado, Entregue, Cancelado e Devolvido.**"
+                          },
+                          "situacao_personalizada_id": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "description": "ID da situação personalizada deste pedido no Shoppping de Preços."
+                          },
+                          "situacao_personalizada_nome": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Nome da situação personalizada deste pedido no Shoppping de Preços."
+                          },
+                          "vendedor_id": {
+                            "type": "integer",
+                            "description": "Seu ID (Identificador de cliente) no Shopping de Preços."
+                          },
+                          "token": {
+                            "type": "string"
+                          },
+                          "pais_origem_pedido": {
+                            "type": "string",
+                            "description": "Pais em que o pedido foi gerado."
+                          },
+                          "moeda": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Moeda em que o pedido foi gerado (Ex: R$, US)."
+                          },
+                          "moeda_cotacao_reais": {
+                            "type": "null"
+                          },
+                          "entrega_cotacao": {
+                            "type": "null"
+                          },
+                          "faturamento_horario": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Horário em que o pedido foi faturado."
+                          },
+                          "nf_plataforma": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "NFe do pedido na integração/plataforma."
+                          },
+                          "total_sem_frete": {
+                            "type": "number",
+                            "description": "Total do pedido **sem frete** no Shopping de Preços."
+                          },
+                          "total_frete": {
+                            "type": "integer",
+                            "description": "Total do frete do pedido no Shopping de Preços."
+                          },
+                          "total_desconto": {
+                            "type": "integer",
+                            "description": "Total de desconto do pedido no Shopping de Preços."
+                          },
+                          "total_cupom": {
+                            "type": "integer",
+                            "description": "Total de desconto via cupom do pedido no Shopping de Preços."
+                          },
+                          "total_acrescimo": {
+                            "type": "integer",
+                            "description": "Total de acréscimo do pedido no Shopping de Preços."
+                          },
+                          "total_pedido": {
+                            "type": "number",
+                            "description": "Total do pedido no Shopping de Preços."
+                          },
+                          "produtos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "sequencia": {
+                                  "type": "integer",
+                                  "description": "Sequência do produto vendido."
+                                },
+                                "sku": {
+                                  "type": "string",
+                                  "description": "SKU do produto vendido."
+                                },
+                                "sku_erp": {
+                                  "type": "string",
+                                  "description": "SKUERP do produto vendido."
+                                },
+                                "numero_serial": {
+                                  "type": "null",
+                                  "description": "Número/serial do produto vendido."
+                                },
+                                "mlb": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Para casos de pedidos **Mercado Livre**, retornará o MLB do produto vendido."
+                                },
+                                "foto": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Para casos de pedidos **Mercado Livre**, retornará a foto do produto vendido."
+                                },
+                                "ean": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "EAN do produto vendido."
+                                },
+                                "variacao_id": {
+                                  "type": [
+                                    "integer",
+                                    "null"
+                                  ],
+                                  "description": "Para casos de pedidos **Mercado Livre**, retornará oID da variação no Mercado Livre do produto vendido."
+                                },
+                                "descricao": {
+                                  "type": "string",
+                                  "description": "Descrição/Título do produto vendido."
+                                },
+                                "descricao_variacao": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Descrição/Título do produto vendido (caso seja variação)."
+                                },
+                                "observacao": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Observações do produto vendido."
+                                },
+                                "qtde": {
+                                  "type": "integer",
+                                  "description": "Quantidade do produto vendido."
+                                },
+                                "valor_unitario": {
+                                  "type": "number",
+                                  "description": "Valor unitário do produto vendido."
+                                },
+                                "desconto": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ],
+                                  "description": "Desconto do produto vendido."
+                                },
+                                "valor_total": {
+                                  "type": "number",
+                                  "description": "Valor total com o desconto do produto vendido."
+                                },
+                                "tarifa_venda": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ],
+                                  "description": "Para casos de pedidos **Mercado Livre**, retornará a tarifa de venda deste produto."
+                                },
+                                "percentual_comissao": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ],
+                                  "description": "Percentual de comissão do produto vendido."
+                                },
+                                "tipo_anuncio": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Para casos de pedidos **Mercado Livre**, retornará o tipo de anúncio do produto vendido (Premium, Clássico)."
+                                },
+                                "embalagem_presente": {
+                                  "type": [
+                                    "boolean",
+                                    "null"
+                                  ],
+                                  "description": "Para caso em que haja embalagem para presente, retornará **true**, caso contrário, retornará **false**."
+                                },
+                                "kit": {
+                                  "type": [
+                                    "boolean",
+                                    "null"
+                                  ],
+                                  "description": "Para caso em queo produto seja um kit, retornará **true**, caso contrário, retornará **false**."
+                                },
+                                "itens_kit": {
+                                  "type": [
+                                    "array",
+                                    "null"
+                                  ],
+                                  "items": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "description": "Array/Lista com os elementos do kit."
+                                },
+                                "dropshipping": {
+                                  "type": [
+                                    "array",
+                                    "null"
+                                  ],
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "description": "Array/Lista com os elementos do dropshipping."
+                                },
+                                "dimensoes": {
+                                  "type": "object",
+                                  "properties": {
+                                    "altura": {
+                                      "type": "null",
+                                      "description": "Altura do produto."
+                                    },
+                                    "largura": {
+                                      "type": "null",
+                                      "description": "Largura do produto."
+                                    },
+                                    "comprimento": {
+                                      "type": "null",
+                                      "description": "Comprimento do produto."
+                                    },
+                                    "peso": {
+                                      "type": "null",
+                                      "description": "Peso do produto."
+                                    }
+                                  },
+                                  "required": [
+                                    "altura",
+                                    "largura",
+                                    "comprimento",
+                                    "peso"
+                                  ],
+                                  "description": "Dimensões do produto vendido."
+                                }
+                              },
+                              "required": [
+                                "descricao",
+                                "qtde",
+                                "valor_unitario",
+                                "valor_total",
+                                "dimensoes"
+                              ]
+                            },
+                            "description": "Array/Lista com os registros retornados."
+                          },
+                          "pagamentos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "sequencia": {
+                                  "type": "integer",
+                                  "description": "Sequência do pagamento."
+                                },
+                                "data": {
+                                  "type": "string",
+                                  "description": "Data do pagamento."
+                                },
+                                "valor": {
+                                  "type": "number",
+                                  "description": "Valor do pagamento."
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "description": "Status do pagamento (Aprovado, Cancelado, Pendente, Rejeitado,  Em Mediação, Estornado ou Verificar)."
+                                },
+                                "bandeira": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Bandeira do cartão."
+                                },
+                                "operadora": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "Operadora do cartão."
+                                },
+                                "identificacao": {
+                                  "type": "string",
+                                  "description": "identificação do pagamento."
+                                },
+                                "codigo_transacao": {
+                                  "type": "null",
+                                  "description": "ID da transação do pagamento."
+                                },
+                                "forma": {
+                                  "type": "string",
+                                  "description": "Forma de pagamento (Cartão Crédito, Cartão Débito, Boleto, Promissória, Outros, Transferência Bancária, Cupom, Braspag, Pagamento na Retirada ou PIX)."
+                                },
+                                "parcelas": {
+                                  "type": "integer",
+                                  "description": "Número de parcelas do pagamento."
+                                }
+                              },
+                              "required": [
+                                "sequencia",
+                                "data",
+                                "valor",
+                                "status",
+                                "forma",
+                                "parcelas"
+                              ]
+                            },
+                            "description": "Array/Lista contendo os pagamentos deste pedido."
+                          },
+                          "pedidos_carrinho": {
+                            "type": "null",
+                            "description": "Para casos de pedidos **Mercado Livre**, retornará os pedidos que estão presentes no mesmo carrinho."
+                          },
+                          "plataforma_pai_id": {
+                            "type": "null",
+                            "description": "Para casos de plataforma que são filhas de outra plataforma, retornará o ID da plataforma pai."
+                          },
+                          "tipo_operacao": {
+                            "type": "string",
+                            "description": "Tipo de operação do pedido."
+                          },
+                          "plataforma": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "description": "ID da plataforma."
+                              },
+                              "nome": {
+                                "type": "string",
+                                "description": "Nome/Identificação da plataforma."
+                              },
+                              "intermediador_cnpj": {
+                                "type": "string",
+                                "description": "CNPJ intermediador da plataforma."
+                              },
+                              "intermediador_identificacao_loja": {
+                                "type": "string",
+                                "description": "Identficação intermediador da plataforma."
+                              },
+                              "loja": {
+                                "type": "string",
+                                "description": "Nome da loja na plataforma."
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nome",
+                              "intermediador_cnpj",
+                              "intermediador_identificacao_loja",
+                              "loja"
+                            ],
+                            "description": "Dados da plataforma do pedido."
+                          },
+                          "comprador": {
+                            "type": "object",
+                            "properties": {
+                              "apelido": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Apelido do comprador."
+                              },
+                              "nome": {
+                                "type": "string",
+                                "description": "Nome do comprador."
+                              },
+                              "documento": {
+                                "type": "string",
+                                "description": "Documento do comprador."
+                              },
+                              "rg_ie": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Inscrição Estadual do comprador."
+                              },
+                              "endereco": {
+                                "type": "string",
+                                "description": "Endereço do comprador."
+                              },
+                              "numero": {
+                                "type": "string",
+                                "description": "Número do endereço do comprador."
+                              },
+                              "bairro": {
+                                "type": "string",
+                                "description": "Bairro do endereço do comprador."
+                              },
+                              "complemento": {
+                                "type": "string",
+                                "description": "Complemento do endereço do comprador."
+                              },
+                              "cidade": {
+                                "type": "string",
+                                "description": "Cidade do endereço do comprador."
+                              },
+                              "uf": {
+                                "type": "string",
+                                "description": "UF (Sigla) do endereço do comprador."
+                              },
+                              "pais": {
+                                "type": "string",
+                                "description": "País do endereço do comprador."
+                              },
+                              "cep": {
+                                "type": "string",
+                                "description": "CEP do endereço do comprador."
+                              },
+                              "email": {
+                                "type": "null",
+                                "description": "E-mail do comprador."
+                              },
+                              "fone": {
+                                "type": "null",
+                                "description": "Telefone fixo do comprador."
+                              },
+                              "celular": {
+                                "type": "null",
+                                "description": "Celular do comprador."
+                              }
+                            },
+                            "required": [
+                              "nome",
+                              "documento",
+                              "endereco",
+                              "numero",
+                              "bairro",
+                              "complemento",
+                              "cidade",
+                              "uf",
+                              "pais",
+                              "cep"
+                            ],
+                            "description": "Dados do comprador."
+                          },
+                          "entrega": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "ID da entrega."
+                              },
+                              "nome": {
+                                "type": "string",
+                                "description": "Nome da entrega."
+                              },
+                              "endereco": {
+                                "type": "string",
+                                "description": "Endereço da entrega."
+                              },
+                              "numero": {
+                                "type": "string",
+                                "description": "Número da entrega."
+                              },
+                              "bairro": {
+                                "type": "string",
+                                "description": "Bairro da entrega."
+                              },
+                              "complemento": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Complemento da entrega."
+                              },
+                              "cidade": {
+                                "type": "string",
+                                "description": "Cidade da entrega."
+                              },
+                              "uf": {
+                                "type": "string",
+                                "description": "UF (Sigla) da entrega."
+                              },
+                              "cep": {
+                                "type": "string",
+                                "description": "CEP da entrega."
+                              },
+                              "email": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "E-mail da entrega."
+                              },
+                              "fone": {
+                                "type": "null",
+                                "description": "Telefone/Celular da entrega."
+                              },
+                              "forma_envio": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Forma de envio da entrega."
+                              },
+                              "transportadora": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Transportadora da entrega."
+                              },
+                              "codigo_rastreio": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Código de rastreio da entrega."
+                              },
+                              "programa_envio": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Programa de envio associado a entrega."
+                              },
+                              "limite_entrega": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Data limite para entrega (YYYY-MM-DD)"
+                              },
+                              "previsao_liberacao_etiqueta": {
+                                "type": "null",
+                                "description": "Data de previsão da liberação de etiqueta para envio. (YYYY-MM-DD H:i:s)"
+                              },
+                              "limite_expedicao": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Data limite para expedição (YYYY-MM-DD)"
+                              },
+                              "comissao_frete": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Comissão de frete da entrega."
+                              },
+                              "cotacao": {
+                                "type": "null",
+                                "description": "Cotação da entrega."
+                              },
+                              "dados_enviados_erp": {
+                                "type": "object",
+                                "properties": {
+                                  "ie": {
+                                    "type": "string"
+                                  },
+                                  "nf": {
+                                    "type": "string"
+                                  },
+                                  "data": {
+                                    "type": "string"
+                                  },
+                                  "erro": {
+                                    "type": "null"
+                                  },
+                                  "chave": {
+                                    "type": "string"
+                                  },
+                                  "serie": {
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "volume": {
+                                    "type": "string"
+                                  },
+                                  "especie": {
+                                    "type": "null"
+                                  },
+                                  "horario": {
+                                    "type": "string"
+                                  },
+                                  "etiqueta": {
+                                    "type": "null"
+                                  },
+                                  "rastreio": {
+                                    "type": "string"
+                                  },
+                                  "cancelado": {
+                                    "type": "boolean"
+                                  },
+                                  "atualizado": {
+                                    "type": "integer"
+                                  },
+                                  "forma_envio": {
+                                    "type": "string"
+                                  },
+                                  "rastreioURL": {
+                                    "type": "string"
+                                  },
+                                  "produto_cfop": {
+                                    "type": "string"
+                                  },
+                                  "horario_update": {
+                                    "type": "string"
+                                  },
+                                  "transportadora": {
+                                    "type": "string"
+                                  },
+                                  "previsao_entrega": {
+                                    "type": "string"
+                                  },
+                                  "envia_status_proprio": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "ie",
+                                  "nf",
+                                  "data",
+                                  "erro",
+                                  "chave",
+                                  "serie",
+                                  "status",
+                                  "volume",
+                                  "especie",
+                                  "horario",
+                                  "etiqueta",
+                                  "rastreio",
+                                  "cancelado",
+                                  "atualizado",
+                                  "forma_envio",
+                                  "rastreioURL",
+                                  "produto_cfop",
+                                  "horario_update",
+                                  "transportadora",
+                                  "previsao_entrega",
+                                  "envia_status_proprio"
+                                ],
+                                "description": "Dados de envio do pedido."
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nome",
+                              "endereco",
+                              "numero",
+                              "bairro",
+                              "cidade",
+                              "uf",
+                              "cep",
+                              "fone",
+                              "previsao_liberacao_etiqueta",
+                              "cotacao",
+                              "dados_enviados_erp"
+                            ],
+                            "description": "Dados da entrega."
+                          },
+                          "faturamento": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "nf": {
+                                  "type": "string",
+                                  "description": "Numero da Nota Fiscal."
+                                },
+                                "chave": {
+                                  "type": "string",
+                                  "description": "Chave da Nota Fiscal."
+                                },
+                                "serie": {
+                                  "type": "integer",
+                                  "description": "Seria da Nota Fiscal."
+                                },
+                                "emissao": {
+                                  "type": "string",
+                                  "description": "Data de emissão da Nota Fiscal."
+                                },
+                                "url_xml": {
+                                  "type": "string",
+                                  "description": "Url para acessar o XML da Nota Fiscal (Caso emitida pelo Shopping de Preços)."
+                                },
+                                "url_pdf": {
+                                  "type": "string",
+                                  "description": "Url para acessar a DANFE da Nota Fiscal em PDF(Caso emitida pelo Shopping de Preços)."
+                                }
+                              }
+                            },
+                            "description": "Array/Lista de faturamento do pedido."
+                          },
+                          "dropshipping": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Array/Lista do dropshipping associado ao pedido."
+                          }
+                        },
+                        "required": [
+                          "integracao_id",
+                          "pedido_id",
+                          "vendedor_id",
+                          "status",
+                          "ultima_atualizacao",
+                          "data_pedido",
+                          "pais_origem_pedido",
+                          "nf_plataforma",
+                          "produtos",
+                          "pagamentos",
+                          "tipo_operacao",
+                          "plataforma",
+                          "comprador"
+                        ]
+                      },
+                      "description": "Array/Lista com os registros retornados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "integracao_id": 600000,
+                      "observacoes": "",
+                      "pedido_id": "20000600000",
+                      "tipo_me": "me2",
+                      "carrinho_ml": null,
+                      "data_pedido": "2025-00-00 18:00:00",
+                      "ultima_atualizacao": "2025-00-00 18:00:00",
+                      "status": "Entregue",
+                      "situacao_personalizada_id": 1,
+                      "situacao_personalizada_nome": "Pedido Ativo",
+                      "vendedor_id": 4200000,
+                      "token": "0aa0a0a0a0a0a0a0a0a0a0",
+                      "pais_origem_pedido": "BR",
+                      "moeda": "R$",
+                      "moeda_cotacao_reais": null,
+                      "entrega_cotacao": null,
+                      "faturamento_horario": "2025-00-00 18:00:00",
+                      "nf_plataforma": "",
+                      "total_sem_frete": 380.88,
+                      "total_frete": 0,
+                      "total_desconto": 0,
+                      "total_cupom": 0,
+                      "total_acrescimo": 0,
+                      "total_pedido": 380.88,
+                      "produtos": [
+                        {
+                          "sequencia": 1,
+                          "sku": "109005",
+                          "sku_erp": "109005",
+                          "numero_serial": null,
+                          "mlb": "MLB0000000000",
+                          "foto": "https://www.google.com.br",
+                          "ean": "",
+                          "variacao_id": 182049415825,
+                          "descricao": "Kit 10 Barras Rodape De Poliestireno Frisado 10 Cm Altura",
+                          "descricao_variacao": "Cor: Branco Liso",
+                          "observacao": "",
+                          "qtde": 1,
+                          "valor_unitario": 380.88,
+                          "desconto": 0,
+                          "valor_total": 380.88,
+                          "tarifa_venda": 62.85,
+                          "percentual_comissao": 16.5,
+                          "tipo_anuncio": "Premium",
+                          "embalagem_presente": false,
+                          "kit": false,
+                          "itens_kit": [],
+                          "dropshipping": [],
+                          "dimensoes": {
+                            "altura": null,
+                            "largura": null,
+                            "comprimento": null,
+                            "peso": null
+                          }
+                        }
+                      ],
+                      "pagamentos": [
+                        {
+                          "sequencia": 1,
+                          "data": "2025-00-00 18:00:00",
+                          "valor": 380.88,
+                          "status": "Aprovado",
+                          "bandeira": "Visa",
+                          "operadora": "Mercado Pago",
+                          "identificacao": "1010011010010",
+                          "codigo_transacao": null,
+                          "forma": "Cartão Crédito",
+                          "parcelas": 11
+                        }
+                      ],
+                      "pedidos_carrinho": null,
+                      "plataforma_pai_id": null,
+                      "tipo_operacao": "Venda",
+                      "plataforma": {
+                        "id": 1,
+                        "nome": "Mercado Livre",
+                        "intermediador_cnpj": "10101010101010",
+                        "intermediador_identificacao_loja": "10101010101010",
+                        "loja": "Mercado Livre"
+                      },
+                      "comprador": {
+                        "apelido": "TESTE",
+                        "nome": "TESTE DO SHOPPING",
+                        "documento": "55555555555",
+                        "rg_ie": "",
+                        "endereco": "Rua Andrade Neves",
+                        "numero": "10",
+                        "bairro": "CENTRO",
+                        "complemento": "",
+                        "cidade": "São Paulo",
+                        "uf": "SP",
+                        "pais": "BRASIL",
+                        "cep": "02022555",
+                        "email": null,
+                        "fone": null,
+                        "celular": null
+                      },
+                      "entrega": {
+                        "id": "44613105897",
+                        "nome": "TESTE ENTREGA",
+                        "endereco": "Rua Andrade Neves",
+                        "numero": "10",
+                        "bairro": "CENTRO",
+                        "complemento": "",
+                        "cidade": "São Paulo",
+                        "uf": "SP",
+                        "cep": "0000000",
+                        "email": "",
+                        "fone": null,
+                        "forma_envio": "Normal",
+                        "transportadora": "Mercado Envios",
+                        "codigo_rastreio": "MEL00000000",
+                        "programa_envio": "cross_docking",
+                        "limite_entrega": "2025-03-22",
+                        "previsao_liberacao_etiqueta": null,
+                        "limite_expedicao": "2025-00-00 18:00:00",
+                        "comissao_frete": 44.45,
+                        "cotacao": null,
+                        "dados_enviados_erp": {
+                          "ie": "",
+                          "nf": "302920",
+                          "data": "16/03/2025",
+                          "erro": null,
+                          "chave": "400000000000000000000000000",
+                          "serie": "1",
+                          "status": "FATURADO",
+                          "volume": "1",
+                          "especie": null,
+                          "horario": "2025/00/00 18:00:00",
+                          "etiqueta": null,
+                          "rastreio": "",
+                          "cancelado": false,
+                          "atualizado": 1,
+                          "forma_envio": "TRANSPORTADORA",
+                          "rastreioURL": "",
+                          "produto_cfop": "",
+                          "horario_update": "2025/00/00 18:00:00",
+                          "transportadora": "MERCADO ENVIOS",
+                          "previsao_entrega": "2025/03/24",
+                          "envia_status_proprio": false
+                        }
+                      },
+                      "faturamento": [
+                        {
+                          "nf": "302920",
+                          "chave": "4000000000000000000000000000000000000",
+                          "serie": 1,
+                          "emissao": "2025/00/00 18:00:00",
+                          "url_xml": "https://apiv2.shoppingdeprecos.com.br/pedidos/xml/0101010110101010101010101010",
+                          "url_pdf": "https://apiv2.shoppingdeprecos.com.br/pedidos/pdf/0101010110101010101010101010"
+                        }
+                      ],
+                      "dropshipping": []
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/situacoes-personalizadas": {
+      "get": {
+        "summary": "Listar Situações Personalizadas",
+        "deprecated": false,
+        "description": "## Baixa as situações personalizadas dos pedidos.\n#### Este método é responsável por informar todas as situações/status personalizados dos pedidos.\n\n:::highlight blue 💡\n**OBSERVAÇÃO:** A situação personalizada é só um campo gerencial, esse campo não é refletido para os marketplaces ou e-commerces.\n:::",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "quantidade": {
+                      "type": "integer"
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "situacao": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "id": 1,
+                      "situacao": "Pedido Ativo"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/ml/pedidos/{pedidoID}/etiquetas/{formato}": {
+      "get": {
+        "summary": "Etiquetas do Mercado Livre",
+        "deprecated": false,
+        "description": "## Etiquetas do Mercado Livre\n#### Este método retornará a etiqueta de um pedido do Mercado Livre no formato informado.\n\n\n:::highlight blue 💡\n**OBSERVAÇÃO:** Se o modelo solicitado for **PDF**, o retorno será um arquivo **PDF** contendo a etiqueta e a **PLP** juntos. Já se o modelo solicitado for **ZPL**, este recurso retorna um arquivo **ZIP** que inclui um **PDF** com o **PLP** e um arquivo TXT da Zebra Printer.\n:::",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "pedidoID",
+            "in": "path",
+            "description": "ID do pedido do Mercado Livre na qual deseja a etiqueta.",
+            "required": true,
+            "example": "0000000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "formato",
+            "in": "path",
+            "description": "O formato do arquivo da etiqueta, podendo ser dos tipos: **zpl2** ou **pdf**.",
+            "required": true,
+            "example": "zpl2",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "docto",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "required": [
+                    "01JWGHAP8VZX46Q9PRFX2SZFQC"
+                  ]
+                },
+                "example": {}
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/pedidos/{pedidoID}/integracao/{IntegracaoID}/aceitePedidoCompra": {
+      "post": {
+        "summary": "Aceite Pedido Compra Amazon - Vendor",
+        "deprecated": false,
+        "description": "#### Método responsável por realizar o Aceite de um pedido de Compra realizado para o Marketplace ao Fornecedor",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "pedidoID",
+            "in": "path",
+            "description": "Código/ID do Pedido da integração no Shopping de Preços.",
+            "required": true,
+            "example": "MRP00000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IntegracaoID",
+            "in": "path",
+            "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+            "required": true,
+            "example": "1000000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sku": {
+                      "type": "string",
+                      "description": "SKU do Item no Marketplace"
+                    },
+                    "quantidade_aceita": {
+                      "type": "integer",
+                      "description": "Quantidade de itens que serão aceitas no pedido de compra. Caso não seja aceito o item, enviar 0"
+                    }
+                  },
+                  "required": [
+                    "sku",
+                    "quantidade_aceita"
+                  ]
+                }
+              },
+              "example": [
+                {
+                  "sku": "B0D4R6FFF3",
+                  "quantidade_aceita": 10
+                },
+                {
+                  "sku": "XYSS5525",
+                  "quantidade_aceita": 0
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "example": {
+                  "status": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/baixarXmlNF": {
+      "post": {
+        "summary": "Recuperação dos XMLs das Notas Fiscais dos Pedidos",
+        "deprecated": false,
+        "description": "## Realiza a recuperação do XML das NFes de um pedido ou vários.\n#### Este método realiza a busca de todos os XMLs das NFes presentes em um pedido.\n\n:::highlight blue 💡\n**OBSERVAÇÃO:** É possível realizar a recuperação de vários pedidos em uma única requisição, informando cada um deles separadamente por vírgula, como por exemplo: 12345,6789,101112.\n:::",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "name": "X-Client",
+            "in": "header",
+            "description": "Token fornecido pelo Shopping de Preços - [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/introducao)",
+            "required": true,
+            "example": "xxxxxxxxxxxxx",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/json",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "application/gzip",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "Basic *****************",
+            "schema": {
+              "type": "string",
+              "default": "Basic *****************"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "IntegracaoID": {
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-integracoes)",
+                    "example": "111111",
+                    "type": "string"
+                  },
+                  "PlataformaID": {
+                    "description": "Código da integração no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-plataformas)",
+                    "example": "1",
+                    "type": "string"
+                  },
+                  "Pedidos": {
+                    "description": "IDs dos pedidos no Shopping de Preços. [Saiba mais clicando aqui](https://apidoc.shoppingdeprecos.com.br/lista-pedidos-atualizados)",
+                    "example": "1,2,3,4,5",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "IntegracaoID",
+                  "PlataformaID",
+                  "Pedidos"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                    },
+                    "quantidade": {
+                      "type": "integer",
+                      "description": "Quantidade dos registros retornados."
+                    },
+                    "registros": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "boolean",
+                            "description": "Para caso de sucesso, retornará **true**, e para caso de erros, retornará **false**."
+                          },
+                          "PlataformaID": {
+                            "type": "integer",
+                            "description": "ID da plataforma relacionada a integração em que está o pedido."
+                          },
+                          "Tempo": {
+                            "type": "number",
+                            "description": "Tempo de execução na busca dos XMLs."
+                          },
+                          "OutrasNFs": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "description": "ID/Identificador da NFe."
+                                },
+                                "origem": {
+                                  "type": "string",
+                                  "description": "Origem de onde a NFe retornou (Ex: ml, magalu)."
+                                },
+                                "tipo": {
+                                  "type": "string",
+                                  "description": "Tipo da NFe no marketplace (Ex: Simbólica, retorno de depósito, etc)."
+                                },
+                                "descricao": {
+                                  "type": "string",
+                                  "description": "Descrição do tipo da NFe no marketplace (Ex: Retorno Simbólico de Depósito Temporário)."
+                                },
+                                "xml": {
+                                  "type": "string",
+                                  "description": "XML da NFe em formato Base64."
+                                }
+                              },
+                              "required": [
+                                "xml",
+                                "descricao",
+                                "tipo",
+                                "id",
+                                "origem"
+                              ]
+                            },
+                            "description": "Array/Lista contendo as demais NFes atreladas ao pedido."
+                          },
+                          "PedidoID": {
+                            "type": "string",
+                            "description": "ID do pedido no marketplace dentro do Shopping de Preços."
+                          },
+                          "body": {
+                            "type": "string",
+                            "description": "NFe de venda em formato Base64."
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "PlataformaID",
+                          "Tempo",
+                          "OutrasNFs",
+                          "PedidoID",
+                          "body"
+                        ]
+                      },
+                      "description": "Array/Lista de quantidade dos registros retornados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "quantidade",
+                    "registros"
+                  ]
+                },
+                "example": {
+                  "status": true,
+                  "quantidade": 1,
+                  "registros": [
+                    {
+                      "status": true,
+                      "PlataformaID": 1,
+                      "Tempo": 0.51348185539246,
+                      "OutrasNFs": [
+                        {
+                          "id": "00000000",
+                          "origem": "ml",
+                          "tipo": "symbolic_inbound_return",
+                          "descricao": "Descrição do tipo da nota",
+                          "xml": "PD94bWwgdm.....VZT48L25mZVByb2M+"
+                        }
+                      ],
+                      "PedidoID": "2000000000000000",
+                      "body": "PD94bWwgdmVyc....48L25mZVByb2M+"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    }
+  },
+  "webhooks": {},
+  "components": {
+    "schemas": {
+      "Modelo Cadastro de Produto Simples": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "SKU": {
+              "type": "string",
+              "description": "Código/SKU do Produto."
+            },
+            "Titulo": {
+              "type": "string",
+              "description": "Titulo do Produto."
+            },
+            "Marca": {
+              "type": "string",
+              "description": "Marca do Produto."
+            },
+            "Categoria": {
+              "type": "string",
+              "description": "Categoria do Produto."
+            },
+            "Descricao": {
+              "type": "string",
+              "description": "Descrição do Produto."
+            },
+            "Preco": {
+              "type": "string",
+              "description": "Preço do Produto."
+            },
+            "PrecoPromocao": {
+              "type": "string",
+              "description": "Preço promocional do Produto."
+            },
+            "PrecoCusto": {
+              "type": "string",
+              "description": "Preço de custo do Produto."
+            },
+            "InicioPromocao": {
+              "type": "string",
+              "description": "Data Inicial da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "TerminoPromocao": {
+              "type": "string",
+              "description": "Data Final da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "Estoque": {
+              "type": "string",
+              "description": "Estoque do Produto."
+            },
+            "Video": {
+              "type": "string",
+              "description": "Url do video no Youtube."
+            },
+            "Garantia": {
+              "type": "string",
+              "description": "Garantia do Produto (Em dias)."
+            },
+            "Fabricante": {
+              "type": "string",
+              "description": "Fabricante do Produto."
+            },
+            "LarguraCm": {
+              "type": "string",
+              "description": "Largura do Produto (em Centímetros)."
+            },
+            "AlturaCm": {
+              "type": "string",
+              "description": "Altura do Produto (em Centímetros)."
+            },
+            "ComprimentoCm": {
+              "type": "string",
+              "description": "Comprimento do Produto (em Centímetros)."
+            },
+            "PesoKg": {
+              "type": "string",
+              "description": "Peso do Produto (em Kg)."
+            },
+            "LarguraEmbalagemCm": {
+              "type": "string",
+              "description": "Largura Da Embalagem do Produto (em Centímetros)."
+            },
+            "AlturaEmbalagemCm": {
+              "type": "string",
+              "description": "Altura Da Embalagem do Produto (em Centímetros)."
+            },
+            "ComprimentoEmbalagemCm": {
+              "type": "string",
+              "description": "Comprimento Da Embalagem do Produto (em Centímetros)."
+            },
+            "PesoEmbalagemKg": {
+              "type": "string",
+              "description": "Peso da Embalagem do Produto (em Kg)."
+            },
+            "DescricaoCurta": {
+              "type": "string"
+            },
+            "MetaTag": {
+              "type": "string"
+            },
+            "MetaTitle": {
+              "type": "string"
+            },
+            "MetaDescription": {
+              "type": "string"
+            },
+            "Atributos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "description": "Ex: Tipo de Material"
+                  },
+                  "valor": {
+                    "type": "string",
+                    "description": "Ex: Cerâmica"
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "valor"
+                ]
+              },
+              "description": "Atributos específicos do produto. Não engloba variações."
+            },
+            "Imagens": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "Link das imagens hospedadas em um servidor."
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            },
+            "CEST": {
+              "type": "string",
+              "description": "CEST (Código Especificador da Substituição Tributária) do produto."
+            },
+            "Origem": {
+              "type": "integer",
+              "description": "Origem tributária do produto."
+            },
+            "UnidadeMedida": {
+              "type": "string",
+              "description": "Unidade de medida do produto."
+            },
+            "CSOSN": {
+              "type": "string",
+              "description": "CSOSN (Código de situação da operação no simples nacional) do produto."
+            },
+            "NCM": {
+              "type": "string",
+              "description": "NCM (Nomenclatura Comum do Mercosul) do produto"
+            },
+            "EAN": {
+              "type": "string",
+              "description": "Código de barras do Produto."
+            }
+          },
+          "required": [
+            "SKU",
+            "Titulo"
+          ]
+        }
+      },
+      "Modelo Cadastro de Produto Com Variações": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "SKU": {
+              "type": "string",
+              "description": "Código/SKU do Produto."
+            },
+            "Titulo": {
+              "type": "string",
+              "description": "Titulo do Produto."
+            },
+            "Marca": {
+              "type": "string",
+              "description": "Marca do Produto."
+            },
+            "Categoria": {
+              "type": "string",
+              "description": "Categoria do Produto."
+            },
+            "Descricao": {
+              "type": "string",
+              "description": "Descrição do Produto."
+            },
+            "Preco": {
+              "type": "string",
+              "description": "Preço do Produto."
+            },
+            "PrecoPromocao": {
+              "type": "string",
+              "description": "Preço promocional do Produto."
+            },
+            "PrecoCusto": {
+              "type": "string",
+              "description": "Preço de custo do Produto."
+            },
+            "InicioPromocao": {
+              "type": "string",
+              "description": "Data Inicial da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "TerminoPromocao": {
+              "type": "string",
+              "description": "Data Final da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "Estoque": {
+              "type": "string",
+              "description": "Estoque do Produto."
+            },
+            "Video": {
+              "type": "string",
+              "description": "Url do video no Youtube."
+            },
+            "Garantia": {
+              "type": "string",
+              "description": "Garantia do Produto (Em dias)."
+            },
+            "Fabricante": {
+              "type": "string",
+              "description": "Fabricante do Produto."
+            },
+            "LarguraCm": {
+              "type": "string",
+              "description": "Largura do Produto (em Centímetros)."
+            },
+            "AlturaCm": {
+              "type": "string",
+              "description": "Altura do Produto (em Centímetros)."
+            },
+            "ComprimentoCm": {
+              "type": "string",
+              "description": "Comprimento do Produto (em Centímetros)."
+            },
+            "PesoKg": {
+              "type": "string",
+              "description": "Peso do Produto (em Kg)."
+            },
+            "LarguraEmbalagemCm": {
+              "type": "string",
+              "description": "Largura Da Embalagem do Produto (em Centímetros)."
+            },
+            "AlturaEmbalagemCm": {
+              "type": "string",
+              "description": "Altura Da Embalagem do Produto (em Centímetros)."
+            },
+            "ComprimentoEmbalagemCm": {
+              "type": "string",
+              "description": "Comprimento Da Embalagem do Produto (em Centímetros)."
+            },
+            "PesoEmbalagemKg": {
+              "type": "string",
+              "description": "Peso da Embalagem do Produto (em Kg)."
+            },
+            "DescricaoCurta": {
+              "type": "string"
+            },
+            "MetaTag": {
+              "type": "string"
+            },
+            "MetaTitle": {
+              "type": "string"
+            },
+            "MetaDescription": {
+              "type": "string"
+            },
+            "Imagens": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "Atributos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "description": "Ex: Tipo de Material"
+                  },
+                  "valor": {
+                    "type": "string",
+                    "description": "Ex: Cerâmica"
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "valor"
+                ]
+              },
+              "description": "Atributos específicos do produto. Não engloba variações."
+            },
+            "Variacoes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ean": {
+                    "type": "string",
+                    "description": "Código de barras da Variação."
+                  },
+                  "sku": {
+                    "type": "string",
+                    "description": "Código/SKU da Variação."
+                  },
+                  "preco": {
+                    "type": "string",
+                    "description": "Preço da Variação."
+                  },
+                  "PrecoCusto": {
+                    "type": "integer",
+                    "description": "Preço de custo da Variação."
+                  },
+                  "estoque": {
+                    "type": "string",
+                    "description": "Estoque da Variação."
+                  },
+                  "LarguraCm": {
+                    "type": "string",
+                    "description": "Largura da Variação (Em cm)."
+                  },
+                  "AlturaCm": {
+                    "type": "string",
+                    "description": "Altura da Variação (Em cm)."
+                  },
+                  "ComprimentoCm": {
+                    "type": "string",
+                    "description": "Comprimento da Variação (Em cm)."
+                  },
+                  "PesoKg": {
+                    "type": "string",
+                    "description": "Peso da Variação (Em Kg)."
+                  },
+                  "Imagens": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "description": "Link das imagens hospedadas em um servidor."
+                        }
+                      }
+                    }
+                  },
+                  "Atributos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "tipo": {
+                          "type": "string",
+                          "description": "Tipo do atributo na plataforma/marketplace (Ex: \"COR\")"
+                        },
+                        "valor": {
+                          "type": "string",
+                          "description": "Valor do atributo na plataforma/marketplace(Ex: \"AZUL\")"
+                        }
+                      },
+                      "required": [
+                        "tipo",
+                        "valor"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "sku",
+                  "Atributos"
+                ]
+              }
+            },
+            "CEST": {
+              "type": "string",
+              "description": "CEST (Código Especificador da Substituição Tributária) do produto."
+            },
+            "Origem": {
+              "type": "integer",
+              "description": "Origem tributária do produto."
+            },
+            "UnidadeMedida": {
+              "type": "string",
+              "description": "Unidade de medida do produto."
+            },
+            "CSOSN": {
+              "type": "string",
+              "description": "CSOSN (Código de situação da operação no simples nacional) do produto."
+            },
+            "NCM": {
+              "type": "string",
+              "description": "NCM (Nomenclatura Comum do Mercosul) do produto."
+            },
+            "EAN": {
+              "type": "string",
+              "description": "Código de barras do Produto."
+            }
+          },
+          "required": [
+            "SKU",
+            "Titulo",
+            "Variacoes"
+          ]
+        }
+      },
+      "Modelo Produto Kit": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "SKU": {
+              "type": "string",
+              "description": "Código/SKU do Produto."
+            },
+            "Titulo": {
+              "type": "string",
+              "description": "Titulo do Produto."
+            },
+            "Marca": {
+              "type": "string",
+              "description": "Marca do Produto."
+            },
+            "Categoria": {
+              "type": "string",
+              "description": "Categoria do Produto."
+            },
+            "Descricao": {
+              "type": "string",
+              "description": "Descrição do Produto."
+            },
+            "Preco": {
+              "type": "string",
+              "description": "Preço do Produto."
+            },
+            "PrecoPromocao": {
+              "type": "string",
+              "description": "Preço promocional do Produto."
+            },
+            "PrecoCusto": {
+              "type": "string",
+              "description": "Preço de custo do Produto."
+            },
+            "InicioPromocao": {
+              "type": "string",
+              "description": "Data Inicial da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "TerminoPromocao": {
+              "type": "string",
+              "description": "Data Final da promoção (AAAA-MM-DD HH:MM:SS)."
+            },
+            "Estoque": {
+              "type": "string",
+              "description": "Estoque do Produto."
+            },
+            "Video": {
+              "type": "string",
+              "description": "Url do video no Youtube."
+            },
+            "Garantia": {
+              "type": "string",
+              "description": "Garantia do Produto (Em dias)."
+            },
+            "Fabricante": {
+              "type": "string",
+              "description": "Fabricante do Produto."
+            },
+            "LarguraCm": {
+              "type": "string",
+              "description": "Largura do Produto (em Centímetros)."
+            },
+            "AlturaCm": {
+              "type": "string",
+              "description": "Altura do Produto (em Centímetros)."
+            },
+            "ComprimentoCm": {
+              "type": "string",
+              "description": "Comprimento do Produto (em Centímetros)."
+            },
+            "PesoKg": {
+              "type": "string",
+              "description": "Peso do Produto (em Kg)."
+            },
+            "LarguraEmbalagemCm": {
+              "type": "string",
+              "description": "Largura Da Embalagem do Produto (em Centímetros)."
+            },
+            "AlturaEmbalagemCm": {
+              "type": "string",
+              "description": "Altura Da Embalagem do Produto (em Centímetros)."
+            },
+            "ComprimentoEmbalagemCm": {
+              "type": "string",
+              "description": "Comprimento Da Embalagem do Produto (em Centímetros)."
+            },
+            "PesoEmbalagemKg": {
+              "type": "string",
+              "description": "Peso da Embalagem do Produto (em Kg)."
+            },
+            "DescricaoCurta": {
+              "type": "string"
+            },
+            "MetaTag": {
+              "type": "string"
+            },
+            "MetaTitle": {
+              "type": "string"
+            },
+            "MetaDescription": {
+              "type": "string"
+            },
+            "CEST": {
+              "type": "string",
+              "description": "CEST (Código Especificador da Substituição Tributária) do produto."
+            },
+            "Origem": {
+              "type": "integer",
+              "description": "Origem tributária do produto."
+            },
+            "UnidadeMedida": {
+              "type": "string",
+              "description": "Unidade de medida do produto."
+            },
+            "CSOSN": {
+              "type": "string",
+              "description": "CSOSN (Código de situação da operação no simples nacional) do produto."
+            },
+            "NCM": {
+              "type": "string",
+              "description": "NCM (Nomenclatura Comum do Mercosul) do produto."
+            },
+            "EAN": {
+              "type": "string",
+              "description": "Código de barras do produto."
+            },
+            "Atributos": {
+              "type": "object",
+              "properties": {
+                "tipo": {
+                  "type": "string",
+                  "description": "Ex: Tipo de Material"
+                },
+                "valor": {
+                  "type": "string",
+                  "description": "Ex: Cerâmica"
+                }
+              },
+              "description": "Atributos específicos do produto. Não engloba variações.",
+              "required": [
+                "valor",
+                "tipo"
+              ]
+            },
+            "ItensKit": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sku": {
+                    "type": "string",
+                    "description": "SKU do componente do KIT"
+                  },
+                  "qtde_itens": {
+                    "type": "integer",
+                    "description": "Quantidade de itens do componente do KIT"
+                  },
+                  "percentual_valor_kit": {
+                    "type": "integer",
+                    "description": "Porcentagem do valor do Item no Kit - (Somatória deve totalizar 100%)"
+                  }
+                },
+                "required": [
+                  "sku",
+                  "qtde_itens",
+                  "percentual_valor_kit"
+                ]
+              }
+            },
+            "Imagens": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "Link das imagens hospedadas em um servidor."
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            }
+          },
+          "required": [
+            "SKU",
+            "Titulo",
+            "ItensKit"
+          ]
+        }
+      },
+      "Modelo Atualização de Estoque por Produto": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "SKU": {
+              "type": "string",
+              "description": "Código/SKU do Produto"
+            },
+            "Estoque": {
+              "type": "integer",
+              "description": "Estoque do Produto"
+            }
+          },
+          "required": [
+            "SKU",
+            "Estoque"
+          ]
+        }
+      },
+      "Modelo Atualização de Preço por Produto": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "SKU": {
+              "type": "string",
+              "description": "Código/SKU do produto"
+            },
+            "Preco": {
+              "type": "number",
+              "description": "Preço do produto"
+            },
+            "PrecoCusto": {
+              "type": "integer",
+              "description": "Preço de Custo do produto"
+            },
+            "PrecoPromocao": {
+              "type": "number",
+              "description": "Preço Promocional do produto"
+            },
+            "InicioPromocao": {
+              "type": "string",
+              "description": "Data Inicial da promoção (AAAA-MM-DD HH:MM:SS)"
+            },
+            "TerminoPromocao": {
+              "type": "string",
+              "description": "Data Final da promoção (AAAA-MM-DD HH:MM:SS)"
+            }
+          },
+          "required": [
+            "SKU",
+            "Preco"
+          ]
+        }
+      },
+      "Modelo Categoria no envio de produtos para as plataformas": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "ID da categoria na plataforma/marketplace"
+            },
+            "nome": {
+              "type": "string",
+              "description": "Nome da Categoria"
+            }
+          },
+          "required": [
+            "id",
+            "nome"
+          ]
+        }
+      },
+      "Modelo Variações no envio de produtos para as plataformas": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "ProdutoID": {
+              "type": "string",
+              "description": "###### ID do produto interno no Shopping de Preços."
+            },
+            "SKU": {
+              "type": "string",
+              "description": "###### SKU/Identificador do produto no marketplace/integração."
+            },
+            "Atributos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "chave_erp": {
+                    "type": "string",
+                    "description": "Tipo do atributo no Shopping de Preços (Ex: \"COR\")"
+                  },
+                  "valor_erp": {
+                    "type": "string",
+                    "description": "Valor do atributo no Shopping de Preços (Ex: \"AZUL\")"
+                  },
+                  "chave_plataforma": {
+                    "type": "string",
+                    "description": "Tipo do atributo na plataforma/marketplace (Ex: \"COR\")"
+                  },
+                  "valor_plataforma": {
+                    "type": "string",
+                    "description": "Valor do atributo na plataforma/marketplace(Ex: \"AZUL\")"
+                  }
+                },
+                "required": [
+                  "chave_erp",
+                  "valor_erp",
+                  "chave_plataforma",
+                  "valor_plataforma"
+                ]
+              },
+              "description": "###### Array/Lista contendo os atributos da variação."
+            }
+          },
+          "required": [
+            "ProdutoID",
+            "SKU"
+          ]
+        },
+        "title": ""
+      },
+      "Modelo Atributos no envio de produtos para as plataformas": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "categoria": {
+              "type": "string",
+              "description": "Categoria do produto"
+            },
+            "chave_erp": {
+              "type": "string",
+              "description": "Tipo do atributo no Shopping de Preços (Ex: \"COR\")"
+            },
+            "valor_erp": {
+              "type": "string",
+              "description": "Valor do atributo no Shopping de Preços (Ex: \"AZUL\")"
+            },
+            "chave_plataforma": {
+              "type": "string",
+              "description": "Tipo do atributo na plataforma/marketplace (Ex: \"COR\")"
+            },
+            "valor_plataforma": {
+              "type": "string",
+              "description": "Valor do atributo na plataforma/marketplace(Ex: \"AZUL\")"
+            },
+            "atributo_id": {
+              "type": "string",
+              "description": "ID do atributo na plataforma/marketplace"
+            }
+          },
+          "required": [
+            "chave_erp",
+            "valor_erp",
+            "chave_plataforma",
+            "valor_plataforma",
+            "atributo_id"
+          ]
+        }
+      },
+      "Modelo de Envio Estoque para Depositos": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "estoque": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "estoque"
+          ]
+        }
+      }
+    },
+    "responses": {},
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}
