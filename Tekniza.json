@@ -1,742 +1,540 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "title": "Sale Api - Documentação Tecknisa",
-    "description": "A integração tem por objetivo retornar as informações de vendas realizadas no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores de fechamento do dia(Fechamento dos caixas - consolidado).\n\n### **Regras de Execução**\n- A Busca dos dados acontecerá de acordo com filtro de data com limite de intervalo de até 5 dias.\n- Será retornado dados da venda junto a suas informações fiscais e formas de pagamento da venda.\n- Será retornado itens da venda junto a suas informações fiscais.\n- As vendas são ordenadas de acordo com a data de movimentação do caixa. (Considerado abertura de caixa no Sistema Teknisa)\n- Junto as informações da movimentação do dia, será retornado os dados de fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor informado na Sangria de Fechamento do Caixa) - Parâmetro Retail\n- A autenticação para consumo da API será feita através de token enviado no header da requisição.",
-    "version": "0.6.18"
-  },
-  "host": "{{base_url}}",
-  "schemes": [
-    "https",
-    "http"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "securityDefinitions": {
-    "bearerAuth": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header",
-      "description": "Insira o token com o prefixo Bearer (ex: Bearer {token})"
-    }
-  },
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/": {
-      "get": {
-        "summary": "Version",
-        "description": "O endpoint faz uma requisição HTTP GET para retornar os dados de versão da API.",
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "client": {
-                  "type": "string",
-                  "example": "cloud9"
-                },
-                "version": {
-                  "type": "string",
-                  "example": "0.6.18"
-                },
-                "revision": {
-                  "type": "string",
-                  "example": "1"
-                },
-                "date": {
-                  "type": "string",
-                  "example": "24/09/2024 08:30"
-                },
-                "filialCount": {
-                  "type": "integer",
-                  "example": 3
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/getSales": {
-      "post": {
-        "summary": "getSales",
-        "description": "Retorna os detalhes das vendas de acordo com os filtros de data e caixa informados.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "dtInicial",
-                "dtFinal"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string",
-                  "description": "Código de Unidade no sistema Teknisa"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string",
-                  "description": "Código Externo cadastrado para a Filial"
-                },
-                "dtInicial": {
-                  "type": "string",
-                  "description": "Data Inical para consulta (dd/mm/aaaa)"
-                },
-                "dtFinal": {
-                  "type": "string",
-                  "description": "Data Final para consulta (dd/mm/aaaa)"
-                },
-                "posCode": {
-                  "type": "string",
-                  "description": "Código do caixa na Teknisa"
-                },
-                "posOpeningDate": {
-                  "type": "string",
-                  "description": "Data e hora de abertura do caixa"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "dtInicial": "05/05/2024",
-                "dtFinal": "07/05/2024",
-                "posCode": "002",
-                "posOpeningDate": null
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "subsidiaryCode": {
-                    "type": "string"
-                  },
-                  "subsidiaryExtCode": {
-                    "type": "string"
-                  },
-                  "subsidiaryName": {
-                    "type": "string"
-                  },
-                  "sales": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "description": "Objeto contendo os dados da venda, consumidor, payments e itens."
-                    }
-                  },
-                  "unutilized": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/getDayReduction": {
-      "post": {
-        "summary": "getDayReduction",
-        "description": "Retorna os dados de redução do dia (Fechamentos de caixa).",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "dtInicial",
-                "dtFinal"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "dtInicial": {
-                  "type": "string"
-                },
-                "dtFinal": {
-                  "type": "string"
-                },
-                "useFilterStore": {
-                  "type": "boolean"
-                }
-              },
-              "example": {
-                "subsidiaryExtCode": "0001",
-                "dtInicial": "23/09/2024",
-                "dtFinal": "23/09/2024",
-                "useFilterStore": false
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "subsidiaryCode": {
-                    "type": "string"
-                  },
-                  "subsidiaryName": {
-                    "type": "string"
-                  },
-                  "closing": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/getStock": {
-      "post": {
-        "summary": "getStock",
-        "description": "Retorna os produtos a serem retirados do estoque baseados no período especificado.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "dtInicial",
-                "dtFinal"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "dtInicial": {
-                  "type": "string"
-                },
-                "dtFinal": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "subsidiaryExtCode": "0001",
-                "dtInicial": "04/12/2025",
-                "dtFinal": "09/12/2025"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Retorno dos dados de estoque."
-          }
-        }
-      }
-    },
-    "/pos/getDayCloses": {
-      "post": {
-        "summary": "getDayCloses",
-        "description": "Retorna informações gerais dos caixas com status 'Fechado' em uma data.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "date"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "date": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryExtCode": "0001",
-                "date": "27/09/2024"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/pos/getClosingSummary": {
-      "post": {
-        "summary": "getClosingSummary",
-        "description": "Retorna o array com o detalhamento dos fechamentos de caixas, incluindo pagamentos e sangrias de despesa.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "cashierClosingDate": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryExtCode": "0001",
-                "cashierClosingDate": "27/09/2024"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/import/importSale": {
-      "post": {
-        "summary": "importSale",
-        "description": "Permite a importação de vendas para o sistema Teknisa. Suporta a importação de uma venda única ou múltiplas vendas.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "noteNumber": {
-                  "type": "string"
-                },
-                "noteSeries": {
-                  "type": "string"
-                },
-                "chaveSefaz": {
-                  "type": "string"
-                },
-                "xml": {
-                  "type": "string"
-                },
-                "itens": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                },
-                "payments": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Importação concluída."
-          }
-        }
-      }
-    },
-    "/taxes/getProductTaxes": {
-      "post": {
-        "summary": "getProductTaxes",
-        "description": "Permite recuperar informações das taxas/impostos para produtos específicos.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "productsCode": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "subsidiaryExtCode": "0001",
-                "productsCode": [
-                  "9150101000"
-                ]
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/taxes/setProductTaxes": {
-      "post": {
-        "summary": "setProductTaxes",
-        "description": "Permite configurar/cadastrar informações fiscais (impostos) para produtos específicos.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "taxes": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean"
-                },
-                "message": {
-                  "type": "string"
-                },
-                "result": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sale/cancelSale": {
-      "post": {
-        "summary": "cancelSale",
-        "description": "Realiza o cancelamento de uma venda previamente registrada no sistema usando a Chave SEFAZ.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "chaveSefaz",
-                "saleDate"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "chaveSefaz": {
-                  "type": "string"
-                },
-                "saleDate": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "subsidiaryExtCode": "0001",
-                "chaveSefaz": "23251213783221010783650010000000189157614481",
-                "saleDate": "17-12-2025"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean"
-                },
-                "message": {
-                  "type": "string"
-                },
-                "result": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sale/getSaleProducts": {
-      "post": {
-        "summary": "getSaleProducts",
-        "description": "Retorna os produtos e seus complementos de vendas baseados nos filtros de data.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "dtInicial",
-                "dtFinal"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "dtInicial": {
-                  "type": "string"
-                },
-                "dtFinal": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "dtInicial": "06/05/2024",
-                "dtFinal": "06/05/2024"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sale/getXmlsByPeriod": {
-      "post": {
-        "summary": "getXmlsByPeriod",
-        "description": "Recupera os arquivos XML de notas fiscais eletrônicas (NF-e) em um determinado período (compactados em gzip+base64).",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode",
-                "dtInicial",
-                "dtFinal"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "dtInicial": {
-                  "type": "string"
-                },
-                "dtFinal": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "dtInicial": "05/12/2025",
-                "dtFinal": "10/12/2025"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean"
-                },
-                "message": {
-                  "type": "string"
-                },
-                "result": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/getSalesByCategory": {
-      "post": {
-        "summary": "getSalesByCategory",
-        "description": "Recupera dados de vendas organizados por categoria para uma filial especificada (ex. vendas de salão, delivery).",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "subsidiaryCode"
-              ],
-              "properties": {
-                "subsidiaryCode": {
-                  "type": "string"
-                },
-                "subsidiaryExtCode": {
-                  "type": "string"
-                },
-                "page": {
-                  "type": "integer"
-                },
-                "perPage": {
-                  "type": "integer"
-                },
-                "turnId": {
-                  "type": "string"
-                },
-                "itemCategoryLevel": {
-                  "type": "string"
-                }
-              },
-              "example": {
-                "subsidiaryCode": "0001",
-                "subsidiaryExtCode": "0001",
-                "page": null,
-                "perPage": null,
-                "turnId": null,
-                "itemCategoryLevel": null
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sucesso",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+swagger: '2.0'
+info:
+  title: Sale Api - Documentação Tecknisa
+  description: >-
+    A integração tem por objetivo retornar as informações de vendas realizadas
+    no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores
+    de fechamento do dia(Fechamento dos caixas - consolidado).
+
+
+    ### **Regras de Execução**
+
+    - A Busca dos dados acontecerá de acordo com filtro de data com limite de
+    intervalo de até 5 dias.
+
+    - Será retornado dados da venda junto a suas informações fiscais e formas de
+    pagamento da venda.
+
+    - Será retornado itens da venda junto a suas informações fiscais.
+
+    - As vendas são ordenadas de acordo com a data de movimentação do caixa.
+    (Considerado abertura de caixa no Sistema Teknisa)
+
+    - Junto as informações da movimentação do dia, será retornado os dados de
+    fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor
+    informado na Sangria de Fechamento do Caixa) - Parâmetro Retail
+
+    - A autenticação para consumo da API será feita através de token enviado no
+    header da requisição.
+  version: 0.6.18
+
+schemes:
+  - https
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: 'Insira o token com o prefixo Bearer (ex: Bearer {token})'
+security:
+  - bearerAuth: []
+paths:
+  /:
+    get:
+      summary: Version
+      description: >-
+        O endpoint faz uma requisição HTTP GET para retornar os dados de versão
+        da API.
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: object
+            properties:
+              client:
+                type: string
+                example: cloud9
+              version:
+                type: string
+                example: 0.6.18
+              revision:
+                type: string
+                example: '1'
+              date:
+                type: string
+                example: 24/09/2024 08:30
+              filialCount:
+                type: integer
+                example: 3
+  /getSales:
+    post:
+      summary: getSales
+      description: >-
+        Retorna os detalhes das vendas de acordo com os filtros de data e caixa
+        informados.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - dtInicial
+              - dtFinal
+            properties:
+              subsidiaryCode:
+                type: string
+                description: Código de Unidade no sistema Teknisa
+              subsidiaryExtCode:
+                type: string
+                description: Código Externo cadastrado para a Filial
+              dtInicial:
+                type: string
+                description: Data Inical para consulta (dd/mm/aaaa)
+              dtFinal:
+                type: string
+                description: Data Final para consulta (dd/mm/aaaa)
+              posCode:
+                type: string
+                description: Código do caixa na Teknisa
+              posOpeningDate:
+                type: string
+                description: Data e hora de abertura do caixa
+            example:
+              subsidiaryCode: '0001'
+              dtInicial: 05/05/2024
+              dtFinal: 07/05/2024
+              posCode: '002'
+              posOpeningDate: null
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                subsidiaryName:
+                  type: string
+                sales:
+                  type: array
+                  items:
+                    type: object
+                    description: >-
+                      Objeto contendo os dados da venda, consumidor, payments e
+                      itens.
+                unutilized:
+                  type: array
+                  items:
+                    type: object
+  /getDayReduction:
+    post:
+      summary: getDayReduction
+      description: Retorna os dados de redução do dia (Fechamentos de caixa).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - dtInicial
+              - dtFinal
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              dtInicial:
+                type: string
+              dtFinal:
+                type: string
+              useFilterStore:
+                type: boolean
+            example:
+              subsidiaryExtCode: '0001'
+              dtInicial: 23/09/2024
+              dtFinal: 23/09/2024
+              useFilterStore: false
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryName:
+                  type: string
+                closing:
+                  type: array
+                  items:
+                    type: object
+  /getStock:
+    post:
+      summary: getStock
+      description: >-
+        Retorna os produtos a serem retirados do estoque baseados no período
+        especificado.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - dtInicial
+              - dtFinal
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              dtInicial:
+                type: string
+              dtFinal:
+                type: string
+            example:
+              subsidiaryCode: '0001'
+              subsidiaryExtCode: '0001'
+              dtInicial: 04/12/2025
+              dtFinal: 09/12/2025
+      responses:
+        '200':
+          description: Retorno dos dados de estoque.
+  /pos/getDayCloses:
+    post:
+      summary: getDayCloses
+      description: Retorna informações gerais dos caixas com status 'Fechado' em uma data.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - date
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              date:
+                type: string
+            example:
+              subsidiaryExtCode: '0001'
+              date: 27/09/2024
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+  /pos/getClosingSummary:
+    post:
+      summary: getClosingSummary
+      description: >-
+        Retorna o array com o detalhamento dos fechamentos de caixas, incluindo
+        pagamentos e sangrias de despesa.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              cashierClosingDate:
+                type: string
+            example:
+              subsidiaryExtCode: '0001'
+              cashierClosingDate: 27/09/2024
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+  /import/importSale:
+    post:
+      summary: importSale
+      description: >-
+        Permite a importação de vendas para o sistema Teknisa. Suporta a
+        importação de uma venda única ou múltiplas vendas.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              noteNumber:
+                type: string
+              noteSeries:
+                type: string
+              chaveSefaz:
+                type: string
+              xml:
+                type: string
+              itens:
+                type: array
+                items:
+                  type: object
+              payments:
+                type: array
+                items:
+                  type: object
+      responses:
+        '200':
+          description: Importação concluída.
+  /taxes/getProductTaxes:
+    post:
+      summary: getProductTaxes
+      description: >-
+        Permite recuperar informações das taxas/impostos para produtos
+        específicos.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              productsCode:
+                type: array
+                items:
+                  type: string
+            example:
+              subsidiaryExtCode: '0001'
+              productsCode:
+                - '9150101000'
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+  /taxes/setProductTaxes:
+    post:
+      summary: setProductTaxes
+      description: >-
+        Permite configurar/cadastrar informações fiscais (impostos) para
+        produtos específicos.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              subsidiaryCode:
+                type: string
+              taxes:
+                type: array
+                items:
+                  type: object
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              result:
+                type: array
+                items:
+                  type: object
+  /sale/cancelSale:
+    post:
+      summary: cancelSale
+      description: >-
+        Realiza o cancelamento de uma venda previamente registrada no sistema
+        usando a Chave SEFAZ.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - chaveSefaz
+              - saleDate
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              chaveSefaz:
+                type: string
+              saleDate:
+                type: string
+            example:
+              subsidiaryCode: '0001'
+              subsidiaryExtCode: '0001'
+              chaveSefaz: '23251213783221010783650010000000189157614481'
+              saleDate: 17-12-2025
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              result:
+                type: array
+                items:
+                  type: object
+  /sale/getSaleProducts:
+    post:
+      summary: getSaleProducts
+      description: >-
+        Retorna os produtos e seus complementos de vendas baseados nos filtros
+        de data.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - dtInicial
+              - dtFinal
+            properties:
+              subsidiaryCode:
+                type: string
+              dtInicial:
+                type: string
+              dtFinal:
+                type: string
+            example:
+              subsidiaryCode: '0001'
+              dtInicial: 06/05/2024
+              dtFinal: 06/05/2024
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
+  /sale/getXmlsByPeriod:
+    post:
+      summary: getXmlsByPeriod
+      description: >-
+        Recupera os arquivos XML de notas fiscais eletrônicas (NF-e) em um
+        determinado período (compactados em gzip+base64).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+              - dtInicial
+              - dtFinal
+            properties:
+              subsidiaryCode:
+                type: string
+              dtInicial:
+                type: string
+              dtFinal:
+                type: string
+            example:
+              subsidiaryCode: '0001'
+              dtInicial: 05/12/2025
+              dtFinal: 10/12/2025
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              result:
+                type: array
+                items:
+                  type: object
+  /getSalesByCategory:
+    post:
+      summary: getSalesByCategory
+      description: >-
+        Recupera dados de vendas organizados por categoria para uma filial
+        especificada (ex. vendas de salão, delivery).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - subsidiaryCode
+            properties:
+              subsidiaryCode:
+                type: string
+              subsidiaryExtCode:
+                type: string
+              page:
+                type: integer
+              perPage:
+                type: integer
+              turnId:
+                type: string
+              itemCategoryLevel:
+                type: string
+            example:
+              subsidiaryCode: '0001'
+              subsidiaryExtCode: '0001'
+              page: null
+              perPage: null
+              turnId: null
+              itemCategoryLevel: null
+      responses:
+        '200':
+          description: Sucesso
+          schema:
+            type: array
+            items:
+              type: object
