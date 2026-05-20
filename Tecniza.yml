@@ -1,0 +1,270 @@
+openapi: 3.0.3
+info:
+  title: Sale Api - Documentação Tecknisa
+  description: |
+    A integração tem por objetivo retornar as informações de vendas realizadas no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores de fechamento do dia(Fechamento dos caixas - consolidado).
+    
+    ### **Regras de Execução**
+    - A Busca dos dados acontecerá de acordo com filtro de data com limite de intervalo de até 5 dias.
+    - Será retornado dados da venda junto a suas informações fiscais e formas de pagamento da venda.
+    - Será retornado itens da venda junto a suas informações fiscais.
+    - As vendas são ordenadas de acordo com a data de movimentação do caixa. (Considerado abertura de caixa no Sistema Teknisa)
+    - Junto as informações da movimentação do dia, será retornado os dados de fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor informado na Sangria de Fechamento do Caixa) - Parâmetro Retail
+    - A autenticação para consumo da API será feita através de token enviado no header da requisição.
+  version: 0.6.18
+servers:
+  - url: '{{base_url}}'
+    description: Servidor Base
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /:
+    get:
+      summary: Version
+      description: O endpoint faz uma requisição HTTP GET para retornar os dados de versão da API.
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client:
+                    type: string
+                    example: cloud9
+                  version:
+                    type: string
+                    example: 0.6.18
+                  revision:
+                    type: string
+                    example: '1'
+                  date:
+                    type: string
+                    example: 24/09/2024 08:30
+                  filialCount:
+                    type: integer
+                    example: 3
+
+  /getSales:
+    post:
+      summary: getSales
+      description: Retorna os detalhes das vendas de acordo com os filtros de data e caixa informados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                  description: Código de Unidade no sistema Teknisa
+                subsidiaryExtCode:
+                  type: string
+                  description: Código Externo cadastrado para a Filial
+                dtInicial:
+                  type: string
+                  description: Data Inical para consulta (dd/mm/aaaa)
+                dtFinal:
+                  type: string
+                  description: Data Final para consulta (dd/mm/aaaa)
+                posCode:
+                  type: string
+                  description: Código do caixa na Teknisa
+                posOpeningDate:
+                  type: string
+                  nullable: true
+                  description: Data e hora de abertura do caixa
+              example:
+                subsidiaryCode: "0001"
+                dtInicial: "05/05/2024"
+                dtFinal: "07/05/2024"
+                posCode: "002"
+                posOpeningDate: null
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsidiaryCode:
+                      type: string
+                    subsidiaryExtCode:
+                      type: string
+                    subsidiaryName:
+                      type: string
+                    sales:
+                      type: array
+                      items:
+                        type: object
+                        description: Objeto contendo os dados da venda, consumidor, payments e itens.
+                    unutilized:
+                      type: array
+                      items:
+                        type: object
+
+  /getDayReduction:
+    post:
+      summary: getDayReduction
+      description: Retorna os dados de redução do dia (Fechamentos de caixa).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+                useFilterStore:
+                  type: boolean
+              example:
+                subsidiaryExtCode: "0001"
+                dtInicial: "23/09/2024"
+                dtFinal: "23/09/2024"
+                useFilterStore: false
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsidiaryCode:
+                      type: string
+                    subsidiaryName:
+                      type: string
+                    closing:
+                      type: array
+                      items:
+                        type: object
+
+  /getStock:
+    post:
+      summary: getStock
+      description: Retorna os produtos a serem retirados do estoque baseados no período especificado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+              example:
+                subsidiaryCode: "0001"
+                subsidiaryExtCode: "0001"
+                dtInicial: "04/12/2025"
+                dtFinal: "09/12/2025"
+      responses:
+        '200':
+          description: Retorno dos dados de estoque.
+
+  /pos/getDayCloses:
+    post:
+      summary: getDayCloses
+      description: Retorna informações gerais dos caixas com status 'Fechado' em uma data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - date
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                date:
+                  type: string
+              example:
+                subsidiaryExtCode: "0001"
+                date: "27/09/2024"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /pos/getClosingSummary:
+    post:
+      summary: getClosingSummary
+      description: Retorna o array com o detalhamento dos fechamentos de caixas, incluindo pagamentos e sangrias de despesa.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                cashierClosingDate:
+                  type: string
+              example:
+                subsidiaryExtCode: "0001"
+                cashierClosingDate: "27/09/2024"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /import/importSale:
+    post:
+      summary: importSale
+      description: Permite a importação
