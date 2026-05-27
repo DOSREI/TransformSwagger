@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "INTEGRACAO_PARCEIROS",
+    "description": "API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{{url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "paths": {
+    "/API/mod_valida_parceiro/index.php": {
+      "post": {
+        "summary": "gerarToken",
+        "description": "Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hashemp": {
+                    "type": "string",
+                    "description": "Hash da empresa",
+                    "example": "{{hashemp}}"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC Address ou identificador",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "example": "geraToken",
+                    "description": "Nome do serviço a ser executado"
+                  },
+                  "tokenParceiro": {
+                    "type": "string",
+                    "description": "Token de autenticação do parceiro",
+                    "example": "{{token_parceiro}}"
+                  },
+                  "saltParceiro": {
+                    "type": "string",
+                    "description": "Salt MD5 do parceiro",
+                    "example": "{{md5_token_parceiro}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna o payload em base64 contendo o token de requisição."
+          }
+        }
+      }
+    },
+    "/API/mod_relatorio_venda/index.php": {
+      "post": {
+        "summary": "RelatorioVendas / BaixarDanfes",
+        "description": "Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mac": {
+                    "type": "string",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "gerarRelatorio",
+                      "baixarDanfes"
+                    ],
+                    "example": "gerarRelatorio",
+                    "description": "Define qual ação será tomada (gerarRelatorio ou baixarDanfes)"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de requisição obtido na rota gerarToken",
+                    "example": "{{tokenRequisicao}}"
+                  },
+                  "hashemp": {
+                    "type": "string",
+                    "example": "{{hashemp}}"
+                  },
+                  "formato": {
+                    "type": "string",
+                    "example": "xml"
+                  },
+                  "dataInicio": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "dataFim": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "filtro": {
+                    "type": "string",
+                    "example": "fiscal",
+                    "description": "Ex: 'fiscal' para relatórios ou 'evento' para DANFEs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados."
+          }
+        }
+      }
+    }
+  }
+}
