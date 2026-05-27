@@ -1,3 +1,2730 @@
+
+Gemini
+Nova conversa
+Pesquisar conversas
+Biblioteca
+Geração de Arquivo Swagger OpenAPI
+Formalização de Linguagem Técnica e Corporativa
+Atualização de Função JavaScript para Pagamento
+Mapeamento de Pagamento com Jolt
+Análise de Rede: DNS e Bufferbloat
+Ajuste de Documentação Técnica Excel
+Separar JSON por Categoria de Endpoint
+Mapeamento de Campos JSON: Teknisa e MXM
+Erro de Sintaxe SQL `BEGIN`
+Jabra Evolve 75: Cancelamento de Ruído Realista
+Configurar Cancelamento de Ruído Lenovo
+Zone 300 vs 305: Diferenças Essenciais
+Ajuste de Mensagem Clara e Descontraída
+Códigos de Região no Protheus
+Comparativo Ergonômico de Cadeiras de Escritório
+Integrando Google Chat: Erros JSON e IA
+Notificações de Terceiros no Google Meet
+Ajuste de Chaves em Arquivo JSON Swagger
+Cervejeiras: Qualidade, Tamanho e Design
+Gerando Payload para Documentação LLM
+Gemini para Documentação Técnica JSON
+Salvar Arquivo Swagger API
+G305 vs MX Anywhere 3: Jogo vs. Produtividade
+Mouse Logitech: MX Anywhere 3 vs M650
+Converter campo agência para inteiro
+JOLT: Duplicar Dados de Endereço
+Testando Autenticação Shopify API com Curl
+Ajuste de Texto e Correções Técnicas
+Galaxy Book Tela Preta: Soluções
+Ajuste de Telefone no Jolt Spec
+Erro Shopify: Permissão de Produto Negada
+Comparativo de Multivitamínicos: Qual Escolher?
+Jolt: Mapeamento de Dados de Rastreio e Pedido
+Conversa com o Gemini
+gere o arquivo swagger baseado nesse arquivo
+
+Aqui está o arquivo de especificação Swagger (OpenAPI 3.0) gerado a partir da sua collection do Postman. Ele mapeia todas as rotas, métodos, parâmetros, corpos de requisição (bodies), descrições de tabelas e retornos exemplificados no documento.
+
+Você pode copiar o código abaixo e colar no Swagger Editor para visualizá-lo graficamente ou exportá-lo como um arquivo .yaml.
+
+YAML
+openapi: 3.0.3
+info:
+  title: Sale Api - Documentação Tecknisa
+  description: |
+    A integração tem por objetivo retornar as informações de vendas realizadas no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores de fechamento do dia(Fechamento dos caixas - consolidado).
+    
+    ### **Regras de Execução**
+    - A Busca dos dados acontecerá de acordo com filtro de data com limite de intervalo de até 5 dias.
+    - Será retornado dados da venda junto a suas informações fiscais e formas de pagamento da venda.
+    - Será retornado itens da venda junto a suas informações fiscais.
+    - As vendas são ordenadas de acordo com a data de movimentação do caixa. (Considerado abertura de caixa no Sistema Teknisa)
+    - Junto as informações da movimentação do dia, será retornado os dados de fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor informado na Sangria de Fechamento do Caixa) - Parâmetro Retail
+    - A autenticação para consumo da API será feita através de token enviado no header da requisição.
+  version: 0.6.18
+servers:
+  - url: '{{base_url}}'
+    description: Servidor Base
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /:
+    get:
+      summary: Version
+      description: O endpoint faz uma requisição HTTP GET para retornar os dados de versão da API.
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client:
+                    type: string
+                    example: cloud9
+                  version:
+                    type: string
+                    example: 0.6.18
+                  revision:
+                    type: string
+                    example: '1'
+                  date:
+                    type: string
+                    example: 24/09/2024 08:30
+                  filialCount:
+                    type: integer
+                    example: 3
+
+  /getSales:
+    post:
+      summary: getSales
+      description: Retorna os detalhes das vendas de acordo com os filtros de data e caixa informados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                  description: Código de Unidade no sistema Teknisa
+                subsidiaryExtCode:
+                  type: string
+                  description: Código Externo cadastrado para a Filial
+                dtInicial:
+                  type: string
+                  description: Data Inical para consulta (dd/mm/aaaa)
+                dtFinal:
+                  type: string
+                  description: Data Final para consulta (dd/mm/aaaa)
+                posCode:
+                  type: string
+                  description: Código do caixa na Teknisa
+                posOpeningDate:
+                  type: string
+                  nullable: true
+                  description: Data e hora de abertura do caixa
+              example:
+                subsidiaryCode: "0001"
+                dtInicial: "05/05/2024"
+                dtFinal: "07/05/2024"
+                posCode: "002"
+                posOpeningDate: null
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsidiaryCode:
+                      type: string
+                    subsidiaryExtCode:
+                      type: string
+                    subsidiaryName:
+                      type: string
+                    sales:
+                      type: array
+                      items:
+                        type: object
+                        description: Objeto contendo os dados da venda, consumidor, payments e itens.
+                    unutilized:
+                      type: array
+                      items:
+                        type: object
+
+  /getDayReduction:
+    post:
+      summary: getDayReduction
+      description: Retorna os dados de redução do dia (Fechamentos de caixa).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+                useFilterStore:
+                  type: boolean
+              example:
+                subsidiaryExtCode: "0001"
+                dtInicial: "23/09/2024"
+                dtFinal: "23/09/2024"
+                useFilterStore: false
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsidiaryCode:
+                      type: string
+                    subsidiaryName:
+                      type: string
+                    closing:
+                      type: array
+                      items:
+                        type: object
+
+  /getStock:
+    post:
+      summary: getStock
+      description: Retorna os produtos a serem retirados do estoque baseados no período especificado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+              example:
+                subsidiaryCode: "0001"
+                subsidiaryExtCode: "0001"
+                dtInicial: "04/12/2025"
+                dtFinal: "09/12/2025"
+      responses:
+        '200':
+          description: Retorno dos dados de estoque.
+
+  /pos/getDayCloses:
+    post:
+      summary: getDayCloses
+      description: Retorna informações gerais dos caixas com status 'Fechado' em uma data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - date
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                date:
+                  type: string
+              example:
+                subsidiaryExtCode: "0001"
+                date: "27/09/2024"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /pos/getClosingSummary:
+    post:
+      summary: getClosingSummary
+      description: Retorna o array com o detalhamento dos fechamentos de caixas, incluindo pagamentos e sangrias de despesa.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                cashierClosingDate:
+                  type: string
+              example:
+                subsidiaryExtCode: "0001"
+                cashierClosingDate: "27/09/2024"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /import/importSale:
+    post:
+      summary: importSale
+      description: Permite a importação de vendas para o sistema Teknisa. Suporta a importação de uma venda única ou múltiplas vendas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                noteNumber:
+                  type: string
+                noteSeries:
+                  type: string
+                chaveSefaz:
+                  type: string
+                xml:
+                  type: string
+                itens:
+                  type: array
+                  items:
+                    type: object
+                payments:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Importação concluída.
+
+  /taxes/getProductTaxes:
+    post:
+      summary: getProductTaxes
+      description: Permite recuperar informações das taxas/impostos para produtos específicos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                productsCode:
+                  type: array
+                  items:
+                    type: string
+              example:
+                subsidiaryExtCode: "0001"
+                productsCode: ["9150101000"]
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /taxes/setProductTaxes:
+    post:
+      summary: setProductTaxes
+      description: Permite configurar/cadastrar informações fiscais (impostos) para produtos específicos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subsidiaryCode:
+                  type: string
+                taxes:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  result:
+                    type: array
+                    items:
+                      type: object
+
+  /sale/cancelSale:
+    post:
+      summary: cancelSale
+      description: Realiza o cancelamento de uma venda previamente registrada no sistema usando a Chave SEFAZ.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - chaveSefaz
+                - saleDate
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                chaveSefaz:
+                  type: string
+                saleDate:
+                  type: string
+              example:
+                subsidiaryCode: "0001"
+                subsidiaryExtCode: "0001"
+                chaveSefaz: "23251213783221010783650010000000189157614481"
+                saleDate: "17-12-2025"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  result:
+                    type: array
+                    items:
+                      type: object
+
+  /sale/getSaleProducts:
+    post:
+      summary: getSaleProducts
+      description: Retorna os produtos e seus complementos de vendas baseados nos filtros de data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+              example:
+                subsidiaryCode: "0001"
+                dtInicial: "06/05/2024"
+                dtFinal: "06/05/2024"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /sale/getXmlsByPeriod:
+    post:
+      summary: getXmlsByPeriod
+      description: Recupera os arquivos XML de notas fiscais eletrônicas (NF-e) em um determinado período (compactados em gzip+base64).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+                - dtInicial
+                - dtFinal
+              properties:
+                subsidiaryCode:
+                  type: string
+                dtInicial:
+                  type: string
+                dtFinal:
+                  type: string
+              example:
+                subsidiaryCode: "0001"
+                dtInicial: "05/12/2025"
+                dtFinal: "10/12/2025"
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  result:
+                    type: array
+                    items:
+                      type: object
+
+  /getSalesByCategory:
+    post:
+      summary: getSalesByCategory
+      description: Recupera dados de vendas organizados por categoria para uma filial especificada (ex. vendas de salão, delivery).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subsidiaryCode
+              properties:
+                subsidiaryCode:
+                  type: string
+                subsidiaryExtCode:
+                  type: string
+                page:
+                  type: integer
+                  nullable: true
+                perPage:
+                  type: integer
+                  nullable: true
+                turnId:
+                  type: string
+                  nullable: true
+                itemCategoryLevel:
+                  type: string
+                  nullable: true
+              example:
+                subsidiaryCode: "0001"
+                subsidiaryExtCode: "0001"
+                page: null
+                perPage: null
+                turnId: null
+                itemCategoryLevel: null
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+gere o arquivo em json
+
+Aqui está o arquivo de especificação Swagger (OpenAPI 3.0) gerado em formato JSON.
+
+Você pode copiar este código e colá-lo diretamente no Swagger Editor para visualização.
+
+JSON
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Sale Api - Documentação Tecknisa",
+    "description": "A integração tem por objetivo retornar as informações de vendas realizadas no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores de fechamento do dia(Fechamento dos caixas - consolidado).\n\n### **Regras de Execução**\n- A Busca dos dados acontecerá de acordo com filtro de data com limite de intervalo de até 5 dias.\n- Será retornado dados da venda junto a suas informações fiscais e formas de pagamento da venda.\n- Será retornado itens da venda junto a suas informações fiscais.\n- As vendas são ordenadas de acordo com a data de movimentação do caixa. (Considerado abertura de caixa no Sistema Teknisa)\n- Junto as informações da movimentação do dia, será retornado os dados de fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor informado na Sangria de Fechamento do Caixa) - Parâmetro Retail\n- A autenticação para consumo da API será feita através de token enviado no header da requisição.",
+    "version": "0.6.18"
+  },
+  "servers": [
+    {
+      "url": "{{base_url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Version",
+        "description": "O endpoint faz uma requisição HTTP GET para retornar os dados de versão da API.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "client": {
+                      "type": "string",
+                      "example": "cloud9"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "0.6.18"
+                    },
+                    "revision": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "date": {
+                      "type": "string",
+                      "example": "24/09/2024 08:30"
+                    },
+                    "filialCount": {
+                      "type": "integer",
+                      "example": 3
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getSales": {
+      "post": {
+        "summary": "getSales",
+        "description": "Retorna os detalhes das vendas de acordo com os filtros de data e caixa informados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "dtInicial",
+                  "dtFinal"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string",
+                    "description": "Código de Unidade no sistema Teknisa"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string",
+                    "description": "Código Externo cadastrado para a Filial"
+                  },
+                  "dtInicial": {
+                    "type": "string",
+                    "description": "Data Inical para consulta (dd/mm/aaaa)"
+                  },
+                  "dtFinal": {
+                    "type": "string",
+                    "description": "Data Final para consulta (dd/mm/aaaa)"
+                  },
+                  "posCode": {
+                    "type": "string",
+                    "description": "Código do caixa na Teknisa"
+                  },
+                  "posOpeningDate": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Data e hora de abertura do caixa"
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "dtInicial": "05/05/2024",
+                  "dtFinal": "07/05/2024",
+                  "posCode": "002",
+                  "posOpeningDate": null
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "subsidiaryCode": {
+                        "type": "string"
+                      },
+                      "subsidiaryExtCode": {
+                        "type": "string"
+                      },
+                      "subsidiaryName": {
+                        "type": "string"
+                      },
+                      "sales": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Objeto contendo os dados da venda, consumidor, payments e itens."
+                        }
+                      },
+                      "unutilized": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getDayReduction": {
+      "post": {
+        "summary": "getDayReduction",
+        "description": "Retorna os dados de redução do dia (Fechamentos de caixa).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "dtInicial",
+                  "dtFinal"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "dtInicial": {
+                    "type": "string"
+                  },
+                  "dtFinal": {
+                    "type": "string"
+                  },
+                  "useFilterStore": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "subsidiaryExtCode": "0001",
+                  "dtInicial": "23/09/2024",
+                  "dtFinal": "23/09/2024",
+                  "useFilterStore": false
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "subsidiaryCode": {
+                        "type": "string"
+                      },
+                      "subsidiaryName": {
+                        "type": "string"
+                      },
+                      "closing": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getStock": {
+      "post": {
+        "summary": "getStock",
+        "description": "Retorna os produtos a serem retirados do estoque baseados no período especificado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "dtInicial",
+                  "dtFinal"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "dtInicial": {
+                    "type": "string"
+                  },
+                  "dtFinal": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "subsidiaryExtCode": "0001",
+                  "dtInicial": "04/12/2025",
+                  "dtFinal": "09/12/2025"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retorno dos dados de estoque."
+          }
+        }
+      }
+    },
+    "/pos/getDayCloses": {
+      "post": {
+        "summary": "getDayCloses",
+        "description": "Retorna informações gerais dos caixas com status 'Fechado' em uma data.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "date"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryExtCode": "0001",
+                  "date": "27/09/2024"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pos/getClosingSummary": {
+      "post": {
+        "summary": "getClosingSummary",
+        "description": "Retorna o array com o detalhamento dos fechamentos de caixas, incluindo pagamentos e sangrias de despesa.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "cashierClosingDate": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryExtCode": "0001",
+                  "cashierClosingDate": "27/09/2024"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/import/importSale": {
+      "post": {
+        "summary": "importSale",
+        "description": "Permite a importação de vendas para o sistema Teknisa. Suporta a importação de uma venda única ou múltiplas vendas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "noteNumber": {
+                    "type": "string"
+                  },
+                  "noteSeries": {
+                    "type": "string"
+                  },
+                  "chaveSefaz": {
+                    "type": "string"
+                  },
+                  "xml": {
+                    "type": "string"
+                  },
+                  "itens": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "payments": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Importação concluída."
+          }
+        }
+      }
+    },
+    "/taxes/getProductTaxes": {
+      "post": {
+        "summary": "getProductTaxes",
+        "description": "Permite recuperar informações das taxas/impostos para produtos específicos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "productsCode": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "subsidiaryExtCode": "0001",
+                  "productsCode": [
+                    "9150101000"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/taxes/setProductTaxes": {
+      "post": {
+        "summary": "setProductTaxes",
+        "description": "Permite configurar/cadastrar informações fiscais (impostos) para produtos específicos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "taxes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/cancelSale": {
+      "post": {
+        "summary": "cancelSale",
+        "description": "Realiza o cancelamento de uma venda previamente registrada no sistema usando a Chave SEFAZ.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "chaveSefaz",
+                  "saleDate"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "chaveSefaz": {
+                    "type": "string"
+                  },
+                  "saleDate": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "subsidiaryExtCode": "0001",
+                  "chaveSefaz": "23251213783221010783650010000000189157614481",
+                  "saleDate": "17-12-2025"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/getSaleProducts": {
+      "post": {
+        "summary": "getSaleProducts",
+        "description": "Retorna os produtos e seus complementos de vendas baseados nos filtros de data.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "dtInicial",
+                  "dtFinal"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "dtInicial": {
+                    "type": "string"
+                  },
+                  "dtFinal": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "dtInicial": "06/05/2024",
+                  "dtFinal": "06/05/2024"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/getXmlsByPeriod": {
+      "post": {
+        "summary": "getXmlsByPeriod",
+        "description": "Recupera os arquivos XML de notas fiscais eletrônicas (NF-e) em um determinado período (compactados em gzip+base64).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode",
+                  "dtInicial",
+                  "dtFinal"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "dtInicial": {
+                    "type": "string"
+                  },
+                  "dtFinal": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "dtInicial": "05/12/2025",
+                  "dtFinal": "10/12/2025"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getSalesByCategory": {
+      "post": {
+        "summary": "getSalesByCategory",
+        "description": "Recupera dados de vendas organizados por categoria para uma filial especificada (ex. vendas de salão, delivery).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subsidiaryCode"
+                ],
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "perPage": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "turnId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "itemCategoryLevel": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "example": {
+                  "subsidiaryCode": "0001",
+                  "subsidiaryExtCode": "0001",
+                  "page": null,
+                  "perPage": null,
+                  "turnId": null,
+                  "itemCategoryLevel": null
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+gere na versao 2.0
+
+Aqui está o arquivo de especificação convertido para Swagger 2.0 em formato JSON.
+
+Em Swagger 2.0, algumas estruturas mudam em relação ao OpenAPI 3.0 (por exemplo, requestBody passa a ser parameters com in: "body", e securitySchemes muda para securityDefinitions do tipo apiKey para o token no header).
+
+Pode copiar e colar diretamente no Swagger Editor.
+
+JSON
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Sale Api - Documentação Tecknisa",
+    "description": "A integração tem por objetivo retornar as informações de vendas realizadas no PDV Teknisa. Sendo elas, NFCe's, Itens, Impostos, Recebimentos e valores de fechamento do dia(Fechamento dos caixas - consolidado).\n\n### **Regras de Execução**\n- A Busca dos dados acontecerá de acordo com filtro de data com limite de intervalo de até 5 dias.\n- Será retornado dados da venda junto a suas informações fiscais e formas de pagamento da venda.\n- Será retornado itens da venda junto a suas informações fiscais.\n- As vendas são ordenadas de acordo com a data de movimentação do caixa. (Considerado abertura de caixa no Sistema Teknisa)\n- Junto as informações da movimentação do dia, será retornado os dados de fechamento do Caixa (Podendo ser Valor total vendido no dia ou Valor informado na Sangria de Fechamento do Caixa) - Parâmetro Retail\n- A autenticação para consumo da API será feita através de token enviado no header da requisição.",
+    "version": "0.6.18"
+  },
+  "host": "{{base_url}}",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Insira o token com o prefixo Bearer (ex: Bearer {token})"
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Version",
+        "description": "O endpoint faz uma requisição HTTP GET para retornar os dados de versão da API.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "client": {
+                  "type": "string",
+                  "example": "cloud9"
+                },
+                "version": {
+                  "type": "string",
+                  "example": "0.6.18"
+                },
+                "revision": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "date": {
+                  "type": "string",
+                  "example": "24/09/2024 08:30"
+                },
+                "filialCount": {
+                  "type": "integer",
+                  "example": 3
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getSales": {
+      "post": {
+        "summary": "getSales",
+        "description": "Retorna os detalhes das vendas de acordo com os filtros de data e caixa informados.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "dtInicial",
+                "dtFinal"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string",
+                  "description": "Código de Unidade no sistema Teknisa"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string",
+                  "description": "Código Externo cadastrado para a Filial"
+                },
+                "dtInicial": {
+                  "type": "string",
+                  "description": "Data Inical para consulta (dd/mm/aaaa)"
+                },
+                "dtFinal": {
+                  "type": "string",
+                  "description": "Data Final para consulta (dd/mm/aaaa)"
+                },
+                "posCode": {
+                  "type": "string",
+                  "description": "Código do caixa na Teknisa"
+                },
+                "posOpeningDate": {
+                  "type": "string",
+                  "description": "Data e hora de abertura do caixa"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "dtInicial": "05/05/2024",
+                "dtFinal": "07/05/2024",
+                "posCode": "002",
+                "posOpeningDate": null
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryExtCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryName": {
+                    "type": "string"
+                  },
+                  "sales": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "Objeto contendo os dados da venda, consumidor, payments e itens."
+                    }
+                  },
+                  "unutilized": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getDayReduction": {
+      "post": {
+        "summary": "getDayReduction",
+        "description": "Retorna os dados de redução do dia (Fechamentos de caixa).",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "dtInicial",
+                "dtFinal"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "dtInicial": {
+                  "type": "string"
+                },
+                "dtFinal": {
+                  "type": "string"
+                },
+                "useFilterStore": {
+                  "type": "boolean"
+                }
+              },
+              "example": {
+                "subsidiaryExtCode": "0001",
+                "dtInicial": "23/09/2024",
+                "dtFinal": "23/09/2024",
+                "useFilterStore": false
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "subsidiaryCode": {
+                    "type": "string"
+                  },
+                  "subsidiaryName": {
+                    "type": "string"
+                  },
+                  "closing": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getStock": {
+      "post": {
+        "summary": "getStock",
+        "description": "Retorna os produtos a serem retirados do estoque baseados no período especificado.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "dtInicial",
+                "dtFinal"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "dtInicial": {
+                  "type": "string"
+                },
+                "dtFinal": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "subsidiaryExtCode": "0001",
+                "dtInicial": "04/12/2025",
+                "dtFinal": "09/12/2025"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorno dos dados de estoque."
+          }
+        }
+      }
+    },
+    "/pos/getDayCloses": {
+      "post": {
+        "summary": "getDayCloses",
+        "description": "Retorna informações gerais dos caixas com status 'Fechado' em uma data.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "date"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryExtCode": "0001",
+                "date": "27/09/2024"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pos/getClosingSummary": {
+      "post": {
+        "summary": "getClosingSummary",
+        "description": "Retorna o array com o detalhamento dos fechamentos de caixas, incluindo pagamentos e sangrias de despesa.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "cashierClosingDate": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryExtCode": "0001",
+                "cashierClosingDate": "27/09/2024"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/import/importSale": {
+      "post": {
+        "summary": "importSale",
+        "description": "Permite a importação de vendas para o sistema Teknisa. Suporta a importação de uma venda única ou múltiplas vendas.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "noteNumber": {
+                  "type": "string"
+                },
+                "noteSeries": {
+                  "type": "string"
+                },
+                "chaveSefaz": {
+                  "type": "string"
+                },
+                "xml": {
+                  "type": "string"
+                },
+                "itens": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "payments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Importação concluída."
+          }
+        }
+      }
+    },
+    "/taxes/getProductTaxes": {
+      "post": {
+        "summary": "getProductTaxes",
+        "description": "Permite recuperar informações das taxas/impostos para produtos específicos.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "productsCode": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "subsidiaryExtCode": "0001",
+                "productsCode": [
+                  "9150101000"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/taxes/setProductTaxes": {
+      "post": {
+        "summary": "setProductTaxes",
+        "description": "Permite configurar/cadastrar informações fiscais (impostos) para produtos específicos.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "taxes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/cancelSale": {
+      "post": {
+        "summary": "cancelSale",
+        "description": "Realiza o cancelamento de uma venda previamente registrada no sistema usando a Chave SEFAZ.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "chaveSefaz",
+                "saleDate"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "chaveSefaz": {
+                  "type": "string"
+                },
+                "saleDate": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "subsidiaryExtCode": "0001",
+                "chaveSefaz": "23251213783221010783650010000000189157614481",
+                "saleDate": "17-12-2025"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/getSaleProducts": {
+      "post": {
+        "summary": "getSaleProducts",
+        "description": "Retorna os produtos e seus complementos de vendas baseados nos filtros de data.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "dtInicial",
+                "dtFinal"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "dtInicial": {
+                  "type": "string"
+                },
+                "dtFinal": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "dtInicial": "06/05/2024",
+                "dtFinal": "06/05/2024"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sale/getXmlsByPeriod": {
+      "post": {
+        "summary": "getXmlsByPeriod",
+        "description": "Recupera os arquivos XML de notas fiscais eletrônicas (NF-e) em um determinado período (compactados em gzip+base64).",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode",
+                "dtInicial",
+                "dtFinal"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "dtInicial": {
+                  "type": "string"
+                },
+                "dtFinal": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "dtInicial": "05/12/2025",
+                "dtFinal": "10/12/2025"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getSalesByCategory": {
+      "post": {
+        "summary": "getSalesByCategory",
+        "description": "Recupera dados de vendas organizados por categoria para uma filial especificada (ex. vendas de salão, delivery).",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "subsidiaryCode"
+              ],
+              "properties": {
+                "subsidiaryCode": {
+                  "type": "string"
+                },
+                "subsidiaryExtCode": {
+                  "type": "string"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "perPage": {
+                  "type": "integer"
+                },
+                "turnId": {
+                  "type": "string"
+                },
+                "itemCategoryLevel": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "subsidiaryCode": "0001",
+                "subsidiaryExtCode": "0001",
+                "page": null,
+                "perPage": null,
+                "turnId": null,
+                "itemCategoryLevel": null
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+erro
+
+303010200"host" must be name or IP. Must not not include the scheme nor sub-paths and MAY include a port.
+
+
+
+line 30 = host: '{{base_url}}'
+
+Esse erro acontece porque a especificação Swagger 2.0 é extremamente rigorosa com o campo host.
+
+Diferente do Postman (ou do OpenAPI 3.0), o Swagger 2.0 não aceita que o campo host contenha o protocolo (http:// ou https://) e nem caminhos adicionais (como /api). Ele aceita apenas o domínio puro ou IP (com ou sem porta).
+
+Como a variável {{base_url}} geralmente carrega a URL inteira (ex: https://api.tecknisa.com), o validador do Swagger acusa o erro.
+
+Como corrigir
+No seu arquivo JSON, vá até a linha 30 e substitua o "host": "{{base_url}}" pelo domínio real da API (sem o https://). Se você não tiver o domínio exato agora, pode usar um de exemplo.
+
+Mude de:
+
+JSON
+  "host": "{{base_url}}",
+  "schemes": [
+    "https",
+    "http"
+  ],
+Para (exemplo):
+
+JSON
+  "host": "api.tecknisa.com",
+  "basePath": "/",
+  "schemes": [
+    "https",
+    "http"
+  ],
+Resumo da regra no Swagger 2.0:
+Protocolo: Vai no campo "schemes": ["https"].
+
+Domínio: Vai no campo "host": "api.tecknisa.com".
+
+Caminho base (se houver): Vai no campo "basePath": "/v1".
+
+Faça essa substituição rápida no seu arquivo e o erro no Swagger Editor vai sumir! Se a sua URL base original tinha algum caminho extra (tipo https://dominio.com/api), lembre-se de colocar o /api no "basePath".
+
+poderia gerar o json abaixo :
+
+
+
+{
+
+"info": {
+
+"_postman_id": "2f0e93e4-da9a-4572-a5ac-698f56d8a9d2",
+
+"name": "INTEGRACAO_PARCEIROS",
+
+"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+
+},
+
+"item": [
+
+{
+
+"name": "gerarToken",
+
+"event": [
+
+{
+
+"listen": "test",
+
+"script": {
+
+"exec": [
+
+"var jsonData = JSON.parse(atob(responseBody));",
+
+"if(jsonData.status == 1){",
+
+" pm.globals.set(\"tokenRequisicao\", jsonData.data);",
+
+" ",
+
+"}else{",
+
+" console.error('FALHA NA GERACAO DO TOKEN');",
+
+"",
+
+"}",
+
+"// if(jsonData.flg_cloud == 1){",
+
+"// pm.globals.set(\"urlIntegracao\",\"https://cloud.epoc.com.br/ozsys/cadm/\");",
+
+"// }else{",
+
+"// pm.globals.set(\"urlIntegracao\", jsonData.urlRemoto);",
+
+"",
+
+"// }"
+
+],
+
+"type": "text/javascript"
+
+}
+
+}
+
+],
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "geraToken",
+
+"type": "text"
+
+},
+
+{
+
+"key": "tokenParceiro",
+
+"value": "{{token_parceiro}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "saltParceiro",
+
+"value": "{{md5_token_parceiro}}",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_valida_parceiro/index.php",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_valida_parceiro",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+},
+
+{
+
+"name": "RelatorioVendas",
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "gerarRelatorio",
+
+"type": "text"
+
+},
+
+{
+
+"key": "token",
+
+"value": "{{tokenRequisicao}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "formato",
+
+"value": "xml",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataInicio",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataFim",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "filtro",
+
+"value": "fiscal",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_relatorio_venda/index.php",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_relatorio_venda",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+},
+
+{
+
+"name": "BaixarDanfes",
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "baixarDanfes",
+
+"type": "text"
+
+},
+
+{
+
+"key": "token",
+
+"value": "{{tokenRequisicao}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "formato",
+
+"value": "xml",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataInicio",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataFim",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "filtro",
+
+"value": "evento",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_relatorio_venda/index.php",
+
+"protocol": "http",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_relatorio_venda",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+}
+
+]
+
+}
+
+Aqui está o arquivo convertido para o padrão OpenAPI 3.0 em formato JSON.
+
+Como as requisições "RelatorioVendas" e "BaixarDanfes" apontam exatamente para a mesma URL (/API/mod_relatorio_venda/index.php) e usam o mesmo método (POST), agrupei ambas na mesma rota. No Swagger/OpenAPI, rotas duplicadas não são permitidas. Para diferenciar as chamadas, adicionei uma explicação no campo description e coloquei o parâmetro service como um Enum (podendo receber "gerarRelatorio" ou "baixarDanfes").
+
+Copie e cole o código abaixo no seu editor Swagger:
+
+JSON
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "INTEGRACAO_PARCEIROS",
+    "description": "API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{{url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "paths": {
+    "/API/mod_valida_parceiro/index.php": {
+      "post": {
+        "summary": "gerarToken",
+        "description": "Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hashemp": {
+                    "type": "string",
+                    "description": "Hash da empresa"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC Address ou identificador"
+                  },
+                  "service": {
+                    "type": "string",
+                    "example": "geraToken",
+                    "description": "Nome do serviço a ser executado"
+                  },
+                  "tokenParceiro": {
+                    "type": "string",
+                    "description": "Token de autenticação do parceiro"
+                  },
+                  "saltParceiro": {
+                    "type": "string",
+                    "description": "Salt MD5 do parceiro"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna o payload em base64 contendo o token de requisição."
+          }
+        }
+      }
+    },
+    "/API/mod_relatorio_venda/index.php": {
+      "post": {
+        "summary": "RelatorioVendas / BaixarDanfes",
+        "description": "Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mac": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "gerarRelatorio",
+                      "baixarDanfes"
+                    ],
+                    "example": "gerarRelatorio",
+                    "description": "Define qual ação será tomada (gerarRelatorio ou baixarDanfes)"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de requisição obtido na rota gerarToken"
+                  },
+                  "hashemp": {
+                    "type": "string"
+                  },
+                  "formato": {
+                    "type": "string",
+                    "example": "xml"
+                  },
+                  "dataInicio": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "dataFim": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "filtro": {
+                    "type": "string",
+                    "example": "fiscal",
+                    "description": "Ex: 'fiscal' para relatórios ou 'evento' para DANFEs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados."
+          }
+        }
+      }
+    }
+  }
+}
+pode gerar na versao "openapi": "3.0.1",
+
+Com certeza! A estrutura entre a versão 3.0.3 e a 3.0.1 é exatamente a mesma. Apenas ajustei a declaração inicial para refletir a versão solicitada.
+
+Aqui está o seu arquivo OpenAPI 3.0.1 em formato JSON pronto para uso:
+
+JSON
 {
   "openapi": "3.0.1",
   "info": {
@@ -117,3 +2844,921 @@
     }
   }
 }
+pode gerar o arquivo YAml para eu baixar e json para baixa e importar
+
+Como sou uma inteligência artificial baseada em texto, eu não consigo gerar um arquivo físico diretamente para você clicar e fazer o download automático.
+
+Porém, é muito simples transformar os códigos abaixo em arquivos reais. Basta copiar o conteúdo de cada bloco, colar em um bloco de notas (ou editor de código como VS Code ou Notepad++) e salvar com a extensão correspondente (.yaml ou .json).
+
+Aqui estão as duas versões prontas para você importar nas suas ferramentas:
+
+Versão YAML (openapi.yaml)
+YAML
+openapi: 3.0.1
+info:
+  title: INTEGRACAO_PARCEIROS
+  description: API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.
+  version: 1.0.0
+servers:
+  - url: '{{url}}'
+    description: Servidor Base
+paths:
+  /API/mod_valida_parceiro/index.php:
+    post:
+      summary: gerarToken
+      description: Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                hashemp:
+                  type: string
+                  description: Hash da empresa
+                mac:
+                  type: string
+                  description: MAC Address ou identificador
+                service:
+                  type: string
+                  example: geraToken
+                  description: Nome do serviço a ser executado
+                tokenParceiro:
+                  type: string
+                  description: Token de autenticação do parceiro
+                saltParceiro:
+                  type: string
+                  description: Salt MD5 do parceiro
+      responses:
+        '200':
+          description: Sucesso. Retorna o payload em base64 contendo o token de requisição.
+  /API/mod_relatorio_venda/index.php:
+    post:
+      summary: RelatorioVendas / BaixarDanfes
+      description: Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                mac:
+                  type: string
+                service:
+                  type: string
+                  enum:
+                    - gerarRelatorio
+                    - baixarDanfes
+                  example: gerarRelatorio
+                  description: Define qual ação será tomada (gerarRelatorio ou baixarDanfes)
+                token:
+                  type: string
+                  description: Token de requisição obtido na rota gerarToken
+                hashemp:
+                  type: string
+                formato:
+                  type: string
+                  example: xml
+                dataInicio:
+                  type: string
+                  example: 10/11/2021
+                dataFim:
+                  type: string
+                  example: 10/11/2021
+                filtro:
+                  type: string
+                  example: fiscal
+                  description: Ex - 'fiscal' para relatórios ou 'evento' para DANFEs
+      responses:
+        '200':
+          description: Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados.
+Versão JSON (openapi.json)
+JSON
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "INTEGRACAO_PARCEIROS",
+    "description": "API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{{url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "paths": {
+    "/API/mod_valida_parceiro/index.php": {
+      "post": {
+        "summary": "gerarToken",
+        "description": "Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hashemp": {
+                    "type": "string",
+                    "description": "Hash da empresa"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC Address ou identificador"
+                  },
+                  "service": {
+                    "type": "string",
+                    "example": "geraToken",
+                    "description": "Nome do serviço a ser executado"
+                  },
+                  "tokenParceiro": {
+                    "type": "string",
+                    "description": "Token de autenticação do parceiro"
+                  },
+                  "saltParceiro": {
+                    "type": "string",
+                    "description": "Salt MD5 do parceiro"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna o payload em base64 contendo o token de requisição."
+          }
+        }
+      }
+    },
+    "/API/mod_relatorio_venda/index.php": {
+      "post": {
+        "summary": "RelatorioVendas / BaixarDanfes",
+        "description": "Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mac": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "gerarRelatorio",
+                      "baixarDanfes"
+                    ],
+                    "example": "gerarRelatorio",
+                    "description": "Define qual ação será tomada (gerarRelatorio ou baixarDanfes)"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de requisição obtido na rota gerarToken"
+                  },
+                  "hashemp": {
+                    "type": "string"
+                  },
+                  "formato": {
+                    "type": "string",
+                    "example": "xml"
+                  },
+                  "dataInicio": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "dataFim": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "filtro": {
+                    "type": "string",
+                    "example": "fiscal",
+                    "description": "Ex: 'fiscal' para relatórios ou 'evento' para DANFEs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados."
+          }
+        }
+      }
+    }
+  }
+}
+percebi que mandaram o json mas e arquivo do postman , pode convertes em swaager para integrar 3.0.1 ?
+
+
+
+{
+
+"info": {
+
+"_postman_id": "2f0e93e4-da9a-4572-a5ac-698f56d8a9d2",
+
+"name": "INTEGRACAO_PARCEIROS",
+
+"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+
+},
+
+"item": [
+
+{
+
+"name": "gerarToken",
+
+"event": [
+
+{
+
+"listen": "test",
+
+"script": {
+
+"exec": [
+
+"var jsonData = JSON.parse(atob(responseBody));",
+
+"if(jsonData.status == 1){",
+
+" pm.globals.set(\"tokenRequisicao\", jsonData.data);",
+
+" ",
+
+"}else{",
+
+" console.error('FALHA NA GERACAO DO TOKEN');",
+
+"",
+
+"}",
+
+"// if(jsonData.flg_cloud == 1){",
+
+"// pm.globals.set(\"urlIntegracao\",\"https://cloud.epoc.com.br/ozsys/cadm/\");",
+
+"// }else{",
+
+"// pm.globals.set(\"urlIntegracao\", jsonData.urlRemoto);",
+
+"",
+
+"// }"
+
+],
+
+"type": "text/javascript"
+
+}
+
+}
+
+],
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "geraToken",
+
+"type": "text"
+
+},
+
+{
+
+"key": "tokenParceiro",
+
+"value": "{{token_parceiro}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "saltParceiro",
+
+"value": "{{md5_token_parceiro}}",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_valida_parceiro/index.php",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_valida_parceiro",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+},
+
+{
+
+"name": "RelatorioVendas",
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "gerarRelatorio",
+
+"type": "text"
+
+},
+
+{
+
+"key": "token",
+
+"value": "{{tokenRequisicao}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "formato",
+
+"value": "xml",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataInicio",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataFim",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "filtro",
+
+"value": "fiscal",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_relatorio_venda/index.php",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_relatorio_venda",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+},
+
+{
+
+"name": "BaixarDanfes",
+
+"request": {
+
+"method": "POST",
+
+"header": [],
+
+"body": {
+
+"mode": "urlencoded",
+
+"urlencoded": [
+
+{
+
+"key": "mac",
+
+"value": "{{mac}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "service",
+
+"value": "baixarDanfes",
+
+"type": "text"
+
+},
+
+{
+
+"key": "token",
+
+"value": "{{tokenRequisicao}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "hashemp",
+
+"value": "{{hashemp}}",
+
+"type": "text"
+
+},
+
+{
+
+"key": "formato",
+
+"value": "xml",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataInicio",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "dataFim",
+
+"value": "10/11/2021",
+
+"type": "text"
+
+},
+
+{
+
+"key": "filtro",
+
+"value": "evento",
+
+"type": "text"
+
+}
+
+]
+
+},
+
+"url": {
+
+"raw": "{{url}}/API/mod_relatorio_venda/index.php",
+
+"protocol": "http",
+
+"host": [
+
+"{{url}}"
+
+],
+
+"path": [
+
+"API",
+
+"mod_relatorio_venda",
+
+"index.php"
+
+]
+
+}
+
+},
+
+"response": []
+
+}
+
+]
+
+}
+
+Com certeza! Converti a sua nova collection do Postman para o padrão OpenAPI 3.0.1 em formato JSON.
+
+Como as requisições RelatorioVendas e BaixarDanfes apontam exatamente para a mesma URL (/API/mod_relatorio_venda/index.php) e usam o mesmo método (POST), eu as agrupei em uma única rota, pois o Swagger/OpenAPI não permite rotas duplicadas.
+
+Para diferenciar a chamada na documentação, adicionei o parâmetro service como um Enum (uma lista de opções fechadas), permitindo que você escolha entre gerarRelatorio ou baixarDanfes.
+
+Aqui está o arquivo pronto para você importar:
+
+JSON
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "INTEGRACAO_PARCEIROS",
+    "description": "API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{{url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "paths": {
+    "/API/mod_valida_parceiro/index.php": {
+      "post": {
+        "summary": "gerarToken",
+        "description": "Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hashemp": {
+                    "type": "string",
+                    "description": "Hash da empresa",
+                    "example": "{{hashemp}}"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC Address ou identificador",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "example": "geraToken",
+                    "description": "Nome do serviço a ser executado"
+                  },
+                  "tokenParceiro": {
+                    "type": "string",
+                    "description": "Token de autenticação do parceiro",
+                    "example": "{{token_parceiro}}"
+                  },
+                  "saltParceiro": {
+                    "type": "string",
+                    "description": "Salt MD5 do parceiro",
+                    "example": "{{md5_token_parceiro}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna o payload em base64 contendo o token de requisição."
+          }
+        }
+      }
+    },
+    "/API/mod_relatorio_venda/index.php": {
+      "post": {
+        "summary": "RelatorioVendas / BaixarDanfes",
+        "description": "Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mac": {
+                    "type": "string",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "gerarRelatorio",
+                      "baixarDanfes"
+                    ],
+                    "example": "gerarRelatorio",
+                    "description": "Define qual ação será tomada (gerarRelatorio ou baixarDanfes)"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de requisição obtido na rota gerarToken",
+                    "example": "{{tokenRequisicao}}"
+                  },
+                  "hashemp": {
+                    "type": "string",
+                    "example": "{{hashemp}}"
+                  },
+                  "formato": {
+                    "type": "string",
+                    "example": "xml"
+                  },
+                  "dataInicio": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "dataFim": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "filtro": {
+                    "type": "string",
+                    "example": "fiscal",
+                    "description": "Ex: 'fiscal' para relatórios ou 'evento' para DANFEs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados."
+          }
+        }
+      }
+    }
+  }
+}
+pode gerar 2 arquivos , a plataforma de integracao esta dando erro ao importar
+
+Seus arquivos JSON e YAML (versão OpenAPI 3.0.1) foram gerados com sucesso e já estão prontos para você baixar e usar na sua plataforma de integração:
+Ícone do app JSON
+ openapi 
+JSON
+Ícone do app YAML
+ openapi 
+YAML
+
+Basta fazer o download e importar. Se surgir mais algum erro na plataforma, me avise para eu ajustar a estrutura do arquivo!
+
+
+
+
+Suas conversas com TOTVS SA não são usadas para aprimorar nossos modelos. O Gemini é uma IA e pode cometer erros. Sua privacidade e o GeminiAbre em uma nova janela
+
+
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "INTEGRACAO_PARCEIROS",
+    "description": "API para integração de parceiros, geração de token, relatórios de vendas e download de DANFEs.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{{url}}",
+      "description": "Servidor Base"
+    }
+  ],
+  "paths": {
+    "/API/mod_valida_parceiro/index.php": {
+      "post": {
+        "summary": "gerarToken",
+        "description": "Endpoint responsável por validar os dados do parceiro e retornar o token de requisição.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hashemp": {
+                    "type": "string",
+                    "description": "Hash da empresa",
+                    "example": "{{hashemp}}"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC Address ou identificador",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "example": "geraToken",
+                    "description": "Nome do serviço a ser executado"
+                  },
+                  "tokenParceiro": {
+                    "type": "string",
+                    "description": "Token de autenticação do parceiro",
+                    "example": "{{token_parceiro}}"
+                  },
+                  "saltParceiro": {
+                    "type": "string",
+                    "description": "Salt MD5 do parceiro",
+                    "example": "{{md5_token_parceiro}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna o payload em base64 contendo o token de requisição."
+          }
+        }
+      }
+    },
+    "/API/mod_relatorio_venda/index.php": {
+      "post": {
+        "summary": "RelatorioVendas / BaixarDanfes",
+        "description": "Este endpoint centraliza a geração de relatórios de vendas e o download de DANFEs. Altere o campo `service` para `gerarRelatorio` ou `baixarDanfes` conforme a necessidade.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mac": {
+                    "type": "string",
+                    "example": "{{mac}}"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "gerarRelatorio",
+                      "baixarDanfes"
+                    ],
+                    "example": "gerarRelatorio",
+                    "description": "Define qual ação será tomada (gerarRelatorio ou baixarDanfes)"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de requisição obtido na rota gerarToken",
+                    "example": "{{tokenRequisicao}}"
+                  },
+                  "hashemp": {
+                    "type": "string",
+                    "example": "{{hashemp}}"
+                  },
+                  "formato": {
+                    "type": "string",
+                    "example": "xml"
+                  },
+                  "dataInicio": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "dataFim": {
+                    "type": "string",
+                    "example": "10/11/2021"
+                  },
+                  "filtro": {
+                    "type": "string",
+                    "example": "fiscal",
+                    "description": "Ex: 'fiscal' para relatórios ou 'evento' para DANFEs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso. Retorna os dados do relatório ou os arquivos DANFE solicitados."
+          }
+        }
+      }
+    }
+  }
+}
+openapi.json
+Exibindo openapi.json.
