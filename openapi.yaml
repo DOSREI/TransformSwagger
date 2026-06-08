@@ -1,0 +1,784 @@
+openapi: 3.0.3
+info:
+  title: API externa de repasses Sibrape
+  description: |
+    API HTTP autenticada com Bearer para consumidores externos de repasse (integrações em lote PIX).
+
+    Obtenha um token de API no admin da app Sibrape (Configurações → Tokens de API). Envie em todas as requisições:
+
+    `Authorization: Bearer <token>`
+
+    Opcional: envie o cabeçalho `X-Correlation-Id`; o mesmo valor é devolvido na resposta para correlação em suporte.
+
+    A URL base é o host do deploy da app (URL da app Shopify), por exemplo `https://sua-app.exemplo.com`.
+
+    **Publicação da spec (sem autenticação):** `GET https://{appHost}/docs/openapi.yaml`
+
+    **Swagger UI (sessão admin Shopify):** `/app/api-docs` no admin embutido.
+
+    Visão de arquitetura e fluxos: [`ARCHITECTURE.md`](../ARCHITECTURE.md) no repositório.
+  version: 1.0.0
+  contact:
+    name: Suporte de integração Sibrape / Check
+
+servers:
+  - url: https://{appHost}
+    description: Host do deploy da app Sibrape
+    variables:
+      appHost:
+        default: sua-app.exemplo.com
+        description: Nome do host onde a app Shopify é servida
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Saude
+    description: Conectividade e validação do token
+  - name: Repasses
+    description: Ciclo de vida do repasse de comissão para processadores externos
+
+paths:
+  /api/ping:
+    get:
+      tags: [Saude]
+      summary: Verificação de saúde
+      description: Valida o token Bearer e retorna a loja autenticada e metadados do token.
+      operationId: ping
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Token válido
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PingSuccess"
+              examples:
+                pong:
+                  value:
+                    ok: true
+                    ping: pong
+                    shop: acme.myshopify.com
+                    token:
+                      id: 550e8400-e29b-41d4-a716-446655440000
+                      name: Integração Protheus
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/payouts/pending:
+    get:
+      tags: [Repasses]
+      summary: Listar repasses pendentes
+      description: |
+        Retorna repasses de comissão com status `pending` da loja vinculada ao token, ordenados por
+        `createdAt` ascendente (FIFO). Cada item inclui snapshot do split, dados PIX do representante
+        e identificação do pedido (id numérico e nome visível). Paginação cursor-based via `cursor` e `limit`.
+      operationId: listPendingPayouts
+      parameters:
+        - $ref: "#/components/parameters/CorrelationId"
+        - $ref: "#/components/parameters/PendingListCursor"
+        - $ref: "#/components/parameters/PendingListLimit"
+      responses:
+        "200":
+          description: Página de repasses pendentes
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPendingPayoutsResponse"
+              examples:
+                pendingList:
+                  value:
+                    data:
+                      - payoutId: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+                        orderId: "5678901234"
+                        orderName: "#1042"
+                        shopifyOrderGid: gid://shopify/Order/5678901234
+                        amountBrl: "77.25"
+                        expiresAt: "2026-06-20T14:30:00.000Z"
+                        createdAt: "2026-05-21T10:00:00.000Z"
+                        splitSnapshot:
+                          scenario: "1"
+                          revenda:
+                            codigo: rev-a
+                            nome: Revenda A
+                            percentual: 10
+                            valor: 50
+                          representante:
+                            codigo: REP-001
+                            nome: Representante 1
+                            percentual: 5
+                            valor: 77.25
+                          subtotal_base: 1000
+                          sibrape_valor: 872.75
+                          calculated_at: "2026-05-21T09:55:00.000Z"
+                        representante:
+                          codigo: REP-001
+                          nome: Representante 1
+                          cpf_cnpj: "12345678901"
+                          chave_pix_tipo: CPF
+                          chave_pix: "12345678901"
+                    pagination:
+                      next_cursor: null
+        "400":
+          description: Parâmetro `cursor` ou `limit` inválido
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleApiError"
+              examples:
+                invalidCursor:
+                  value:
+                    error: Invalid cursor
+                invalidLimit:
+                  value:
+                    error: Invalid limit
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/payouts/{orderId}:
+    patch:
+      tags: [Repasses]
+      summary: Atualizar status do repasse
+      description: |
+        Atualiza o status do repasse para um id numérico de pedido Shopify. Status de destino permitidos pela API:
+        `in_progress`, `paid`, `failed`. As transições seguem a máquina de estados do servidor
+        (ex.: `pending` → `in_progress`; `in_progress` → `paid` ou `failed`).
+      operationId: updatePayoutStatus
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchPayoutRequest"
+            examples:
+              markInProgress:
+                summary: Marcar em processamento
+                value:
+                  status: in_progress
+                  externalId: batch-2026-05-21-001
+              markPaid:
+                summary: Marcar como pago
+                value:
+                  status: paid
+                  externalId: pix-tx-abc123
+              markFailed:
+                summary: Marcar como falha
+                value:
+                  status: failed
+                  errorMessage: Chave PIX inválida
+      responses:
+        "200":
+          description: Repasse atualizado
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutMutationSuccess"
+              examples:
+                inProgress:
+                  value:
+                    ok: true
+                    payout:
+                      id: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+                      shopId: 550e8400-e29b-41d4-a716-446655440001
+                      orderId: "5678901234"
+                      shopifyOrderGid: gid://shopify/Order/5678901234
+                      representanteCodigo: REP-001
+                      amountBrl: "77.25"
+                      status: in_progress
+                      externalId: batch-2026-05-21-001
+                      errorMessage: null
+                      expiresAt: "2026-06-20T14:30:00.000Z"
+                      createdAt: "2026-05-21T10:00:00.000Z"
+                      updatedAt: "2026-05-21T11:15:00.000Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/payouts/{orderId}/cancel:
+    post:
+      tags: [Repasses]
+      summary: Cancelar repasse
+      description: |
+        Cancela um repasse quando o status é `pending` ou `in_progress`. Define o status como `cancelled`.
+      operationId: cancelPayout
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: Repasse cancelado
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutMutationSuccess"
+              examples:
+                cancelled:
+                  value:
+                    ok: true
+                    payout:
+                      id: 8d9e6679-7425-40de-944b-e07fc1f90ae8
+                      shopId: 550e8400-e29b-41d4-a716-446655440001
+                      orderId: "5678909999"
+                      shopifyOrderGid: gid://shopify/Order/5678909999
+                      representanteCodigo: REP-CANCEL
+                      amountBrl: "12.00"
+                      status: cancelled
+                      externalId: null
+                      errorMessage: null
+                      expiresAt: "2026-06-20T14:30:00.000Z"
+                      createdAt: "2026-05-21T10:00:00.000Z"
+                      updatedAt: "2026-05-21T12:00:00.000Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/payouts/{orderId}/confirm:
+    post:
+      tags: [Repasses]
+      summary: Confirmar repasse processado no ERP
+      description: |
+        Recebe a confirmação de um repasse processado no ERP (Protheus/iPaaS).
+
+        Em `status=success`: atualiza o pedido para `repassado_total`, grava `repasse_external_id`
+        no metafield do pedido e marca a fila local (`commission_payouts`) como `paid`.
+
+        Em `status=failed`: registra a tentativa e o motivo na fila, mantendo o repasse
+        `pending` para retry (reverte `in_progress` → `pending` quando aplicável). Não altera
+        `status_repasse` do pedido.
+
+        Chamadas repetidas com sucesso quando o pedido já está `repassado_total` são idempotentes
+        (sem efeitos colaterais).
+      operationId: confirmPayout
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmPayoutRequest"
+            examples:
+              success:
+                summary: Confirmação de sucesso
+                value:
+                  external_id: protheus-tx-abc123
+                  ts: "2026-05-21T14:30:00.000Z"
+                  status: success
+              failed:
+                summary: Falha no processamento
+                value:
+                  ts: "2026-05-21T14:35:00.000Z"
+                  status: failed
+                  error_message: Chave PIX inválida no ERP
+      responses:
+        "200":
+          description: Confirmação aceita
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmPayoutSuccess"
+              examples:
+                success:
+                  value:
+                    ok: true
+                    payout:
+                      id: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+                      shopId: 550e8400-e29b-41d4-a716-446655440001
+                      orderId: "5678901234"
+                      shopifyOrderGid: gid://shopify/Order/5678901234
+                      representanteCodigo: REP-001
+                      amountBrl: "77.25"
+                      status: paid
+                      externalId: protheus-tx-abc123
+                      errorMessage: null
+                      expiresAt: "2026-06-20T14:30:00.000Z"
+                      createdAt: "2026-05-21T10:00:00.000Z"
+                      updatedAt: "2026-05-21T14:30:00.000Z"
+                idempotent:
+                  value:
+                    ok: true
+                    idempotent: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          description: Falha ao atualizar metafields do pedido no Shopify
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              examples:
+                metafieldFailed:
+                  value:
+                    ok: false
+                    error: metafield_update_failed
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Token de API criado em Configurações da app Sibrape (o valor em texto é exibido apenas uma vez na criação).
+
+  parameters:
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      description: Id numérico do pedido Shopify (somente dígitos)
+      schema:
+        type: string
+        pattern: "^[0-9]+$"
+      example: "5678901234"
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: Id de correlação enviado pelo cliente para suporte; ecoado na resposta quando informado ou gerado pelo servidor.
+      schema:
+        type: string
+        example: req-20260521-abc123
+    PendingListCursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor opaco da página anterior (`pagination.next_cursor`)
+      schema:
+        type: string
+    PendingListLimit:
+      name: limit
+      in: query
+      required: false
+      description: Tamanho da página (padrão 50, máximo 100)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+
+  headers:
+    CorrelationId:
+      description: Id de correlação da requisição (informado pelo cliente ou gerado pelo servidor)
+      schema:
+        type: string
+
+  schemas:
+    ApiError:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [false]
+        error:
+          type: string
+          description: Código ou mensagem de erro legível por máquina (valores retornados pela API em inglês)
+
+    PayoutStatus:
+      type: string
+      description: Status do repasse
+      enum:
+        - pending
+        - in_progress
+        - paid
+        - failed
+        - cancelled
+
+    Payout:
+      type: object
+      required:
+        - id
+        - shopId
+        - orderId
+        - shopifyOrderGid
+        - representanteCodigo
+        - amountBrl
+        - status
+        - expiresAt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identificador interno do repasse
+        shopId:
+          type: string
+          format: uuid
+          description: Identificador interno da loja
+        orderId:
+          type: string
+          description: Id numérico do pedido Shopify
+        shopifyOrderGid:
+          type: string
+          description: GID do pedido no Shopify
+          example: gid://shopify/Order/5678901234
+        representanteCodigo:
+          type: string
+          description: Código do representante no metaobjeto Sibrape (`codigo`)
+        amountBrl:
+          type: string
+          description: Valor decimal em BRL com duas casas decimais
+          example: "77.25"
+        status:
+          $ref: "#/components/schemas/PayoutStatus"
+        externalId:
+          type: string
+          nullable: true
+          description: Referência do processador externo (id do lote, id da transação PIX, etc.)
+        errorMessage:
+          type: string
+          nullable: true
+          description: Mensagem de erro do processador, quando aplicável
+        expiresAt:
+          type: string
+          format: date-time
+          description: Data de expiração do repasse pendente
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PatchPayoutRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          description: Novo status solicitado
+          enum: [in_progress, paid, failed]
+        externalId:
+          type: string
+          nullable: true
+          description: Referência externa (lote, transação PIX, etc.)
+        errorMessage:
+          type: string
+          nullable: true
+          description: Detalhe da falha quando `status` é `failed`
+
+    ConfirmPayoutRequest:
+      type: object
+      required: [ts, status]
+      properties:
+        external_id:
+          type: string
+          description: ID do lançamento no Protheus (obrigatório quando `status` é `success`)
+        ts:
+          type: string
+          format: date-time
+          description: Timestamp ISO-8601 da confirmação no ERP
+        status:
+          type: string
+          enum: [success, failed]
+          description: Resultado do processamento no ERP
+        error_message:
+          type: string
+          description: Motivo da falha (obrigatório quando `status` é `failed`)
+
+    ConfirmPayoutSuccess:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        idempotent:
+          type: boolean
+          description: true quando o pedido já estava em repassado_total (sem alterações)
+        payout:
+          $ref: "#/components/schemas/Payout"
+
+    PingSuccess:
+      type: object
+      required: [ok, ping, shop, token]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        ping:
+          type: string
+          enum: [pong]
+        shop:
+          type: string
+          description: Domínio da loja Shopify
+          example: acme.myshopify.com
+        token:
+          type: object
+          required: [id, name]
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+              description: Nome amigável do token definido no admin
+
+    SimpleApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SplitSnapshotParty:
+      type: object
+      required: [codigo, nome, percentual, valor]
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+        percentual:
+          type: number
+        valor:
+          type: number
+
+    SplitSnapshot:
+      type: object
+      required: [scenario, subtotal_base, sibrape_valor, calculated_at]
+      properties:
+        scenario:
+          type: string
+          enum: ["1", "2", "3"]
+        revenda:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/SplitSnapshotParty"
+        representante:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/SplitSnapshotParty"
+        subtotal_base:
+          type: number
+        sibrape_valor:
+          type: number
+        calculated_at:
+          type: string
+          format: date-time
+
+    PendingPayoutRepresentative:
+      type: object
+      required: [codigo, nome, cpf_cnpj, chave_pix_tipo, chave_pix]
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+        cpf_cnpj:
+          type: string
+        chave_pix_tipo:
+          type: string
+          enum: [CPF, CNPJ, EMAIL, TELEFONE, ALEATORIA]
+        chave_pix:
+          type: string
+
+    PendingPayoutListItem:
+      type: object
+      required:
+        - payoutId
+        - orderId
+        - orderName
+        - shopifyOrderGid
+        - amountBrl
+        - expiresAt
+        - createdAt
+        - splitSnapshot
+        - representante
+      properties:
+        payoutId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+        orderName:
+          type: string
+          description: Nome visível do pedido no admin Shopify (ex. `#1042`)
+        shopifyOrderGid:
+          type: string
+        amountBrl:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        splitSnapshot:
+          $ref: "#/components/schemas/SplitSnapshot"
+        representante:
+          $ref: "#/components/schemas/PendingPayoutRepresentative"
+
+    PendingPayoutPagination:
+      type: object
+      required: [next_cursor]
+      properties:
+        next_cursor:
+          type: string
+          nullable: true
+          description: Cursor para a próxima página, ou `null` se não houver mais itens
+
+    ListPendingPayoutsResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingPayoutListItem"
+        pagination:
+          $ref: "#/components/schemas/PendingPayoutPagination"
+
+    PayoutMutationSuccess:
+      type: object
+      required: [ok, payout]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        payout:
+          $ref: "#/components/schemas/Payout"
+
+  responses:
+    Unauthorized:
+      description: Token Bearer ausente ou inválido
+      headers:
+        WWW-Authenticate:
+          schema:
+            type: string
+            example: Bearer
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            unauthorized:
+              summary: Não autorizado
+              value:
+                ok: false
+                error: Unauthorized
+    BadRequest:
+      description: Parâmetro de path ou corpo da requisição inválido
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            invalidOrderId:
+              summary: orderId inválido
+              value:
+                ok: false
+                error: Invalid orderId
+            invalidJson:
+              summary: JSON inválido
+              value:
+                ok: false
+                error: Invalid JSON body
+            invalidStatus:
+              summary: status ausente ou inválido
+              value:
+                ok: false
+                error: Invalid or missing status
+    NotFound:
+      description: Repasse não encontrado ou não visível para esta loja
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            notFound:
+              summary: Repasse não encontrado
+              value:
+                ok: false
+                error: payout_not_found
+    Conflict:
+      description: Regra de negócio impede a operação (transição inválida, não cancelável, etc.)
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            invalidTransition:
+              summary: Transição de status inválida
+              value:
+                ok: false
+                error: invalid_status_transition
+            notCancellable:
+              summary: Repasse não pode ser cancelado
+              value:
+                ok: false
+                error: not_cancellable
+    MethodNotAllowed:
+      description: Método HTTP não suportado neste path
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            methodNotAllowed:
+              summary: Método não permitido
+              value:
+                ok: false
+                error: Method not allowed
