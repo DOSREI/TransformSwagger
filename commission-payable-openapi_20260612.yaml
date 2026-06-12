@@ -1,0 +1,672 @@
+openapi: 3.0.3
+info:
+  title: Contas a Pagar - Commission Payables API
+  version: 1.0.0
+  description: |
+    Documentação OpenAPI da API de Integração de Contas a Pagar por comissão.
+
+    Autenticação:
+    - Basic Authentication
+      Authorization: Basic <base64(username:password)>
+
+    - JWT Authentication
+
+     Exemplo prático (JWT):
+     1. Requisição do token:
+       `POST` /api/oauth2/v1/token?grant_type=password&username=<usuario>&password=<senha>
+     2. Pegar o valor de `access_token` retornado.
+     3. Usar nas chamadas protegidas:
+       Authorization: Bearer <access_token>
+
+    Exemplo prático (JWT) do Refresh token:
+    1. Atualização do token com refres_token: `POST` api/oauth2/v1/token?grant_type=refresh_token&refresh_token=
+    2. O token será renovado e retornará um novo payload `JwtTokenResponse`
+    3. Usar nas chamadas protegidas o novo token retornado:
+       Authorization: Bearer <access_token>
+
+    Todos os endpoints protegidos aceitam tanto Basic Authentication quanto JWT Authentication.
+
+    Fluxo funcional:
+    - `POST /v1/commission-payables` valida o payload e grava a solicitação na fila interna para processamento.
+    - A criação efetiva do título ocorre de forma assíncrona pela rotina de processamento de fila.
+    - `GET /v1/commission-payables/status/{type}/{id}` consulta o título processado e devolve seu status atual.
+
+    Observações importantes:
+    - O endpoint de criação retorna sucesso ao enfileirar a solicitação, não ao concluir a criação do título a pagar. Após o envio, é necessário consultar o `status` do processamento do ID.
+    - Os dados do `Fornecedor` serão sempre obrigatórios e serão utilizados para manter os dados do Protheus sincronizados com a origem.
+servers:
+  - url: http://protheusteste.sibrape.com:9205/rest
+    description: Base HML REST do Protheus
+security:
+  - BasicAuth: []
+  - BearerAuth: []
+tags:
+  - name: Authentication
+    description: Endpoint de autenticação para geração de token JWT
+  - name: Commission Payables
+    description: Enfileiramento e consulta de títulos a pagar de comissão
+paths:
+
+  /api/oauth2/v1/token:
+    post:
+      tags:
+        - Authentication
+      summary: Gerar token JWT
+      description: |
+        Gera um token JWT para autenticação nas requisições protegidas.
+
+        URL completa de exemplo:
+        `http://protheusteste.sibrape.com:9205/rest/api/oauth2/v1/token?grant_type=password&username=<usuario>&password=<senha>`
+
+        Passo a passo:
+        1. Informar `grant_type=password`, `username` e `password` na query string.
+        2. Executar o endpoint para receber o token.
+        3. Enviar o token nas demais chamadas no header:
+           `Authorization: Bearer <access_token>`
+      security: []
+      parameters:
+        - name: grant_type
+          in: query
+          required: true
+          schema:
+            type: string
+            example: password
+          description: Tipo de grant OAuth2. Para este fluxo, usar sempre `password`.
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+            example: usuario.integracao
+          description: Usuário válido no ambiente Protheus.
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+            example: senhaForte123
+          description: Senha do usuário informado.
+      responses:
+        '200':
+          description: Token JWT gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtTokenResponse'
+              examples:
+                success:
+                  summary: Exemplo de retorno com token
+                  value:
+                    access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    refresh_token: "4-FCAsX_EsSF1S9BMYxSGom8.ykpXVCJ9.."
+                    scope: "default"
+                    token_type: "Bearer"
+                    expires_in: 3600
+                    hasMFA: false
+        '400':
+          description: Requisição inválida (parâmetros ausentes ou formato incorreto)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidRequest:
+                  value:
+                    code: 400
+                    message: "invalid_grant - username não informado"
+                    detailedMessage: "invalid_grant - username não informado"
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    code: 401
+                    error: "invalid_grant Falha de autenticação para o usuário [usuario]."
+                    detailedMessage: "invalid_grant Falha de autenticação para o usuário [usuario]."
+
+  /v1/commission-payables:
+    post:
+      tags:
+        - Commission Payables
+      summary: Enfileira um título a pagar de comissão
+      description: |
+        Valida o payload do JSON e grava a solicitação na fila interna para o processamento.
+
+        O processamento do título e do fornecedor ocorre posteriormente por rotina assíncrona. O `commissionPayableId` retornado deve ser usado na consulta de status.
+
+        - A tag `pixKeys` se torna obrigatória caso o fornecedor não exista.
+        - Tags opcionais: Caso não sejam informadas, será gravado o valor default parametrizado no Protheus. 
+          - CommissionPayableRequest
+          `prefix`, `accountNature`, `issueDate`, `dueDate`
+          
+          - supplier
+          `supplierType`, `supplierCountryCode`, `supplierBacenCountryCode`, `supplierNature`, `supplierAccountingAccount`, `supplierTaxGroup`
+      operationId: queueCommissionPayable
+      parameters:
+        - in: header
+          name: TenantId
+          required: true
+          schema:
+            type: string
+          description: "Empresa e filial no formato <empresa>,<filial>. Ex: 01,010104"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommissionPayableRequest'
+            examples:
+              basic:
+                summary: Exemplo de enfileiramento
+                value:
+                  prefix: "COM"
+                  accountNature: "123456"
+                  issueDate: "2026-05-29"
+                  dueDate: "2026-06-30"
+                  amount: 1575.45
+                  shopifyOrderNumber: "SHO-123456"
+                  description: "Pagamento de comissão referente ao pedido XPTO"
+                  supplier:
+                    supplierState: "MG"
+                    supplierType: "J"
+                    supplierCGC: "12345678000195"
+                    supplierName: "RAZAO SOCIAL"
+                    supplierTradeName: "NOME FANTASIA"
+                    supplierAddress: "RUA PINTASSILGO, 100"
+                    supplierCity: "UBERABA"
+                    supplierCountryCode: "105"
+                    supplierBacenCountryCode: "01058"
+                    supplierNature: "10001"
+                    supplierAccountingAccount: "111101002"
+                    supplierTaxGroup: "1"
+                  pixKeys:
+                    - keyType: "03"
+                      key: "12345678000195"
+                      isMainKey: "1"
+      responses:
+        '200':
+          description: Solicitação enfileirada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommissionPayableQueuedResponse'
+              examples:
+                queued:
+                  value:
+                    message: "Commission payable queued successfully!"
+                    commissionPayableId: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+        '400':
+          description: Payload inválido ou dados obrigatórios ausentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidPayload:
+                  value:
+                    error: "Missing TenantId header!"
+                    detailedMessage: "The 'TenantId' header is required. Format: <company>,<branch>"
+                invalidShopifyOrderNumberType:
+                  value:
+                    error: "Invalid shopifyOrderNumber in JSON payload!"
+                    detailedMessage: "The 'shopifyOrderNumber' field must be a string if provided."
+                invalidShopifyOrderNumberLength:
+                  value:
+                    error: "Invalid shopifyOrderNumber in JSON payload!"
+                    detailedMessage: "The 'shopifyOrderNumber' field cannot exceed 20 characters in length."
+        '500':
+          description: Falha interna ou desconhecida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  value:
+                    error: "Exception occurred during account queue process!"
+                    detailedMessage: "Exception message: [exception message]"
+        '501':
+          description: Método HTTP não implementado ou não permitido pelo servidor.
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>HTTPREST - Error report</title>
+                  </head>
+                  <body>
+                    <h1>HTTP Status: 501</h1>
+                    <b>description:</b>
+                    The server either does not recognize the request method, or it lacks the ability to fulfill the request.
+                    <br/>
+                    <b>detailed message:</b>
+                    Bad request 501, method 'GET' not allowed
+                  </body>
+                </html>
+  /v1/commission-payables/status/{type}/{id}:
+    get:
+      tags:
+        - Commission Payables
+      summary: Consulta o status do título a pagar de comissão
+      description: |
+        Consulta o título a pagar processado a partir do `UUID` retornado no enfileiramento ou do número do pedido Shopify.
+
+        Regras de status:
+        - `CANCELLED`: existe baixa/cancelamento identificado.
+        - `PAID`: saldo do título baixado.
+        - `OPEN`: título localizado e ainda com saldo em aberto.
+      operationId: getCommissionPayableStatus
+      parameters:
+        - $ref: '#/components/parameters/CommissionPayableType'
+        - $ref: '#/components/parameters/CommissionPayableId'
+      responses:
+        '200':
+          description: Titulo localizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommissionPayableStatusResponse'
+              examples:
+                open:
+                  summary: Titulo em aberto
+                  value:
+                    id: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+                    shopifyOrderNumber: "SHO-123456"
+                    prefix: "COM"
+                    number: "000001"
+                    description: "Pagamento de comissao referente ao fechamento mensal"
+                    dueDate: "2026-05-30"
+                    status: "OPEN"
+                    amount: 1575.45
+                    type: "FT"
+                    companyCode: "01"
+                    branchCode: "010104"
+                paid:
+                  summary: Titulo quitado
+                  value:
+                    id: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+                    shopifyOrderNumber: "SHO-123456"
+                    prefix: "COM"
+                    number: "000001"
+                    description: "Pagamento de comissao referente ao fechamento mensal"
+                    dueDate: "2026-05-30"
+                    status: "PAID"
+                    amount: 1575.45
+                    type: "FT"
+                    companyCode: "01"
+                    branchCode: "010104"
+                cancelled:
+                  summary: Titulo cancelado
+                  value:
+                    id: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+                    shopifyOrderNumber: "SHO-123456"
+                    prefix: "COM"
+                    number: "000001"
+                    description: "Pagamento de comissao referente ao fechamento mensal"
+                    dueDate: "2026-05-30"
+                    status: "CANCELLED"
+                    amount: 1575.45
+                    type: "FT"
+                    companyCode: "01"
+                    branchCode: "010104"
+        '202':
+          description: ID ainda pendente de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                stillProcessing:
+                  value:
+                    message: "Still processing commission payable!"
+                    detailedMessage: "The commission payable is still being processed."
+        '400':
+          description: Parâmetro de identificação ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingId:
+                  value:
+                    error: "Missing accountPayableId or Shopify order number parameter in path!"
+                    detailedMessage: "The ID or Shopify order number parameter is required in the URL path."
+                invalidType:
+                  value:
+                    error: "Invalid path parameter 'type'!"
+                    detailedMessage: "The 'type' path parameter must be 'id' or 'ordernumber'."
+        '404':
+          description: Título não localizado para o identificador informado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Commission payable not found!"
+                    detailedMessage: "No commission payable found with ID [7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0] or Shopify Order Number [SHO-123456]"
+        '422':
+          description: O processamento da fila falhou acima do limite máximo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Error processing commission payable!"
+                    detailedMessage: "The commission payable amount could not be created after [x] processing attempts."
+
+        '500':
+          description: Falha interna ao consultar o status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  value:
+                    error: "Exception occurred while retrieving commission payable status!"
+                    detailedMessage: "Exception message: <detalhes da excecao>"
+        '501':
+          description: Método HTTP não implementado ou não permitido pelo servidor.
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>HTTPREST - Error report</title>
+                  </head>
+                  <body>
+                    <h1>HTTP Status: 501</h1>
+                    <b>description:</b>
+                    The server either does not recognize the request method, or it lacks the ability to fulfill the request.
+                    <br/>
+                    <b>detailed message:</b>
+                    Bad request 501, method 'GET' not allowed
+                  </body>
+                </html>
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Authentication using username and password.
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication using a JWT token.
+
+  parameters:
+    CommissionPayableType:
+      name: type
+      in: path
+      required: true
+      description: Tipo de consulta do status (`id` para UUID ou `ordernumber` para número do pedido Shopify)
+      schema:
+        type: string
+        enum: [id, ordernumber]
+        example: "id"
+    CommissionPayableId:
+      name: id
+      in: path
+      required: true
+      description: Identificador conforme o `type` informado (UUID quando `type=id` ou número do pedido Shopify quando `type=ordernumber`)
+      schema:
+        type: string
+        example: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+  schemas:
+    CommissionPayableRequest:
+      type: object
+      description: |
+        Payload usado para enfileirar o título a pagar.
+      required:
+        - amount
+        - description
+        - supplier
+        - shopifyOrderNumber
+      properties:
+        prefix:
+          type: string
+          description: Prefixo do título a pagar. Pode ser informado caso seja necessário um prefixo específico.
+          example: "COM"
+        accountNature:
+          type: string
+          description: Natureza financeira do titulo. Pode ser informada caso seja enviada uma natureza específica.
+          example: "123456"
+        issueDate:
+          type: string
+          format: date
+          description: Data de emissao do título no formato ISO `yyyy-mm-dd`. Caso não seja informado, será considerado o dia atual.
+          example: "2026-05-26"
+        dueDate:
+          type: string
+          format: date
+          description: Data de vencimento do título no formato ISO `yyyy-mm-dd`. Caso não seja informado, será considerado conforme parametrização de dias para vencimento.
+          example: "2026-05-30"
+        amount:
+          type: number
+          format: double
+          description: Valor do titulo
+          example: 1575.45
+        description:
+          type: string
+          description: Historico do titulo a pagar
+          example: "Pagamento de comissão referente ao pedido XPTO"
+        shopifyOrderNumber:
+          type: string
+          description: Número do pedido Shopify relacionado ao título. Quando informado, deve ser string não vazia e com até 20 caracteres.
+          maxLength: 20
+          example: "SHO-123456"
+        pixKeys:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PixKeyData'
+          description: "Array de chaves PIX do fornecedor. Obrigatório somente caso o Fornecedor não exista."
+        supplier:
+          $ref: '#/components/schemas/SupplierData'
+    PixKeyData:
+      type: object
+      required:
+        - keyType
+        - key
+        - isMainKey
+      properties:
+        keyType:
+          type: string
+          enum: ["01", "02", "03", "04"]
+          description: "Tipo da chave PIX: 01=Telefone (99) 99999-9999, 02=Email, 03=CPF/CNPJ, 04=Chave Aleatória (32 chars)"
+          example: "03"
+        key:
+          type: string
+          description: "Valor da chave PIX"
+          example: "12345678000195"
+        isMainKey:
+          type: string
+          enum: ["1", "2"]
+          description: "Indicador de chave principal: 1=Principal, 2=Secundária"
+          example: "1"
+    SupplierData:
+      type: object
+      required:
+        - supplierCGC
+        - supplierState
+        - supplierCity
+      properties:
+        supplierCGC:
+          type: string
+          description: CPF ou CNPJ do fornecedor
+          example: "12345678000195"
+        supplierType:
+          type: string
+          enum: [F, J, X]
+          description: "Tipo do fornecedor: F=Fisica, J=Jurídica, X=Outro. Caso não seja informada, será considerado X=Outros."
+          example: "J"
+        supplierState:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: "UF do fornecedor (2 caracteres). Ex: MG"
+          example: "MG"
+        supplierName:
+          type: string
+          description: Razao social ou nome do fornecedor
+          example: "RAZAO SOCIAL"
+        supplierTradeName:
+          type: string
+          description: Nome fantasia do fornecedor
+          example: "NOME FANTASIA"
+        supplierAddress:
+          type: string
+          description: Endereco do fornecedor
+          example: "RUA PINTASSILGO, 100"
+        supplierCity:
+          type: string
+          description: Cidade do fornecedor
+          example: "UBERABA"
+        supplierCountryCode:
+          type: string
+          description: Codigo do pais do fornecedor
+          example: "105"
+        supplierBacenCountryCode:
+          type: string
+          description: Codigo BACEN do pais do fornecedor
+          example: "01058"
+        supplierNature:
+          type: string
+          description: Natureza do fornecedor
+          example: "10001"
+        supplierAccountingAccount:
+          type: string
+          description: Conta contabil associada ao fornecedor
+          example: "111101002"
+        supplierTaxGroup:
+          type: string
+          description: Grupo tributario do fornecedor
+          example: "1"
+    CommissionPayableQueuedResponse:
+      type: object
+      required:
+        - message
+        - commissionPayableId
+      properties:
+        message:
+          type: string
+          example: "Commission payable queued successfully!"
+        commissionPayableId:
+          type: string
+          description: Identificador da solicitacao enfileirada
+          example: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+    CommissionPayableStatusResponse:
+      type: object
+      required:
+        - id
+        - prefix
+        - number
+        - description
+        - dueDate
+        - status
+        - amount
+        - type
+        - companyCode
+        - branchCode
+      properties:
+        id:
+          type: string
+          example: "7a1c6e20-4f18-44a8-9b1c-6d45b2b6e8d0"
+        shopifyOrderNumber:
+          type: string
+          description: Número do pedido Shopify associado ao título.
+          example: "SHO-123456"
+        prefix:
+          type: string
+          example: "COM"
+        number:
+          type: string
+          example: "000001"
+        description:
+          type: string
+          example: "Pagamento de comissão referente ao pedido XPTO"
+        dueDate:
+          type: string
+          format: date
+          example: "2026-05-30"
+        status:
+          type: string
+          enum:
+            - OPEN
+            - PAID
+            - CANCELLED
+          example: OPEN
+        amount:
+          type: number
+          format: double
+          example: 1575.45
+        type:
+          type: string
+          example: "FT"
+        companyCode:
+          type: string
+          description: Empresa ativa no contexto de consulta
+          example: "01"
+        branchCode:
+          type: string
+          example: "010104"
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - detailedMessage
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+        detailedMessage:
+          type: string
+          description: Mensagem detalhada do erro
+    JwtTokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - refresh_token
+        - expires_in
+      properties:
+        access_token:
+          type: string
+          description: Token JWT a ser enviado no header Authorization como Bearer token.
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          description: Refresh Token JWT a ser utilizado para renovação do Token.
+          example: "4-FCAsX_EsSF1S9BMYxSGom8.ykpXVCJ9..."
+        scope:
+          type: string
+          description: Escopo do Token
+          example: "default"
+        token_type:
+          type: string
+          description: Tipo do token retornado.
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: Tempo de expiração do token em segundos.
+          example: 3600
+        hasMFA:
+          type: boolean
+          description: Se o login possui MFA
+          example: false
