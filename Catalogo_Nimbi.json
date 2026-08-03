@@ -1,0 +1,203 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Punchout",
+    "description": "Conjunto de interfaces que automatiza o ciclo de compras entre o ERP do cliente e o nosso cat&#225;logo.",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/PunchoutAPI/rest/Punchout"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Punchout"
+    }
+  ],
+  "paths": {
+    "/Catalog/v1": {
+      "post": {
+        "tags": [
+          "Punchout"
+        ],
+        "description": "Processa o PunchOutSetupRequest cXML para valida&#231;&#227;o de identidade e abertura de sess&#227;o segura de cat&#225;logo B2B  (Login Punchout)",
+        "operationId": "SetupRequest",
+        "requestBody": {
+          "description": "cXML PunchOutSetupRequest",
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "description": "cXML PunchOutSetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "cXML PunchOutSetupResponse",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "cXML PunchOutSetupResponse",
+                  "default": ""
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "XML"
+      }
+    },
+    "/CatalogOCI/v1": {
+      "post": {
+        "tags": [
+          "Punchout"
+        ],
+        "description": "Processa o PunchOutSetupRequest OCI para valida&#231;&#227;o de identidade e abertura de sess&#227;o segura de cat&#225;logo B2B  (Login Punchout)",
+        "operationId": "SetupLogin",
+        "requestBody": {
+          "description": "The raw text string payload sent by the ERP in application/x-www-form-urlencoded format.",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "description": "The raw text string payload sent by the ERP in application/x-www-form-urlencoded format.",
+                "default": ""
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The outgoing data response payload containing the calculated redirection web landing page URL address.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "The outgoing data response payload containing the calculated redirection web landing page URL address.",
+                  "default": ""
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "Payload"
+      }
+    },
+    "/OrderRequest/v1": {
+      "post": {
+        "tags": [
+          "Punchout"
+        ],
+        "description": "OrderRequest cXML para atualiza&#231;&#227;o de pedido",
+        "operationId": "OrderRequest",
+        "requestBody": {
+          "description": "cXML OrderRequest",
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "description": "cXML OrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "cXML Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "cXML Response",
+                  "default": ""
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "XML"
+      }
+    },
+    "/Profile/v1": {
+      "post": {
+        "tags": [
+          "Punchout"
+        ],
+        "description": "Retorna dinamicamente as URLs de transa&#231;&#227;o com as capacidades do servidor.",
+        "operationId": "ProfileRequest",
+        "requestBody": {
+          "description": "cXML ProfileRequest",
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "description": "cXML ProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "cXML ProfileResponse",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "cXML ProfileResponse",
+                  "default": ""
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "XML"
+      }
+    },
+    "/StatusUpdateRequest/v1": {
+      "post": {
+        "tags": [
+          "Punchout"
+        ],
+        "description": "Mensagem de retorno do processamento de CatalogUploadRequest ",
+        "operationId": "StatusUpdateRequest",
+        "requestBody": {
+          "description": "cXML CatalogUploadResponse",
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "description": "cXML CatalogUploadResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "cXML CatalogUploadResponse",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "cXML CatalogUploadResponse",
+                  "default": ""
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "XML"
+      }
+    }
+  },
+  "components": {},
+  "x-original-swagger-version": "2.0"
+}
