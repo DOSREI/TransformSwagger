@@ -1,0 +1,5378 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Requisitions",
+    "description": "API do Compra - requer os seguintes par&#226;metros headers:\n* ClientAPI_ID (Identifica&#231;&#227;o do Cliente NIMBI);\n* ClientAPI_Key (Chave de acesso NIMBI para o consumo de APIs);\n* companyTaxNumber (Registro Fiscal da empresa que est&#225; executando a&#231;&#227;o - sem m&#225;scara);\n* companyCountryCode (C&#243;digo do Pa&#237;s da empresa que est&#225; executando a&#231;&#227;o. Ex: &#39;BR&#39;).",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/CompraAPI/rest/Requisitions"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Requisitions"
+    }
+  ],
+  "paths": {
+    "/v1": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as requisi&#231;&#245;es de acordo com os par&#226;metros informados.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_RequisitionByParameters",
+        "parameters": [
+          {
+            "name": "updateDateRequisition",
+            "in": "query",
+            "description": "Filtra pela data de atualiza&#231;&#227;o da requisi&#231;&#227;o.\n\n * Passar a data no formato - ex: &#39;2014-12-31T23:59:59.938Z,2020-01-01T00:00:00.000Z&#39; - caso n&#227;o queira especificar uma das datas, colocar asterisco no lugar\n\n * Caso n&#227;o seja informado, ir&#225; retornar os &#250;ltimos 30 dias",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updatedDateItem",
+            "in": "query",
+            "description": "Filtra pela data de atualiza&#231;&#227;o do item.\n\n* Passar a data no formato - ex: &#39;2014-12-31T23:59:59.938Z,2020-01-01T00:00:00.000Z&#39; - caso n&#227;o queira especificar uma das datas, colocar asterisco no lugar",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statusCode",
+            "in": "query",
+            "description": "Status da requsi&#231;&#227;o\n* DRAFT = Em Composi&#231;&#227;o\n* PENDING_APPROVAL = Em Aprova&#231;&#227;o\n* APPROVED = Aprovado\n* RETURNED = Devolvido\n* REFUSED = Recusado\n* CANCELLED = Cancelado\n* WAITING_ERP = Aguardando ERP",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentTypeCode",
+            "in": "query",
+            "description": "C&#243;digo do tipo de documento",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemStatusId",
+            "in": "query",
+            "description": "Status de tratamento do item no GR\n* 1 = N&#227;o tratado\n* 2 = Em processamento\n* 3 = Tratado\n* 4 = Cancelado\n* 5 = Aguardando aceite",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s do campo &#39;UpdateDate&#39; da requisi&#231;&#227;o. Para essa API utilize &#39;value-asc&#39; ou &#39;value-desc&#39;. Default &#39;value-desc&#39;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as requisi&#231;&#245;es de acordo com os par&#226;metros informados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_Paramenters_API_GET"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria uma requisi&#231;&#227;o.",
+        "operationId": "POST_Requisition",
+        "parameters": [
+          {
+            "name": "acceptlanguage",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura da requisi&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Struct_POST_Requisition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da cria&#231;&#227;o da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsidRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "requisition"
+      }
+    },
+    "/v1/{requisitionId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o",
+        "operationId": "GET_RequisitionById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_API_GET"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Atualiza uma requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o, somente para os status “Em composi&#231;&#227;o” ou “Devolvido”.",
+        "operationId": "PUT_RequisitionById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura da requisi&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Struct_PUT_Requisition_V2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da cria&#231;&#227;o da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsidRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "requisition"
+      },
+      "delete": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Exclui uma requisi&#231;&#227;o baseado no identificador da requisi&#231;&#227;o.",
+        "operationId": "DELETE_RequisitionById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem de retorno das mensagens de erro (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da exclus&#227;o do item da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsRecord2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/approve": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Aprova uma requisi&#231;&#227;o &quot;Em aprova&#231;&#227;o&quot; pelo usu&#225;rio informado no cabe&#231;alho da chamada.",
+        "operationId": "PUT_RequisitionStateApprove",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "username",
+            "in": "header",
+            "description": "Usu&#225;rio que est&#225; realizando a a&#231;&#227;o (email)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio a ser gravado na requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PUT_CommentByOperationCode"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da a&#231;&#227;o realizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutRequisitionByOperationCodeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/{requisitionId}/approvers": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca a lista de aprovadores para cada fase de aprova&#231;&#227;o do &#250;ltimo ciclo.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_ApprovalsByRequisition",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificado interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s do campo &quot;ApprovalDate&quot; do workflow. Para essa API utilize &#39;value-asc&#39; ou &#39;value-desc&#39;. Default &#39;value-desc&#39;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorno com a estrutura de erros caso haja e lista de usu&#225;rios, caso n&#227;o possua erros",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetApprovalsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/attachs": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca os anexos de uma requisi&#231;&#227;o baseado no identificador da requisi&#231;&#227;o",
+        "operationId": "GetRequisitionAttach",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca dos anexos da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_Attachs_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/attributes": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria ou Atualiza os atributos da requisi&#231;&#227;o.",
+        "operationId": "PUT_RequisitionAttributes",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n\n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Struct_POST_RequisitionAttribute"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura de retorno da chamada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructErrorsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "attributes"
+      }
+    },
+    "/v1/{requisitionId}/comment": {
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria um coment&#225;rio em uma requisi&#231;&#227;o.",
+        "operationId": "POST_Comment",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de coment&#225;rio da requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequisitionComment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da cria&#231;&#227;o do coment&#225;rio.\n\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCommentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/{requisitionId}/item/{itemId}": {
+      "delete": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Exclui um item de uma requisi&#231;&#227;o.",
+        "operationId": "DELETE_Requisition2",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n\n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da exclus&#227;o do item da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsidRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/item/{itemId}/comment": {
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria um coment&#225;rio no item da requisi&#231;&#227;o.",
+        "operationId": "POST_CommentItem",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de coment&#225;rio da requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequisitionComment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da cria&#231;&#227;o do coment&#225;rio.\n\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCommentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/{requisitionId}/item/{itemId}/costAllocation": {
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Criar uma aloca&#231;&#227;o de custo no item de uma requisi&#231;&#227;o.\n(M&#225;ximo de 50 itens por chamada)",
+        "operationId": "POST_CostAllocationByItemId",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura JSON para cria&#231;&#227;o de aloca&#231;&#227;o de custo no item da requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "description": "Estrutura JSON para cria&#231;&#227;o de aloca&#231;&#227;o de custo no item da requisi&#231;&#227;o.",
+                "items": {
+                  "$ref": "#/components/schemas/costAllocations"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsCostAllocation"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "costAllocations"
+      }
+    },
+    "/v1/{requisitionId}/item/{requisitionItemId}/attachs": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca os anexos de um item baseado no identificador da requisi&#231;&#227;o e do item",
+        "operationId": "GetRequisitionItemAttachsById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "requisitionItemId",
+            "in": "path",
+            "description": "Identificador do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca dos anexos do item da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_RequisitionItens_Attachs_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/items": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca a lista com informa&#231;&#245;es b&#225;sicas dos itens da requsi&#231;&#227;o baseado no Id da requisi&#231;&#227;o.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_RequisitionItemsById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s dos seguintes valores:\n\n* id -&gt; Ordenar&#225; pelo identificador de forma ascendente.\n\n* portal -&gt; Ordenar&#225; de acordo com a ordena&#231;&#227;o default do portal de forma ascendente.\n\n* -id -&gt; Ordenar&#225; pelo identificador de forma descendente.\n\n* -portal -&gt; Ordenar&#225; de acordo com a ordena&#231;&#227;o default do portal de forma descendente.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemStatusCode",
+            "in": "query",
+            "description": "Filtro multi-valor pelo status.code do item.\nEx.: para filtrar mais de um status utilize os valores separados por virgula:\n* itemStatusCode=DRAFT,on_approval",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca a lista com informa&#231;&#245;es b&#225;sicas dos itens da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_Items_API_GET"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "DESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\n\nUtilizar API mais recente (v2)\nData descontinua&#231;&#227;o (20/08/2020)\n\nBusca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+        "operationId": "GET_Item_ById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_GET_Item_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/items/{itemId}/receivings": {
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Inclus&#227;o de recebimentos em um item",
+        "operationId": "POST_Item_Receivings",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificado interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de entrada para altera&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/API_POST_ListReceiving"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da edi&#231;&#227;o dos itens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/structErrorListIntegerRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "receivings"
+      }
+    },
+    "/v1/{requisitionId}/items/{itemId}/uncataloged": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Altera um item n&#227;o catalogados da requisi&#231;&#227;o baseado no Identificador da requisi&#231;&#227;o.",
+        "operationId": "PUT_UncatalogedItem",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificado interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de entrada para altera&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/API_PUT_RequisitionItem_Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da edi&#231;&#227;o dos itens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructErrorsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "item"
+      }
+    },
+    "/v1/{requisitionId}/items/{operation}": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Aprova ou Devolve os itens das Requisi&#231;&#245;es que estejam no status &#39;Aguardando ERP&#39;.",
+        "operationId": "PUT_ApproveOrReturnItems",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "operation",
+            "in": "path",
+            "description": "Tipo de a&#231;&#227;o a ser executada. &quot;approve&quot;: aprova o item da Requisi&#231;&#227;o (pode iniciar Workflows); &quot;return&quot;: devolve o item da Requisi&#231;&#227;o;",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "in": "header",
+            "description": "E-mail do usu&#225;rio que est&#225; realizando a a&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de chamada.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/API_PUT_ApproveOrReturnItems"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura de retorno da resposta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_PUT_ApproveOrReturnItems_Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/v1/{requisitionId}/items/buyerGroup": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Atualiza o grupo de compras dos itens da requisi&#231;&#227;o.",
+        "operationId": "PUT_GroupBuyer",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificado interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BuyerGroup"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/responseListerrorsRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "buyerGroups"
+      }
+    },
+    "/v1/{requisitionId}/items/cataloged": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Altera itens catalogados da requisi&#231;&#227;o baseado no Identificador da requisi&#231;&#227;o.\n(M&#225;ximo de 50 itens por requisi&#231;&#227;o)",
+        "operationId": "PUT_Cataloged",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificado interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PUT_Items_Cataloged"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da edi&#231;&#227;o dos itens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/responseListerrorsRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "Items"
+      },
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria itens catalogados em uma requisi&#231;&#227;o baseado no Identificador da requisi&#231;&#227;o. (M&#225;ximo de 50 itens por chamada)",
+        "operationId": "POST_ItemsCataloged",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n\n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Items_Cataloged"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseListerror"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "items_Cataloged"
+      }
+    },
+    "/v1/{requisitionId}/items/uncataloged": {
+      "post": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Cria itens n&#227;o catalogados em uma requisi&#231;&#227;o baseado no Identificador da requisi&#231;&#227;o.\n(M&#225;ximo de 50 itens por chamada)",
+        "operationId": "POST_ItemsNotCataloged",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n\n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Lista de itens",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "description": "Lista de itens",
+                "items": {
+                  "$ref": "#/components/schemas/Items_NotCataloged"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseListerror"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "items_NotCataloged"
+      }
+    },
+    "/v1/{requisitionId}/itens/{itemId}": {
+      "delete": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Exclui um item de uma requisi&#231;&#227;o (DEPRECATED N&#195;O USAR)",
+        "operationId": "DELETE_Requisition",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n\n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da exclus&#227;o do item da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsidRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{requisitionId}/publish": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Publica uma requisi&#231;&#227;o com status &quot;Em composi&#231;&#227;o&quot; ou &quot;Devolvida&quot;",
+        "operationId": "PUT_RequisitionStatePublish",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "username",
+            "in": "header",
+            "description": "Usu&#225;rio que est&#225; realizando a a&#231;&#227;o (email)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio a ser gravado na requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PUT_CommentByOperationCode"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da a&#231;&#227;o realizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutRequisitionByOperationCodeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/{requisitionId}/return": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Devolve uma requisi&#231;&#227;o &quot;Em aprova&#231;&#227;o&quot; pelo usu&#225;rio informado no cabe&#231;alho da chamada.",
+        "operationId": "PUT_RequisitionStateReturn",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "username",
+            "in": "header",
+            "description": "Usu&#225;rio que est&#225; realizando a a&#231;&#227;o (email)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio a ser gravado na requisi&#231;&#227;o.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PUT_CommentByOperationCode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da a&#231;&#227;o realizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutRequisitionByOperationCodeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/{requisitionId}/status": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "DESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\n\nUtilizar API mais recente\nData descontinua&#231;&#227;o (20/08/2021)\n\nAtualiza o status de uma requisi&#231;&#227;o",
+        "operationId": "PUT_RequisitionStatusById",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status \n\n* 1 = Draft\n* 2 = Pending Approval\n* 3 = Approved\n* 4 = Returned\n* 5 = Refused\n* 6 = Cancelled\n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio de atualiza&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comments"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Struct_Errors_PUT_Requisition_Status"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comments"
+      }
+    },
+    "/v1/{requisitionId}/status/{operation}": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Aprova (inicia workflow) ou Devolve uma requisi&#231;&#227;o no status &quot;Aguardando ERP&quot;.",
+        "operationId": "PUT_RequisitionStatusByOperationCode",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP da requisi&#231;&#227;o.\n\nObs: Se for enviado o header “erpCode”, com um valor vazio, a requisi&#231;&#227;o ser&#225; atualizada e ficar&#225; sem o C&#243;digo ERP, exemplo ( erpCode: ).  N&#227;o pode ser enviado caso a RC j&#225; tenha o mesmo c&#243;digo ERP que est&#225; sendo enviado.\n\nSe n&#227;o for enviado o header “erpCode”, n&#227;o ser&#225; feito nenhuma altera&#231;&#227;o no coderp.\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "operation",
+            "in": "path",
+            "description": "C&#243;digo da opera&#231;&#227;o que ir&#225; atualizar o status da requisi&#231;&#227;o\n\nOPERATION:\n* approve - inicia o workflow da requisi&#231;&#227;o\n* return - devolve a requisi&#231;&#227;o (coment&#225;rio &#233; obrigat&#243;rio)\n\n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio de atualiza&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comments"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da atualiza&#231;&#227;o da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructErrorsResponse_WaitingERP"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "comment"
+      }
+    },
+    "/v1/approvals/status": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as requisi&#231;&#245;es por status de um aprovador.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_RequisitionByApprove",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "header",
+            "description": "Email do usu&#225;rio.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statusId",
+            "in": "query",
+            "description": "Status do pedido:\n\n* 1 = Pendente de Aprova&#231;&#227;o.\n* 2 = Aprovado.\n* 3 = Devolvido.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "T&#237;tulo da requisi&#231;&#227;o",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "initialDate",
+            "in": "query",
+            "description": "Data inicial da atualiza&#231;&#227;o da requisi&#231;&#227;o",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "finalDate",
+            "in": "query",
+            "description": "Data final da atualiza&#231;&#227;o requisi&#231;&#227;o",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Parametro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Parametro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GET_RequisitionByApprove_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/erp": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no c&#243;digo ERP",
+        "operationId": "GET_Requisition_ByERP",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "\t\nEstrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no c&#243;digo ERP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_API_GET"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Atualiza uma requisi&#231;&#227;o baseado no c&#243;digo ERP.",
+        "operationId": "PUT_RequisitionByERP",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP do pedido",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura da requisi&#231;&#227;o",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Struct_PUT_Requisition_V2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da cria&#231;&#227;o da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsidRecord"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "requisition"
+      },
+      "delete": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Exclui a requisi&#231;&#227;o baseado no c&#243;digo ERP.",
+        "operationId": "DELETE_RequisitionByERP",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP do pedido",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem de retorno das mensagens de erro (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da exclus&#227;o do item da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorsRecord2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/erp/{requisitionId}/items/{operation}": {
+      "put": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Aprova ou Devolve os itens das Requisi&#231;&#245;es que estejam no status &#39;Aguardando ERP&#39;.",
+        "operationId": "PUT_ApproveOrReturnItemsWaitingERP",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador da requisi&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "operation",
+            "in": "path",
+            "description": "Tipo de a&#231;&#227;o a ser executada. &quot;approve&quot;: aprova o item da Requisi&#231;&#227;o (pode iniciar Workflows); &quot;return&quot;: devolve o item da Requisi&#231;&#227;o;",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "in": "header",
+            "description": "E-mail do usu&#225;rio que est&#225; realizando a a&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Estrutura de chamada.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/API_PUT_RequisitionItem_Operation_Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura de retorno da resposta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_PUT_Requisition_Operation_Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/v1/erp/items": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca a lista com informa&#231;&#245;es b&#225;sicas dos itens da requsi&#231;&#227;o baseado no c&#243;digo ERP.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_RequisitionItemsByERP",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s dos seguintes valores:\n\n* id -&gt; Ordenar&#225; pelo identificador de forma ascendente.\n\n* portal -&gt; Ordenar&#225; de acordo com a ordena&#231;&#227;o default do portal de forma ascendente.\n\n* -id -&gt; Ordenar&#225; pelo identificador de forma descendente.\n\n* -portal -&gt; Ordenar&#225; de acordo com a ordena&#231;&#227;o default do portal de forma descendente.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemStatusCode",
+            "in": "query",
+            "description": "Filtro multi-valor pelo status.code do item.\nEx.: para filtrar mais de um status utilize os valores separados por virgula:\n* itemStatusCode=DRAFT,on_approval",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca a lista com informa&#231;&#245;es b&#225;sicas dos itens da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_Items_API_GET"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/erp/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "DESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\n\nUtilizar API mais recente (v2)\nData descontinua&#231;&#227;o (20/08/2020)\n\nBusca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no c&#243;digo ERP da requisi&#231;&#227;o e Id do Item",
+        "operationId": "GET_Item_ByERP",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_GET_Item_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/items/approvals": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca os itens que est&#227;o &quot;Em Aprova&#231;&#227;o&quot; de acordo os par&#226;metros informados.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_RequisitionsItemsByApprovals",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "header",
+            "description": "E-mail do usu&#225;rio que est&#225; realizando a a&#231;&#227;o.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requisitionId",
+            "in": "query",
+            "description": "Filtro pelo Id da requisi&#231;&#227;o",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemsId",
+            "in": "query",
+            "description": "Filtro pelo Id do item - Campo multivalorado - separar por v&#237;rgula. \n\nEx.: 123,456,789",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Parametro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Parametro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para ordenar a consulta atrav&#233;s dos campos &quot;updatedDate&quot;, &quot;itemId&quot; ou &quot;requisitionId&quot;. Default: &quot;updatedDate&quot;.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON de Resposta da API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRequisitionsItemsByApprovalsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/{requisitionId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o",
+        "operationId": "GET_RequisitionById_v2",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es b&#225;sicas da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Requisition_API_GET_v2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/{requisitionId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+        "operationId": "GET_Item_ById_v2",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_GET_Item_Response_v2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/erp/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no c&#243;digo ERP da requisi&#231;&#227;o e Id do Item",
+        "operationId": "GET_Item_ByERP_v2",
+        "parameters": [
+          {
+            "name": "erpCode",
+            "in": "header",
+            "description": "C&#243;digo ERP da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_GET_Item_Response_v2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v3/{requisitionId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Requisitions"
+        ],
+        "description": "Busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no identificador da requisi&#231;&#227;o e do item\n\nAdicionando campo data de entrega no recebimento (listReceivingDatasRequisition.deliveryDate)",
+        "operationId": "GET_Item_ById_v3",
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador interno do item da requisi&#231;&#227;o",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1234567891234567
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca as informa&#231;&#245;es do item da requisi&#231;&#227;o baseado no Id da requisi&#231;&#227;o e do Item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_Requisition_GET_Item_Response_v3"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "API_POST_ListReceiving": {
+        "type": "object",
+        "properties": {
+          "listReceivingDataRequisition": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/API_POST_ListReceivingDataRequisitionItem"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_POST_ListReceivingDataRequisitionItem": {
+        "type": "object",
+        "properties": {
+          "unloadPoint": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do ponto de descarga do item",
+            "default": ""
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de quem vai receber o carregamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens que ser&#227;o descarregados",
+            "example": 0.1
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data de entrega",
+            "format": "date",
+            "example": "2014-12-31"
+          }
+        },
+        "description": ""
+      },
+      "API_PUT_ApproveOrReturnItems": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Lista de itens que ser&#227;o aprovados ou devolvidos.",
+            "items": {
+              "$ref": "#/components/schemas/API_PUT_ApproveOrReturnItems_Item"
+            }
+          }
+        },
+        "description": "Estrutura para aprova&#231;&#227;o ou devolu&#231;&#227;o de itens da requisi&#231;&#227;o."
+      },
+      "API_PUT_ApproveOrReturnItems_Item": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Identificador do item.",
+            "format": "int32",
+            "example": 0
+          },
+          "comments": {
+            "type": "string",
+            "description": "Coment&#225;rio que ser&#225; adicionado ao item.",
+            "default": ""
+          }
+        },
+        "description": "Estrutura do item para aprova&#231;&#227;o ou devolu&#231;&#227;o."
+      },
+      "API_PUT_ApproveOrReturnItems_Response": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": "Estrutura de retorno."
+      },
+      "API_PUT_Requisition_Operation_Response": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_PUT_RequisitionItem_Item": {
+        "required": [
+          "itemCategoryCode",
+          "itemClassificationCode",
+          "quantity",
+          "shortDescription",
+          "unitOfMeasureCode",
+          "unitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "default": ""
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 0.1
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "itemCategoryCode": {
+            "type": "string",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "deliveryAddressExternalCode": {
+            "type": "string",
+            "default": ""
+          },
+          "paymentAddressExternalCode": {
+            "type": "string",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "default": ""
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "default": ""
+          },
+          "groupCode": {
+            "type": "string",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "format": "date",
+            "example": "2014-12-31"
+          }
+        },
+        "description": ""
+      },
+      "API_PUT_RequisitionItem_Operation_Request": {
+        "type": "object",
+        "properties": {
+          "requisition": {
+            "$ref": "#/components/schemas/Requisition2"
+          }
+        },
+        "description": ""
+      },
+      "API_PUT_RequisitionItem_Request": {
+        "required": [
+          "item"
+        ],
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/API_PUT_RequisitionItem_Item"
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_Attach": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "Nome do arquivo com a extens&#227;o. (EX: arquivo.pdf)",
+            "default": ""
+          },
+          "attach": {
+            "type": "string",
+            "description": "Anexo em Base64",
+            "default": ""
+          },
+          "fileSize": {
+            "type": "integer",
+            "description": "tamanho do arquivo",
+            "format": "int32",
+            "example": 0
+          }
+        },
+        "description": "Estrutura de anexos"
+      },
+      "API_Requisition_Attachs_Response": {
+        "type": "object",
+        "properties": {
+          "attachs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_Attach"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": "Estrutura de resposta de anexos da requisi&#231;&#227;o"
+      },
+      "API_Requisition_GET_Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador &#250;nico do Item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do Item",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do Item",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do Item",
+            "default": ""
+          },
+          "deliveryAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do Item",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio multiplicado pela quantidade",
+            "example": 0.1
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do Tipo de Pagamento",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo do Unidade de Medida",
+            "default": ""
+          },
+          "catalogItemId": {
+            "type": "integer",
+            "description": "Identificador do item no cat&#225;logo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "lineErp": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "itemCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria do item",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade de entrega do item",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "isOnlyOriginalBrand": {
+            "type": "boolean",
+            "description": "Indica se s&#243; permite a utiliza&#231;&#227;o de marcas originais",
+            "example": false
+          },
+          "listCostAllocation": {
+            "type": "array",
+            "description": "Lista de Aloca&#231;&#227;o de Custo",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_CostAllocation"
+            }
+          },
+          "listComment": {
+            "type": "array",
+            "description": "Lista de coment&#225;rios",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_Comments"
+            }
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Natureza da Opera&#231;&#227;o",
+            "default": ""
+          },
+          "listReceivingDatasRequisition": {
+            "type": "array",
+            "description": "Lista de Dados do Recebimento",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_ReceivingDatas"
+            }
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do Grupo de Permiss&#227;o",
+            "default": ""
+          },
+          "requestManagementStatusId": {
+            "type": "integer",
+            "description": "Status de tratamento do item no GR (1 = N&#227;o tratado | 2 = Em processamento | 3 = Tratado | 4 = Cancelado | 5 = Aguardando aceite)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "deliveryAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "description": "C&#243;digo do Classifica&#231;&#227;o do item",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo do Contrato",
+            "default": ""
+          },
+          "contractLineErp": {
+            "type": "string",
+            "description": "Linha ERP do Contrato",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "purchasingOrganizationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "updateDateTime": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do item",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o Longa do Grupo",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Struct_API_GET_BasicRequisitionItem_Status"
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Item_Response": {
+        "type": "object",
+        "properties": {
+          "listItem": {
+            "$ref": "#/components/schemas/API_Requisition_GET_Item"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Lista de erros retornados da opera&#231;&#227;o.",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Item_Response_v2": {
+        "type": "object",
+        "properties": {
+          "listItem": {
+            "$ref": "#/components/schemas/API_Requisition_GET_Item2"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Lista de erros retornados da opera&#231;&#227;o.",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Item_Response_v3": {
+        "type": "object",
+        "properties": {
+          "listItem": {
+            "$ref": "#/components/schemas/API_Requisition_GET_Item3"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Lista de erros retornados da opera&#231;&#227;o.",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Item2": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador &#250;nico do Item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do Item",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do Item",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do Item",
+            "default": ""
+          },
+          "deliveryAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do Item",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio multiplicado pela quantidade",
+            "example": 0.1
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do Tipo de Pagamento",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo do Unidade de Medida",
+            "default": ""
+          },
+          "catalogItemId": {
+            "type": "integer",
+            "description": "Identificador do item no cat&#225;logo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "lineErp": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "itemCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria do item",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade de entrega do item",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "isOnlyOriginalBrand": {
+            "type": "boolean",
+            "description": "Indica se s&#243; permite a utiliza&#231;&#227;o de marcas originais",
+            "example": false
+          },
+          "listCostAllocation": {
+            "type": "array",
+            "description": "Lista de Aloca&#231;&#227;o de Custo",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_CostAllocation2"
+            }
+          },
+          "listComment": {
+            "type": "array",
+            "description": "Lista de coment&#225;rios",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_Comments"
+            }
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Natureza da Opera&#231;&#227;o",
+            "default": ""
+          },
+          "listReceivingDatasRequisition": {
+            "type": "array",
+            "description": "Lista de Dados do Recebimento",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_ReceivingDatas"
+            }
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do Grupo de Permiss&#227;o",
+            "default": ""
+          },
+          "requestManagementStatusId": {
+            "type": "integer",
+            "description": "Status de tratamento do item no GR (1 = N&#227;o tratado | 2 = Em processamento | 3 = Tratado | 4 = Cancelado | 5 = Aguardando aceite)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "deliveryAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "description": "C&#243;digo do Classifica&#231;&#227;o do item",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo do Contrato",
+            "default": ""
+          },
+          "contractLineErp": {
+            "type": "string",
+            "description": "Linha ERP do Contrato",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "purchasingOrganizationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "updateDateTime": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do item",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o Longa do Grupo",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Struct_API_GET_BasicRequisitionItem_Status"
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Item3": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador &#250;nico do Item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do Item",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do Item",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do Item",
+            "default": ""
+          },
+          "deliveryAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo externo do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do Item",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio multiplicado pela quantidade",
+            "example": 0.1
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do Tipo de Pagamento",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo do Unidade de Medida",
+            "default": ""
+          },
+          "catalogItemId": {
+            "type": "integer",
+            "description": "Identificador do item no cat&#225;logo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "lineErp": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "itemCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria do item",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade de entrega do item",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "isOnlyOriginalBrand": {
+            "type": "boolean",
+            "description": "Indica se s&#243; permite a utiliza&#231;&#227;o de marcas originais",
+            "example": false
+          },
+          "listCostAllocation": {
+            "type": "array",
+            "description": "Lista de Aloca&#231;&#227;o de Custo",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_CostAllocation2"
+            }
+          },
+          "listComment": {
+            "type": "array",
+            "description": "Lista de coment&#225;rios",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_Comments"
+            }
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Natureza da Opera&#231;&#227;o",
+            "default": ""
+          },
+          "listReceivingDatasRequisition": {
+            "type": "array",
+            "description": "Lista de Dados do Recebimento",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_GET_Items_ReceivingDatas2"
+            }
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do Grupo de Permiss&#227;o",
+            "default": ""
+          },
+          "requestManagementStatusId": {
+            "type": "integer",
+            "description": "Status de tratamento do item no GR (1 = N&#227;o tratado | 2 = Em processamento | 3 = Tratado | 4 = Cancelado | 5 = Aguardando aceite)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "deliveryAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Entrega",
+            "default": ""
+          },
+          "paymentAddressText": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de Pagamento",
+            "default": ""
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "description": "C&#243;digo do Classifica&#231;&#227;o do item",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo do Contrato",
+            "default": ""
+          },
+          "contractLineErp": {
+            "type": "string",
+            "description": "Linha ERP do Contrato",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "purchasingOrganizationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da Organiza&#231;&#227;o de Compra selecionado para a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "updateDateTime": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do item",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o Longa do Grupo",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Struct_API_GET_BasicRequisitionItem_Status"
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Items_Comments": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id do coment&#225;rio",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "comment": {
+            "type": "string",
+            "description": "Conte&#250;do (texto) do coment&#225;rio",
+            "default": ""
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o do coment&#225;rio",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "updateDateTime": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do coment&#225;rio",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Items_CostAllocation": {
+        "type": "object",
+        "properties": {
+          "costAllocationId": {
+            "type": "integer",
+            "description": "Identificador da Aloca&#231;&#227;o de Custo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "costAllocationDetailCode": {
+            "type": "string",
+            "description": "C&#243;digo do detalhe da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "accountAssignmentCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Porcentagem da Aloca&#231;&#227;o de Custo",
+            "example": 0.1
+          },
+          "costAllocationComplementCode": {
+            "type": "string",
+            "description": "C&#243;digo do complemento da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationObs": {
+            "type": "string",
+            "description": "Observa&#231;&#245;es da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Items_CostAllocation2": {
+        "type": "object",
+        "properties": {
+          "costAllocationId": {
+            "type": "integer",
+            "description": "Identificador da Aloca&#231;&#227;o de Custo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "costAllocationDetailCode": {
+            "type": "string",
+            "description": "C&#243;digo do detalhe da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "accountAssignmentCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationComplementTextField": {
+            "type": "string",
+            "description": "Complemento da aloca&#231;&#227;o de custo com texto livre. Length=50",
+            "default": ""
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Porcentagem da Aloca&#231;&#227;o de Custo",
+            "example": 0.1
+          },
+          "costAllocationComplementCode": {
+            "type": "string",
+            "description": "C&#243;digo do complemento da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationObs": {
+            "type": "string",
+            "description": "Observa&#231;&#245;es da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Items_ReceivingDatas": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador dos Dados do Recebimento",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "unloadPoint": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do ponto de descarga do item",
+            "default": ""
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de quem vai receber o carregamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens que ser&#227;o descarregados",
+            "example": 0.1
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o dos Dados do Recebimento",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": ""
+      },
+      "API_Requisition_GET_Items_ReceivingDatas2": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador dos Dados do Recebimento",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "unloadPoint": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do ponto de descarga do item",
+            "default": ""
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de quem vai receber o carregamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens que ser&#227;o descarregados",
+            "example": 0.1
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o dos Dados do Recebimento",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data de entrega prevista",
+            "format": "date",
+            "example": "2014-12-31"
+          }
+        },
+        "description": ""
+      },
+      "API_RequisitionItens_Attachs_Response": {
+        "type": "object",
+        "properties": {
+          "attachs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/API_Requisition_Attach"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": "Estrutura de resposta de anexos de um item da requisi&#231;&#227;o"
+      },
+      "ApproverItem": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email usu&#225;rio. Length=250",
+            "default": ""
+          },
+          "approvalDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": ""
+      },
+      "BuyerGroup": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Identificador do item da requisi&#231;&#227;o.",
+            "format": "int32",
+            "example": 0
+          },
+          "permissionGroupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo de compras. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Comments": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "contractInfo": {
+        "type": "object",
+        "properties": {
+          "checkContract": {
+            "type": "boolean",
+            "description": "Indica se ir&#225; utilizar a condi&#231;&#227;o comercial do item",
+            "example": false
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo da condi&#231;&#227;o comercial do item. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "CostAllocationItem2": {
+        "required": [
+          "accountAssignmentCategoryCode",
+          "costAllocationComplementCode",
+          "costAllocationDetailCode",
+          "costAllocationObs",
+          "percentage"
+        ],
+        "type": "object",
+        "properties": {
+          "accountAssignmentCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationDetailCode": {
+            "type": "string",
+            "description": "C&#243;digo do detalhe da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationComplementCode": {
+            "type": "string",
+            "description": "C&#243;digo do complemento da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationComplementTextField": {
+            "type": "string",
+            "description": "Complemento da aloca&#231;&#227;o de custo com texto livre. Length=50",
+            "default": ""
+          },
+          "costAllocationObs": {
+            "type": "string",
+            "description": "Observa&#231;&#245;es da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Percentual",
+            "example": 0.1
+          }
+        },
+        "description": ""
+      },
+      "costAllocations": {
+        "required": [
+          "accountAssignmentCategoryCode",
+          "costAllocationDetailCode",
+          "percentage"
+        ],
+        "type": "object",
+        "properties": {
+          "accountAssignmentCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationDetailCode": {
+            "type": "string",
+            "description": "C&#243;digo do detalhe da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationComplementCode": {
+            "type": "string",
+            "description": "C&#243;digo do complemento da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "costAllocationComplementTextField": {
+            "type": "string",
+            "description": "Complemento da aloca&#231;&#227;o de custo com texto livre. Length=50",
+            "default": ""
+          },
+          "costAllocationObs": {
+            "type": "string",
+            "description": "Observa&#231;&#245;es da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Percentual",
+            "example": 0.1
+          }
+        },
+        "description": ""
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "errorsCostAllocation": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": "Estrutura JSON com a resposta"
+      },
+      "errorsidRecord": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "example": 0
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": ""
+      },
+      "errorsRecord2": {
+        "required": [
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GET_RequisitionByApprove": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador da requisicao",
+            "format": "int32",
+            "example": 0
+          },
+          "codeErp": {
+            "type": "string",
+            "description": "Code ERP. Length=30",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "description": "Titulo",
+            "default": ""
+          },
+          "currencySymbol": {
+            "type": "string",
+            "description": "S&#237;mbolo da Moeda",
+            "default": ""
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da requisicao",
+            "example": 0.1
+          },
+          "totalQtdItems": {
+            "type": "integer",
+            "description": "total de items da requisicao",
+            "format": "int64",
+            "example": 1234567891234567
+          }
+        },
+        "description": ""
+      },
+      "GET_RequisitionByApprove_Response": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/structMetadata"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          },
+          "requisition": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GET_RequisitionByApprove"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GetApprovalsResponse": {
+        "required": [
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/structMetadata"
+          },
+          "approvers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApproverItem"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GetRequisitionsItemsByApprovalsResponse": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/structMetadata"
+          },
+          "items": {
+            "type": "array",
+            "description": "Itens que est&#227;o &quot;Em Aprova&#231;&#227;o&quot; para o usu&#225;rio informado",
+            "items": {
+              "$ref": "#/components/schemas/Item3"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Lista de erros encontrados na chamada",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Item3": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item",
+            "default": ""
+          },
+          "lineErp": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "updatedDate": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do item",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "requisition": {
+            "$ref": "#/components/schemas/Requisition"
+          }
+        },
+        "description": ""
+      },
+      "Item4": {
+        "required": [
+          "itemId"
+        ],
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Identificador do item na requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "lineErp": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rios do item.",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Items_Cataloged": {
+        "required": [
+          "code",
+          "costAllocations",
+          "lineERP",
+          "natureOfOperationCode",
+          "needDate",
+          "quantity",
+          "unitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item catalogado. Length=32",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega. Length=50",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento. Length=50",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da natureza de opera&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "contractInfo": {
+            "$ref": "#/components/schemas/contractInfo"
+          },
+          "costAllocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostAllocationItem2"
+            }
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo de compras. Length=50",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra. Length=50",
+            "default": ""
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo. Length=50",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo. Length=200",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo. Length=2500",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": "Lista de itens"
+      },
+      "Items_NotCataloged": {
+        "required": [
+          "categoryCode",
+          "code",
+          "itemClassificationCode",
+          "lineERP",
+          "longDescription",
+          "natureOfOperationCode",
+          "needDate",
+          "quantity",
+          "shortDescription",
+          "unitOfMeasureCode",
+          "unitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item catalogado. Tamanho=32",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta. Tamanho=950",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa. Tamanho=3000",
+            "default": ""
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de pagamento",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo da unidade de medida",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "categoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;dio da natureza de opera&#231;&#227;o",
+            "default": ""
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo de compras",
+            "default": ""
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de item.(PRODUCT, SERVICE)",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra",
+            "default": ""
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo. Tamanho=50",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo. Tamanho=200",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo. Tamanho=2500",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": ""
+      },
+      "PostCommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id do comentario criado.",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PUT_CommentByOperationCode": {
+        "type": "object",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "description": "Coment&#225;rio. Length=3000",
+            "default": ""
+          },
+          "IsPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "PUT_Items_Cataloged": {
+        "required": [
+          "code",
+          "id",
+          "natureOfOperationCode",
+          "quantity",
+          "unitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item da requisi&#231;&#227;o.",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item catalogado. Length=32",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade de itens",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio do item",
+            "example": 0.1
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "needDate": {
+            "type": "string",
+            "description": "Data de necessidade",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega. Length=50",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento. Length=50",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da natureza de opera&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "contractInfo": {
+            "$ref": "#/components/schemas/contractInfo"
+          },
+          "groupPermissionCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo de compras. Length=50",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra. Length=50",
+            "default": ""
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo. Length=50",
+            "default": ""
+          },
+          "groupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo. Length=200",
+            "default": ""
+          },
+          "groupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo. Length=2500",
+            "default": ""
+          },
+          "groupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": ""
+      },
+      "PutRequisitionByOperationCodeResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "Estrutura com os erros",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          },
+          "responseList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/responseList"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Requisition": {
+        "type": "object",
+        "properties": {
+          "requisitionId": {
+            "type": "integer",
+            "description": "Identificador da requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          }
+        },
+        "description": ""
+      },
+      "Requisition_API_GET": {
+        "type": "object",
+        "properties": {
+          "requisition": {
+            "$ref": "#/components/schemas/Struct_API_GET_Requisition"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Requisition_API_GET_v2": {
+        "type": "object",
+        "properties": {
+          "requisition": {
+            "$ref": "#/components/schemas/Struct_API_GET_Requisition_v2"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Requisition_Errors_API_PUT": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Requisition_Items_API_GET": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Struct_Metadata"
+          },
+          "listItem": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Struct_API_GET_BasicRequisitionItem"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": "Estrutura JSON com a resposta da chamada de busca a lista com informa&#231;&#245;es b&#225;sicas dos itens da requisi&#231;&#227;o."
+      },
+      "Requisition_Paramenters_API_GET": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Struct_Metadata"
+          },
+          "listRequisition": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Struct_GET_RequisitionsByParameters"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Requisition2": {
+        "type": "object",
+        "properties": {
+          "codeErp": {
+            "type": "string",
+            "description": "Code ERP. Length=30",
+            "default": ""
+          },
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rios da requisi&#231;&#227;o",
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item4"
+            }
+          }
+        },
+        "description": ""
+      },
+      "RequisitionComment": {
+        "required": [
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rio. Length=3000",
+            "default": ""
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": "Coment&#225;rio do item"
+      },
+      "responseList": {
+        "required": [
+          "rowNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "rowNumber": {
+            "type": "integer",
+            "description": "N&#250;mero da linha da lista ",
+            "format": "int32",
+            "example": 0
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identificador do recurso, &#233; retornado caso o mesmo seja criado",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "errors": {
+            "type": "array",
+            "description": "Estrutura com os erros",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": "Estrutura para retorno das APIs de cria&#231;&#227;o em lista"
+      },
+      "ResponseListerror": {
+        "type": "object",
+        "properties": {
+          "responseList": {
+            "type": "array",
+            "description": "Estrutura para retorno das APIs de cria&#231;&#227;o em lista",
+            "items": {
+              "$ref": "#/components/schemas/ResponseListItem"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Estrutura com os erros",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": "Estrutura JSON com a resposta da cria&#231;&#227;o do pedido"
+      },
+      "responseListerrorsRecord": {
+        "type": "object",
+        "properties": {
+          "responseList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/responseList"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Estrutura com os erros",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": ""
+      },
+      "ResponseListItem": {
+        "required": [
+          "rowNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "rowNumber": {
+            "type": "integer",
+            "description": "N&#250;mero da linha da lista",
+            "format": "int32",
+            "example": 0
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identificador do recurso, &#233; retornado caso o mesmo seja criado",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "errors": {
+            "type": "array",
+            "description": "Estrutura com os erros",
+            "items": {
+              "$ref": "#/components/schemas/utils_structError2"
+            }
+          }
+        },
+        "description": "Estrutura para retorno das APIs de cria&#231;&#227;o em lista"
+      },
+      "Struct_API_GET_Attribute": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome",
+            "default": ""
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_Attribute_v2": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome",
+            "default": ""
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor",
+            "default": ""
+          },
+          "labelValue": {
+            "type": "string",
+            "description": "Campo considerado somente para Atributos Flex&#237;veis do tipo Lista de Valores",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_BasicRequisitionItem": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "requestManagmentStatusId": {
+            "type": "string",
+            "description": "Status de tratamento do item no GR\n1 = &#39;Em composi&#231;&#227;o ou pendente de Tratamento&#39;\n3 = &#39;Tratado&#39;\n4 = &#39;Cancelado&#39;",
+            "default": ""
+          },
+          "status": {
+            "$ref": "#/components/schemas/Struct_API_GET_BasicRequisitionItem_Status"
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_BasicRequisitionItem_Status": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do Status",
+            "default": ""
+          },
+          "label": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Status",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id do coment&#225;rio",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rio",
+            "default": ""
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "updateDateTime": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_Requisition": {
+        "required": [
+          "RequestPriorityId",
+          "createdBy",
+          "createdDate",
+          "id",
+          "isAddressByRequest",
+          "title",
+          "totalPrice",
+          "updatedBy",
+          "updatedDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador da requsi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "description": "Titulo",
+            "default": ""
+          },
+          "RequestPriorityId": {
+            "type": "integer",
+            "description": "Prioridade da Requisi&#231;&#227;o: 1=Priority; 2=Normal.",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "isAddressByRequest": {
+            "type": "boolean",
+            "description": "Se o endere&#231;o &#233; o n&#237;vel da requisi&#231;&#227;o",
+            "example": false
+          },
+          "requestStatusCode": {
+            "type": "string",
+            "description": "C&#243;digo do status",
+            "default": ""
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega",
+            "default": ""
+          },
+          "deliveryAddress": {
+            "type": "string",
+            "description": "Endere&#231;o de entrega",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de faturamento",
+            "default": ""
+          },
+          "paymentAddress": {
+            "type": "string",
+            "description": "Endere&#231;o de faturamento",
+            "default": ""
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que criou a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o da Requisi&#231;&#227;o",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que atualizou a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "updatedDate": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o da Requisi&#231;&#227;o",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da requisi&#231;&#227;o",
+            "example": 0.1
+          },
+          "totalQtdItems": {
+            "type": "string",
+            "description": "Total de linhas da requisi&#231;&#227;o",
+            "default": ""
+          },
+          "requestManagementStatusId": {
+            "type": "integer",
+            "description": "Status de tratamento da requisi&#231;&#227;o no GR\n1 = &#39;Pendente de Tratamento&#39;   \n2 = &#39;Parcialmente Tratada&#39;\n3 = &#39;Totalmente Tratada&#39;",
+            "format": "int32",
+            "example": 0
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento",
+            "default": ""
+          },
+          "paymentType": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "default": ""
+          },
+          "documentFormCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de documento",
+            "default": ""
+          },
+          "purchasingOrganization": {
+            "type": "string",
+            "description": "Organiza&#231;&#227;o de Compra selecionado",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Organiza&#231;&#227;o de Compra",
+            "default": ""
+          },
+          "suggestedSupplierTaxNumber": {
+            "type": "string",
+            "description": "N&#250;mero fiscal do fornecedor sugerido",
+            "default": ""
+          },
+          "suggestedSupplierCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do fornecedor sugerido",
+            "default": ""
+          },
+          "companyCurrencyCode": {
+            "type": "string",
+            "description": "C&#243;digo da moeda cadastrada para empresa",
+            "default": ""
+          },
+          "listComment": {
+            "type": "array",
+            "description": "Lista com os coment&#225;rios",
+            "items": {
+              "$ref": "#/components/schemas/Struct_API_GET_Comment"
+            }
+          },
+          "listAttribute": {
+            "type": "array",
+            "description": "Lista com os atributos",
+            "items": {
+              "$ref": "#/components/schemas/Struct_API_GET_Attribute"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Struct_API_GET_Requisition_v2": {
+        "required": [
+          "createdBy",
+          "createdDate",
+          "id",
+          "isAddressByRequest",
+          "requestPriorityId",
+          "title",
+          "totalPrice",
+          "updatedBy",
+          "updatedDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador da requsi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "description": "Titulo",
+            "default": ""
+          },
+          "requestPriorityId": {
+            "type": "integer",
+            "description": "Prioridade da Requisi&#231;&#227;o: 1=Priority; 2=Normal.",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "isAddressByRequest": {
+            "type": "boolean",
+            "description": "Se o endere&#231;o &#233; o n&#237;vel da requisi&#231;&#227;o",
+            "example": false
+          },
+          "requestStatusCode": {
+            "type": "string",
+            "description": "C&#243;digo do status",
+            "default": ""
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega",
+            "default": ""
+          },
+          "deliveryAddress": {
+            "type": "string",
+            "description": "Endere&#231;o de entrega",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de faturamento",
+            "default": ""
+          },
+          "paymentAddress": {
+            "type": "string",
+            "description": "Endere&#231;o de faturamento",
+            "default": ""
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que criou a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o da Requisi&#231;&#227;o",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que atualizou a requisi&#231;&#227;o",
+            "default": ""
+          },
+          "updatedDate": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o da Requisi&#231;&#227;o",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da requisi&#231;&#227;o",
+            "example": 0.1
+          },
+          "totalQtdItems": {
+            "type": "string",
+            "description": "Total de linhas da requisi&#231;&#227;o",
+            "default": ""
+          },
+          "requestManagementStatusId": {
+            "type": "integer",
+            "description": "Status de tratamento da requisi&#231;&#227;o no GR\n1 = &#39;Pendente de Tratamento&#39;   \n2 = &#39;Parcialmente Tratada&#39;\n3 = &#39;Totalmente Tratada&#39;",
+            "format": "int32",
+            "example": 0
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento",
+            "default": ""
+          },
+          "paymentType": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "default": ""
+          },
+          "documentFormCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de documento",
+            "default": ""
+          },
+          "purchasingOrganization": {
+            "type": "string",
+            "description": "Organiza&#231;&#227;o de Compra selecionado",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da Organiza&#231;&#227;o de Compra",
+            "default": ""
+          },
+          "suggestedSupplierTaxNumber": {
+            "type": "string",
+            "description": "N&#250;mero fiscal do fornecedor sugerido",
+            "default": ""
+          },
+          "suggestedSupplierCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do fornecedor sugerido",
+            "default": ""
+          },
+          "companyCurrencyCode": {
+            "type": "string",
+            "description": "C&#243;digo da moeda cadastrada para empresa",
+            "default": ""
+          },
+          "listComment": {
+            "type": "array",
+            "description": "Lista com os coment&#225;rios",
+            "items": {
+              "$ref": "#/components/schemas/Struct_API_GET_Comment"
+            }
+          },
+          "listAttribute": {
+            "type": "array",
+            "description": "Lista com os atributos",
+            "items": {
+              "$ref": "#/components/schemas/Struct_API_GET_Attribute_v2"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Struct_Errors_PUT_Requisition_Status": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Requisition_Errors_API_PUT"
+            }
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identificador &#250;nico da requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          }
+        },
+        "description": ""
+      },
+      "Struct_GET_RequisitionsByParameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador interno da requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "title": {
+            "type": "string",
+            "description": "Titulo da requisi&#231;&#227;o",
+            "default": ""
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          }
+        },
+        "description": "Estrutura com informa&#231;&#245;es b&#225;sicas da lista de requisi&#231;&#245;es"
+      },
+      "Struct_Metadata": {
+        "type": "object",
+        "properties": {
+          "totalRows": {
+            "type": "string",
+            "description": "Numero total de registro",
+            "default": ""
+          },
+          "offset": {
+            "type": "string",
+            "description": "Offset atual utilizado na busca",
+            "default": ""
+          },
+          "limit": {
+            "type": "string",
+            "description": "Limit atual utilizado na busca",
+            "default": ""
+          },
+          "first": {
+            "type": "string",
+            "description": "Path da primeira pagina da busca",
+            "default": ""
+          },
+          "previous": {
+            "type": "string",
+            "description": "Path da pagina anterior da busca",
+            "default": ""
+          },
+          "next": {
+            "type": "string",
+            "description": "Path da proxima pagina da busca",
+            "default": ""
+          },
+          "last": {
+            "type": "string",
+            "description": "Path da ultima pagina da busca",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_POST_Comment2": {
+        "type": "object",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "description": "Coment&#225;rio. Length=3000",
+            "default": ""
+          },
+          "IsPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "Struct_POST_Requisition": {
+        "required": [
+          "companyCurrencyISO",
+          "createdBy",
+          "documentFormCode",
+          "isAddressByRequest",
+          "requestPriorityId",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "description": "T&#237;tulo da requisi&#231;&#227;o.  Length=200",
+            "default": ""
+          },
+          "requestPriorityId": {
+            "type": "integer",
+            "description": "1=Priority; 2=Normal.",
+            "format": "int32",
+            "example": 0
+          },
+          "isAddressByRequest": {
+            "type": "boolean",
+            "description": "Indica se o endereco e o mesmo para todos os itens (TRUE) ou se cada item tem seu proprio endere&#231;o de entrega e faturamento\n",
+            "example": false
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "Codigo endere&#231;o de entrega da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "Codigo endere&#231;o de faturamento da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de pagamento. Length=50",
+            "default": ""
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que criou a requisi&#231;&#227;o (email). Length=100",
+            "default": ""
+          },
+          "documentFormCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de documento da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra. Length=50",
+            "default": ""
+          },
+          "suggestedSupplierTaxNumber": {
+            "type": "string",
+            "description": "N&#250;mero fiscal do fornecedor sugerido. Length=50",
+            "default": ""
+          },
+          "suggestedSupplierCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do fornecedor sugerido. Length=50",
+            "default": ""
+          },
+          "companyCurrencyISO": {
+            "type": "string",
+            "description": "C&#243;digo ISO da moeda a ser usada na requisi&#231;&#227;o. Length=15",
+            "default": ""
+          },
+          "filialCode": {
+            "type": "string",
+            "description": "C&#243;digo da filial. Length=50",
+            "default": ""
+          },
+          "comments": {
+            "type": "array",
+            "description": "Lista de coment&#225;rios da requisi&#231;&#227;o",
+            "items": {
+              "$ref": "#/components/schemas/Struct_POST_Comment2"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Struct_POST_RequisitionAttribute": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo",
+            "default": ""
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_PUT_Requisition_V2": {
+        "required": [
+          "isAddressByRequest",
+          "requestPriorityId",
+          "title",
+          "updatedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "T&#237;tulo da requisi&#231;&#227;o.  Length=200",
+            "default": ""
+          },
+          "requestPriorityId": {
+            "type": "integer",
+            "description": "1=Priority; 2=Normal.",
+            "format": "int32",
+            "example": 0
+          },
+          "isAddressByRequest": {
+            "type": "boolean",
+            "description": "Indica se o endereco e o mesmo para todos os itens (TRUE) ou se cada item tem seu proprio endere&#231;o de entrega e faturamento\n",
+            "example": false
+          },
+          "deliveryAddressCode": {
+            "type": "string",
+            "description": "Codigo endere&#231;o de entrega da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "paymentAddressCode": {
+            "type": "string",
+            "description": "Codigo endere&#231;o de faturamento da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de pagamento. Length=50",
+            "default": ""
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que atualizou a requisi&#231;&#227;o (email). Length=100",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra. Length=50",
+            "default": ""
+          },
+          "suggestedSupplierTaxNumber": {
+            "type": "string",
+            "description": "N&#250;mero fiscal do fornecedor sugerido. Length=50",
+            "default": ""
+          },
+          "suggestedSupplierCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do fornecedor sugerido. Length=50",
+            "default": ""
+          },
+          "companyCurrencyISO": {
+            "type": "string",
+            "description": "C&#243;digo ISO da moeda a ser usada na requisi&#231;&#227;o. Length=15",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structError3": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structError9": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structErrorListIntegerRecord": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError9"
+            }
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "example": 0
+          }
+        },
+        "description": ""
+      },
+      "StructErrorsResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": ""
+      },
+      "StructErrorsResponse_WaitingERP": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError3"
+            }
+          }
+        },
+        "description": ""
+      },
+      "structMetadata": {
+        "type": "object",
+        "properties": {
+          "totalRows": {
+            "type": "string",
+            "description": "Numero total de registro",
+            "default": ""
+          },
+          "offset": {
+            "type": "string",
+            "description": "Offset atual utilizado na busca",
+            "default": ""
+          },
+          "limit": {
+            "type": "string",
+            "description": "Limit atual utilizado na busca",
+            "default": ""
+          },
+          "first": {
+            "type": "string",
+            "description": "Path da primeira pagina da busca",
+            "default": ""
+          },
+          "previous": {
+            "type": "string",
+            "description": "Path da pagina anterior da busca",
+            "default": ""
+          },
+          "next": {
+            "type": "string",
+            "description": "Path da proxima pagina da busca",
+            "default": ""
+          },
+          "last": {
+            "type": "string",
+            "description": "Path da ultima pagina da busca",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "utils_structError2": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}
