@@ -1,0 +1,1345 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "NimbiAccounts",
+    "description": "API do Provedor Nimbi - requer os seguintes par&#226;metros headers:\n* ClientAPI_ID (Identifica&#231;&#227;o do Cliente NIMBI);\n* ClientAPI_Key (Chave de acesso NIMBI para o consumo de APIs);\n* companyTaxNumber (Registro Fiscal da empresa que est&#225; executando a&#231;&#227;o - sem m&#225;scara);\n* companyCountryCode (C&#243;digo do Pa&#237;s da empresa que est&#225; executando a&#231;&#227;o. Ex: 'BR').",
+    "version": "1"
+  },
+  "basePath": "/NimbiProviderAPI/rest/NimbiAccounts",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/v1/{token}": {
+      "get": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "API para consultar os dados da conta do usu&#225;rio atrav&#233;s do token.",
+        "operationId": "GetUserOAuth",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Chave da autentica&#231;&#227;o"
+          },
+          {
+            "name": "returnFields",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Utilizado para definir quais campos da estrutura JSON v&#227;o ser retornados. Passar os mesmos nomes da estrutura JSON separado por virgula (Ex: &quot;uuid,name,surname&quot;), caso vazio, retornam todos os campos."
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca da autentica&#231;&#227;o.",
+            "schema": {
+              "$ref": "#/definitions/StructApiUserByToken"
+            }
+          }
+        }
+      }
+    },
+    "/v1/{userUuid}/preferences": {
+      "put": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Edita as prefer&#234;ncias de um usu&#225;rio",
+        "operationId": "PUT_USER_PREFERENCES",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Identificador unico do usu&#225;rio"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Estrutura JSON necess&#225;ria para a edi&#231;&#227;o das prefer&#234;ncias do usu&#225;rio",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/API_User_POST_Preferences_Req"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de edi&#231;&#227;o das prefer&#234;ncias do usu&#225;rio.",
+            "schema": {
+              "$ref": "#/definitions/API_User_POST_Preferences_Resp"
+            }
+          }
+        }
+      }
+    },
+    "/v1/applications": {
+      "get": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Retorna as aplica&#231;&#245;es do portal.\n(Pagina&#231;&#227;o baseada no limit)\n\n",
+        "operationId": "GET_APPLICATIONS",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "x-example": 0,
+            "format": "int32",
+            "description": "Parametro utilizado para indicar a posicao inicial de consulta. Default 0."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "x-example": 0,
+            "format": "int32",
+            "description": "Parametro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Parametro utilizado para ordenar a consulta. Para essa API utilize 'name' e/ou 'code'. Default 'name'"
+          },
+          {
+            "name": "acceptlanguage",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca de aplica&#231;&#227;o associada ao cliente",
+            "schema": {
+              "$ref": "#/definitions/GET_Applications_Response_V2"
+            }
+          }
+        }
+      }
+    },
+    "/v1/hierarchies": {
+      "put": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Define a hierarquia de um usu&#225;rio baseado no email (email do usu&#225;rio e do parent)",
+        "operationId": "PUT_Hierarchies",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "in": "body",
+            "description": "Estrutura JSON com a chamada para definir hierarquia de um usu&#225;rio",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PUT_HierarchiesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca de hierarquia de um usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/API_UserHierarchy_PUT"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Busca a hierarquia de um usu&#225;rio baseado no email",
+        "operationId": "GET_Hierarchies",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Email do usu&#225;rio"
+          },
+          {
+            "name": "numberOfLevels",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "x-example": 0,
+            "format": "int32",
+            "description": "Par&#226;metro utilizado para indicar a quantidade de n&#237;veis desejados no retorno da consulta. Default 3 / M&#225;ximo 50."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de busca de hierarquia de um usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/API_UserHierarchy_GET"
+            }
+          }
+        }
+      }
+    },
+    "/v1/user": {
+      "post": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Cria usu&#225;rio com acesso ao portal.",
+        "operationId": "POST_USER",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Estrutura JSON necessaria para a cria&#231;&#227;o do usu&#225;rio",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/API_POST_USER_request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de cria&#231;&#227;o do usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/API_POST_USER_response"
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/{userUuid}": {
+      "put": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Atualiza usu&#225;rio com acesso ao portal.",
+        "operationId": "PUT_USER",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Identificador unico do usu&#225;rio"
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/put_user_request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de atualiza&#231;&#227;o do status do usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/users"
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/{userUuid}/status/{statusCode}": {
+      "put": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Atualiza o status do usu&#225;rio",
+        "operationId": "PUT_USER_STATUS",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Identificador unico do usu&#225;rio"
+          },
+          {
+            "name": "statusCode",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Status a ser atualizado no usu&#225;rio. Valores aceitos: active, inactive"
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de atualiza&#231;&#227;o do status do usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/API_PUT_USER_STATUS_response"
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/status/{statusCode}": {
+      "put": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Atualiza o status do usu&#225;rio",
+        "operationId": "PUT_USER_STATUSBYEMAIL",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Email do usu&#225;rio"
+          },
+          {
+            "name": "statusCode",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "Status a ser atualizado no usu&#225;rio. Valores aceitos: active, inactive"
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada de atualiza&#231;&#227;o do status do usu&#225;rio",
+            "schema": {
+              "$ref": "#/definitions/API_PUT_USER_STATUS_response"
+            }
+          }
+        }
+      }
+    },
+    "/v1/users": {
+      "get": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Busca os usu&#225;rios com acesso ao portal.\n(Pagina&#231;&#227;o baseada no limit)\n\n",
+        "operationId": "GET_USER",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Busca o usu&#225;rio por e-mail pelo valor exato que &#233; passado."
+          },
+          {
+            "name": "querySearch",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Busca por &quot;name&quot;, &quot;surname&quot; ou &quot;email&quot;"
+          },
+          {
+            "name": "userStatus",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Filtro de status do usu&#225;rio: &quot;active&quot; somente usu&#225;rios ativos e &quot;inactive&quot; somente usu&#225;rios inativos, caso vazio busca todos."
+          },
+          {
+            "name": "adminOption",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Filtro de usu&#225;rio administrador: &quot;admin&quot; somente usu&#225;rios administradores e &quot;notadmin&quot; somente usu&#225;rios n&#227;o administradores, caso vazio busca todos."
+          },
+          {
+            "name": "register",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Busca o usu&#225;rio pela matr&#237;cula pelo valor exato que &#233; passado."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Par&#226;metro utilizado para ordenar a consulta. Para essa API utilize 'email', 'name', 'surname', 'isAdmin' e/ou 'updateDate'. Default 'name, surname'"
+          },
+          {
+            "name": "returnFields",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "Utilizado para definir quais campos da estrutura JSON v&#227;o ser retornados. Passar os mesmos nomes da estrutura JSON separado por virgula (Ex: &quot;user.name,userExt.updatedDate&quot;), caso vazio, retornam os seguintes campos: &quot;user.name,user.email,user.isActive,userExt.uuid,userExt.isAdmin&quot;."
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da chamada",
+            "schema": {
+              "$ref": "#/definitions/API_GET_USER_response"
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/plants": {
+      "delete": {
+        "tags": [
+          "NimbiAccounts"
+        ],
+        "description": "Exclui usu&#225;rios de uma planta",
+        "operationId": "DELETE_Plant_Users",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "plantCode",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da planta."
+          },
+          {
+            "name": "userList",
+            "in": "body",
+            "description": "Lista de usu&#225;rios a excluir da planta.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/API_User_List2"
+            }
+          },
+          {
+            "name": "accept-Language",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "",
+            "description": "C&#243;digo da Linguagem que retorna os campos traduzidos (Default = PT): \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da a&#231;&#227;o",
+            "schema": {
+              "$ref": "#/definitions/responseListerrorsRecord2"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "API_GET_USER": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "userExt": {
+          "$ref": "#/definitions/API_GET_USER_userExt"
+        },
+        "user": {
+          "$ref": "#/definitions/API_GET_USER_user"
+        }
+      }
+    },
+    "API_GET_USER_response": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/structMetadata"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/API_GET_USER"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError"
+          }
+        }
+      }
+    },
+    "API_GET_USER_user": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome do usu&#225;rio"
+        },
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "E-mail do usu&#225;rio"
+        },
+        "lastLogin": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2014-12-31T23:59:59.938Z",
+          "description": "&#218;ltimo login do usu&#225;rio"
+        },
+        "isActive": {
+          "type": "boolean",
+          "example": false,
+          "description": "Indica se o usu&#225;rio est&#225; ativo"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2014-12-31T23:59:59.938Z",
+          "description": "Data de cria&#231;&#227;o do usu&#225;rio"
+        }
+      }
+    },
+    "API_GET_USER_userExt": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "surname": {
+          "type": "string",
+          "default": "",
+          "description": "Sobrenome do usu&#225;rio"
+        },
+        "updateDate": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2014-12-31T23:59:59.938Z",
+          "description": "Data de atualiza&#231;&#227;o do usu&#225;rio"
+        },
+        "uuid": {
+          "type": "string",
+          "default": "",
+          "description": "Identificador &#250;nico do usu&#225;rio"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "example": false,
+          "description": "Indica se o usu&#225;rio &#233; administrador da empresa"
+        },
+        "register": {
+          "type": "string",
+          "default": "",
+          "description": "Matr&#237;cula do usu&#225;rio na empresa"
+        }
+      }
+    },
+    "API_POST_USER_request": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/API_POST_USER_user"
+        },
+        "userExt": {
+          "$ref": "#/definitions/API_POST_USER_userExt"
+        }
+      },
+      "required": [
+        "user",
+        "userExt"
+      ]
+    },
+    "API_POST_USER_response": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/API_POST_USER_userUuid"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError"
+          },
+          "description": "Informa&#231;&#245;es do erro"
+        }
+      }
+    },
+    "API_POST_USER_user": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome do usuario. Tamanho: 256 caracteres"
+        },
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usuario. Tamanho: 100 caracteres"
+        }
+      },
+      "required": [
+        "name",
+        "email"
+      ]
+    },
+    "API_POST_USER_userExt": {
+      "description": "Estrutura com atributos referente a usuario (extensao)",
+      "type": "object",
+      "properties": {
+        "surname": {
+          "type": "string",
+          "default": "",
+          "description": "Sobrenome do usuario. Tamanho: 100 caracteres"
+        },
+        "register": {
+          "type": "string",
+          "default": "",
+          "description": "Matricula na empresa do usu&#225;rio. Tamanho: 50 caracteres"
+        }
+      }
+    },
+    "API_POST_USER_userUuid": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "default": "",
+          "description": "identificador &#250;nico do usu&#225;rio"
+        }
+      }
+    },
+    "API_PUT_USER_STATUS_response": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/API_PUT_USER_STATUS_userUuid"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError"
+          },
+          "description": "Informa&#231;&#245;es do erro"
+        }
+      }
+    },
+    "API_PUT_USER_STATUS_userUuid": {
+      "description": "Estrutura com atributos referente a usuario",
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "default": "",
+          "description": "identificador &#250;nico do usu&#225;rio"
+        }
+      }
+    },
+    "API_User_List2": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/API_User2"
+          }
+        }
+      }
+    },
+    "API_User_POST_Preferences_Req": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "isShowWizard": {
+          "type": "boolean",
+          "example": false,
+          "description": "Indica se o usu&#225;rio est&#225; com o wizard habilitado para exibi&#231;&#227;o"
+        },
+        "locale": {
+          "type": "string",
+          "default": "",
+          "description": "Prefer&#234;ncia de linguagem definida pelo usu&#225;rio;"
+        },
+        "defaultApplication": {
+          "type": "string",
+          "default": "",
+          "description": "Aplica&#231;&#227;o definida para redirecionamento ap&#243;s efetuar o login"
+        },
+        "allowEmail": {
+          "type": "boolean",
+          "example": false,
+          "description": "Indica se o usu&#225;rio deseja receber email da aplica&#231;&#227;o"
+        },
+        "allowNotification": {
+          "type": "boolean",
+          "example": false,
+          "description": "Indica se o usu&#225;rio deseja receber notifica&#231;&#245;es"
+        },
+        "timezoneCode": {
+          "type": "string",
+          "default": "",
+          "description": "C&#243;digo do timezone"
+        },
+        "maskCode": {
+          "type": "string",
+          "default": "",
+          "description": "C&#243;digo da  m&#225;scara num&#234;rica ('BRA' ou 'INT')"
+        }
+      }
+    },
+    "API_User_POST_Preferences_Resp": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError3"
+          },
+          "description": "Lista de erros retornados da opera&#231;&#227;o."
+        }
+      }
+    },
+    "API_User2": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "Username": {
+          "type": "string",
+          "default": "",
+          "description": "Nome do usu&#225;rio. Length = 250."
+        }
+      }
+    },
+    "API_UserHierarchy": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "default": "",
+          "description": "Nome completo do usu&#225;rio. Length=256"
+        },
+        "uuid": {
+          "type": "string",
+          "default": "",
+          "description": "Identificador &#250;nico do usu&#225;rio. Length=50"
+        },
+        "level": {
+          "type": "integer",
+          "example": 0,
+          "format": "int32",
+          "description": "N&#237;vel da hierarquia."
+        },
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usu&#225;rio. Length=250"
+        }
+      }
+    },
+    "API_UserHierarchy_GET": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError4"
+          },
+          "description": "Lista de erros retornados da opera&amp;#231;&amp;#227;o."
+        },
+        "hierarchies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/API_UserHierarchy"
+          },
+          "description": "Hierarquias associados ao usu&#225;rio."
+        }
+      }
+    },
+    "API_UserHierarchy_PUT": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError4"
+          },
+          "description": "Lista de erros retornados da opera&amp;#231;&amp;#227;o."
+        },
+        "id": {
+          "type": "integer",
+          "example": 0,
+          "format": "int32",
+          "description": "Identificador interno Nimbi para a hierarquia do usu&#225;rio"
+        }
+      }
+    },
+    "GET_Applications_Response_V2": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GET_Applications_V2"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError3"
+          }
+        }
+      }
+    },
+    "GET_Applications_V2": {
+      "description": "Estrutura com atributos referente a aplicacao",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "default": "",
+          "description": "Codigo da aplicacao. Tamanho: 10 caracteres"
+        },
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome da aplicacao. Tamanho: 150 caracteres"
+        },
+        "description": {
+          "type": "string",
+          "default": "",
+          "description": "Descricao da aplicacao. Tamanho: 500 caracteres"
+        }
+      },
+      "required": [
+        "code",
+        "name"
+      ]
+    },
+    "Metadata": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "totalRows": {
+          "type": "string",
+          "default": "",
+          "description": "Total de Resultados"
+        },
+        "offset": {
+          "type": "string",
+          "default": ""
+        },
+        "limit": {
+          "type": "string",
+          "default": ""
+        },
+        "first": {
+          "type": "string",
+          "default": ""
+        },
+        "previous": {
+          "type": "string",
+          "default": ""
+        },
+        "next": {
+          "type": "string",
+          "default": ""
+        },
+        "last": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "PUT_HierarchiesRequest": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usu&#225;rio. Length=250"
+        },
+        "parentEmail": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usu&#225;rio - Parent. Length=250"
+        }
+      }
+    },
+    "put_user": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome do usuario. Tamanho: 256 caracteres"
+        },
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usuario. Tamanho: 100 caracteres"
+        }
+      },
+      "required": [
+        "name",
+        "email"
+      ]
+    },
+    "put_user_request": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "userExt": {
+          "$ref": "#/definitions/userExt"
+        },
+        "user": {
+          "$ref": "#/definitions/put_user"
+        }
+      }
+    },
+    "responseListerrorsRecord2": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "responseList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Struct_Response_List2"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/utils_structError2"
+          }
+        }
+      }
+    },
+    "Struct_Response_List2": {
+      "description": "Estrutura para retorno das APIs de cria&amp;#231;&amp;#227;o em lista",
+      "type": "object",
+      "properties": {
+        "rowNumber": {
+          "type": "integer",
+          "example": 0,
+          "format": "int32",
+          "description": "N&#250;mero da linha da lista "
+        },
+        "id": {
+          "type": "integer",
+          "example": 1234567891234567,
+          "format": "int64",
+          "description": "Identificador do recurso, &amp;#233; retornado caso o mesmo seja criado"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/utils_structError2"
+          },
+          "description": "Estrutura com os erros"
+        }
+      },
+      "required": [
+        "rowNumber"
+      ]
+    },
+    "StructApiUserByToken": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError"
+          },
+          "description": "Lista de erros retornados da opera&#231;&#227;o."
+        },
+        "user": {
+          "$ref": "#/definitions/StructUserOAuth"
+        }
+      }
+    },
+    "structError": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "default": "",
+          "description": "Codigo do erro"
+        },
+        "type": {
+          "type": "string",
+          "default": "",
+          "description": "Tipo do erro"
+        },
+        "message": {
+          "type": "string",
+          "default": "",
+          "description": "Mensagem do erro"
+        },
+        "objectId": {
+          "type": "string",
+          "default": "",
+          "description": "Indica para qual objeto e referente (opcional)"
+        }
+      }
+    },
+    "structError3": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "default": "",
+          "description": "Codigo do erro"
+        },
+        "type": {
+          "type": "string",
+          "default": "",
+          "description": "Tipo do erro"
+        },
+        "message": {
+          "type": "string",
+          "default": "",
+          "description": "Mensagem do erro"
+        },
+        "objectId": {
+          "type": "string",
+          "default": "",
+          "description": "Indica para qual objeto e referente (opcional)"
+        }
+      }
+    },
+    "structError4": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "default": "",
+          "description": "Codigo do erro"
+        },
+        "type": {
+          "type": "string",
+          "default": "",
+          "description": "Tipo do erro"
+        },
+        "message": {
+          "type": "string",
+          "default": "",
+          "description": "Mensagem do erro"
+        },
+        "objectId": {
+          "type": "string",
+          "default": "",
+          "description": "Indica para qual objeto e referente (opcional)"
+        }
+      }
+    },
+    "structMetadata": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "totalRows": {
+          "type": "string",
+          "default": "",
+          "description": "Numero total de registro"
+        },
+        "offset": {
+          "type": "string",
+          "default": "",
+          "description": "Offset atual utilizado na busca"
+        },
+        "limit": {
+          "type": "string",
+          "default": "",
+          "description": "Limit atual utilizado na busca"
+        },
+        "first": {
+          "type": "string",
+          "default": "",
+          "description": "Path da primeira pagina da busca"
+        },
+        "previous": {
+          "type": "string",
+          "default": "",
+          "description": "Path da pagina anterior da busca"
+        },
+        "next": {
+          "type": "string",
+          "default": "",
+          "description": "Path da proxima pagina da busca"
+        },
+        "last": {
+          "type": "string",
+          "default": "",
+          "description": "Path da ultima pagina da busca"
+        }
+      }
+    },
+    "StructUserOAuth": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome do usuario"
+        },
+        "surname": {
+          "type": "string",
+          "default": "",
+          "description": "Sobrenome do usuario"
+        },
+        "email": {
+          "type": "string",
+          "default": "",
+          "description": "Email do usuario"
+        },
+        "company": {
+          "$ref": "#/definitions/StructUserOAuth_Company"
+        }
+      }
+    },
+    "StructUserOAuth_Company": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "taxNumber": {
+          "type": "string",
+          "default": "",
+          "description": "Registro fiscal da empresa do usu&#225;rio"
+        },
+        "countryCode": {
+          "type": "string",
+          "default": "",
+          "description": "C&#243;digo ISO (2 caracteres) do pa&#237;s relativo a empresa do usu&#225;rio"
+        },
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Nome da empresa do usu&#225;rio"
+        }
+      }
+    },
+    "userExt": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "surname": {
+          "type": "string",
+          "default": "",
+          "description": "Sobrenome do usuario. Tamanho: 100 caracteres"
+        },
+        "isTenantDefault": {
+          "type": "string",
+          "default": "",
+          "description": "Indica se e o tenant default do usuario. Boolean ('true' / 'false')"
+        },
+        "gender": {
+          "type": "string",
+          "default": "",
+          "description": "Sexo do usu&#225;rio (ex: &quot;m&quot;/&quot;f&quot;). Tamanho: 1 caracter"
+        },
+        "register": {
+          "type": "string",
+          "default": "",
+          "description": "Matricula na empresa do usu&#225;rio. Tamanho: 50 caracteres"
+        }
+      },
+      "required": [
+        "surname"
+      ]
+    },
+    "users": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "userUuid": {
+          "type": "string",
+          "default": ""
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/structError3"
+          }
+        }
+      }
+    },
+    "utils_structError2": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "default": "",
+          "description": "Codigo do erro"
+        },
+        "type": {
+          "type": "string",
+          "default": "",
+          "description": "Tipo do erro"
+        },
+        "message": {
+          "type": "string",
+          "default": "",
+          "description": "Mensagem do erro"
+        },
+        "objectId": {
+          "type": "string",
+          "default": "",
+          "description": "Indica para qual objeto e referente (opcional)"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "NimbiAccounts"
+    }
+  ]
+}
