@@ -1,0 +1,3985 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "PurchaseOrdersSuppliers",
+    "description": "API do Compra para fornecedores - requer os seguintes par&#226;metros headers:\n* ClientAPI_ID (Identifica&#231;&#227;o do Cliente NIMBI);\n* ClientAPI_Key (Chave de acesso NIMBI para o consumo de APIs);",
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/CompraAPI/rest/PurchaseOrdersSuppliers"
+    }
+  ],
+  "tags": [
+    {
+      "name": "PurchaseOrdersSuppliers"
+    }
+  ],
+  "paths": {
+    "/v1": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna uma lista de pedidos de acordo com os filtros informados.\n(Pagina&#231;&#227;o sequencial)",
+        "operationId": "GET_PurchaseOrders",
+        "parameters": [
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codeERP",
+            "in": "query",
+            "description": "Filtra pelo c&#243;digo ERP do pedido.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "initialDate",
+            "in": "query",
+            "description": "Data inicial de consulta por data de atualiza&#231;&#227;o do pedido (updateDate)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "finalDate",
+            "in": "query",
+            "description": "Data final de consulta por data de atualiza&#231;&#227;o do pedido (updateDate)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "orderStatusId",
+            "in": "query",
+            "description": "Status do pedido para fornecedor:\n\n* 3 = Approved - Waiting Accept (APPROVED_WAITING_ACCEPT)\n* 5 = Canceled (CANCELED)\n* 6 = Approved - Accepted (APPROVED_ACCEPTED)\n* 7 = Returned - Supplier (RETURNED_SUPPLIER)\n* 9 = Changed - Waiting Acceptance (CHANGED_WAITING_ACCEPTED)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "header",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerCountryCode",
+            "in": "header",
+            "description": "C&#243;digo do p&#225;is do comprador.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Criterio de ordena&#231;&#227;o (Default +updateDate)\n\n* +updateDate (update date ascendente)\n* -updateDate (update date descendente)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura de retorno do pedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1_GetPurchaseOrdersBySupplier_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna uma lista com o pedido informado.",
+        "operationId": "GET_PurchaseOrdersById",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Filtro pelo identificador do pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/attachments": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna uma lista com os anexos de um pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_AttachmentsByOrderId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_PurchaseOrder_Attachs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/attributes": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os atributos flexiveis de um pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_FlexAttributesByOrderId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_PurchaseOrder_FlexAttributes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/comments": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os coment&#225;rios do pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_Comments",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 10. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_Purchraseorder_Comment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Recupera uma lista de itens de um pedido, com informa&#231;&#245;es reduzidas baseado no identificador interno do pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_ItemsByOrderId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador interno do pedido",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s do campo &quot;ApprovalDate&quot; do workflow. Para essa API utilize &#39;value-asc&#39; ou &#39;value-desc&#39;. Default &#39;value-desc&#39;",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_PurchaseOrder_Items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "DESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\nDESCONTINUADA  (N&#227;o utilizar)\n\nUtilizar API mais recente\nData descontinua&#231;&#227;o (20/08/2021)\n\nRetorna os detalhes do item do pedido.",
+        "operationId": "GET_DetailsByItemId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GET_Details_API_GET_OrderItemv1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items/{itemId}/attachments": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna uma lista com os anexos do item de um pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_AttachmentsByItemId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_AttachsByItemId_Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items/{itemId}/attributes": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os atributos flexiveis de um item do pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_FlexAttributesByItemId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_FlexAttributes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items/{itemId}/comments": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os coment&#225;rios do item do pedido.\n(Pagina&#231;&#227;o baseada no limit)",
+        "operationId": "GET_CommentsByItemId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 10. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_Purchraseorder_CommentByItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/items/{itemId}/costAllocations": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retornar apenas a aloca&#231;&#227;o de custo de um item de pedido.",
+        "operationId": "GET_CostAllocationsByItemId",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Parametro utilizado para indicar a posicao inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Parametro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 50. Default 10.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parametro utilizado para ordenar a consulta atrav&#233;s do campo &quot;ApprovalDate&quot; do workflow. Para essa API utilize &#39;value-asc&#39; ou &#39;value-desc&#39;. Default &#39;value-desc&#39;",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/API_GET_Purchraseorder_CostAllocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{purchaseOrderId}/status": {
+      "put": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Aceita ou Devolve um pedido.",
+        "operationId": "PUT_Status",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "operationCode",
+            "in": "header",
+            "description": "C&#243;digo da opera&#231;&#227;o que ir&#225; atualizar o status do pedido\n\nOPERATION:\n* reject - &#201; obrigat&#243;rio o preenchimento do &quot;comment&quot; no JSON.\n* accept \n\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Coment&#225;rio que ser&#225; inclu&#237;do no documento.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAcceptedRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Estrutura JSON com a resposta da atualiza&#231;&#227;o do pedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PUT_Accepted_Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/v2": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna uma lista de pedidos de acordo com os filtros informados.\n(Pagina&#231;&#227;o sequencial)",
+        "operationId": "GET_PurchaseOrders_v2",
+        "parameters": [
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codeERP",
+            "in": "query",
+            "description": "Filtra pelo c&#243;digo ERP do pedido.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "initialDate",
+            "in": "query",
+            "description": "Data inicial de consulta por data de atualiza&#231;&#227;o do pedido (updateDate)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "finalDate",
+            "in": "query",
+            "description": "Data final de consulta por data de atualiza&#231;&#227;o do pedido (updateDate)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          {
+            "name": "orderStatusId",
+            "in": "query",
+            "description": "Status do pedido para fornecedor:\n\n* 3 = Approved - Waiting Accept (APPROVED_WAITING_ACCEPT)\n* 5 = Canceled (CANCELED)\n* 6 = Approved - Accepted (APPROVED_ACCEPTED)\n* 7 = Returned - Supplier (RETURNED_SUPPLIER)\n* 9 = Changed - Waiting Acceptance (CHANGED_WAITING_ACCEPTED)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "header",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerCountryCode",
+            "in": "header",
+            "description": "C&#243;digo do p&#225;is do comprador.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para limitar a quantidade de registros trazidos pela consulta. M&#225;ximo 100. Default 12.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Par&#226;metro utilizado para indicar a posi&#231;&#227;o inicial de consulta. Default 0.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Criterio de ordena&#231;&#227;o (Default +updateDate)\n\n* +updateDate (update date ascendente)\n* -updateDate (update date descendente)",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estrutura de retorno do pedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Struct_PurchaseOrder_Suppliers_v2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/{purchaseOrderId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os detalhes do item do pedido.",
+        "operationId": "GET_DetailsByItemId_v2",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GET_Details_API_GET_OrderItemv2"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v3/{purchaseOrderId}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "PurchaseOrdersSuppliers"
+        ],
+        "description": "Retorna os detalhes do item de um pedido.\n\nNova vers&#227;o que ser&#225; disponibilizada a partir de 2026, contemplando os novos impostos da reforma tribut&#225;ria. ",
+        "operationId": "GET_DetailsByItemId_v3",
+        "parameters": [
+          {
+            "name": "purchaseOrderId",
+            "in": "path",
+            "description": "Identificador do Pedido.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "description": "Identificador do item.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 0
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "description": "C&#243;digo da linguagem que retorna os campos traduzidos: \n* PT -&gt; Portugu&#234;s\n* EN -&gt; Ingl&#234;s\n* ES -&gt; Espanhol\n* FR -&gt; Franc&#234;s\n\nCaso o par&#226;metro n&#227;o seja informado ou esteja com valor diferente das op&#231;&#245;es acima (PT, EN, ES ou FR), o valor default ser&#225; PT",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buyerTaxNumber",
+            "in": "query",
+            "description": "CNPJ do comprador.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GET_Details_API_GET_OrderItemv4"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "API_GET_AttachsByItemId_Response": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseOrder"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error_PurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_FlexAttributes": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseOrder_AttributesByItem"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error_PurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_PurchaseOrder_Attachs": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/GET_PurchaseOrderByAttach"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error_PurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_PurchaseOrder_FlexAttributes": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseOrder_Attributes"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error_PurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_PurchaseOrder_Items": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/GET_PurchaseOrder_items"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error_PurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_Purchraseorder_Comment": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchraseorderByComment"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_Purchraseorder_CommentByItem": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchraseorderByCommentByItem"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": ""
+      },
+      "API_GET_Purchraseorder_CostAllocation": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseorderByCostAllocation"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": ""
+      },
+      "AttachItem": {
+        "type": "object",
+        "properties": {
+          "FileName": {
+            "type": "string",
+            "description": "Nome do anexo",
+            "default": ""
+          },
+          "DownloadURL": {
+            "type": "string",
+            "description": "URL para download do anexo (link com dura&#231;&#227;o de 1h) retornado no campo Expires da URL no formato (epoch time)",
+            "default": ""
+          },
+          "S3UUID": {
+            "type": "string",
+            "description": "Identificador do anexo do S3",
+            "default": ""
+          },
+          "FileSize": {
+            "type": "integer",
+            "description": "tamanho do anexo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "CreationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o do anexo",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "CreatedBy": {
+            "type": "string",
+            "description": "usuario que criou o anexo.",
+            "default": ""
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o anexo &#233; p&#250;blico.",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "AttributePurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo. Length=32",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome. Length=100",
+            "default": ""
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor. (Tamanho conforme configura&#231;&#227;o do atributo)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "basicInformation_Items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "itemClassificationId": {
+            "type": "integer",
+            "description": "C&#243;digo da classifica&#231;&#227;o do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "itemClassificationCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de item. (PRODUCT, SERVICE)",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "groupCode": {
+            "type": "string",
+            "description": "Codigo do grupo do item, quando n&#227;o existe o GroupCode, exibe o ID do Group. Length=50",
+            "default": ""
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item. Length=32",
+            "default": ""
+          },
+          "itemStatus": {
+            "type": "string",
+            "description": "Status do Item. Length=50",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do item no pedido",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio",
+            "example": 0.1
+          }
+        },
+        "description": ""
+      },
+      "CommentsByPurchaseOrder": {
+        "required": [
+          "createdBy",
+          "isPublic"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do coment&#225;rio",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rio",
+            "default": ""
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Flag informando se o coment&#225;rio &#233; p&#250;blico.",
+            "example": false
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o do coment&#225;rio",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Username do usu&#225;rio que criou a requisi&#231;&#227;o",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "CostAllocationByItemId": {
+        "type": "object",
+        "properties": {
+          "CostAllocationId": {
+            "type": "integer",
+            "description": "Identificador da Aloca&#231;&#227;o de Custo",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "AccountAssignmentCategoryCode": {
+            "type": "string",
+            "description": "C&#243;digo da categoria da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "CostAllocationDetailCode": {
+            "type": "string",
+            "description": "C&#243;digo do detalhe da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "CostAllocationComplementCode": {
+            "type": "string",
+            "description": "C&#243;digo do complemento da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "CostAllocationObs": {
+            "type": "string",
+            "description": "Observa&#231;&#245;es da aloca&#231;&#227;o de custo. Length=50",
+            "default": ""
+          },
+          "Percentage": {
+            "type": "number",
+            "description": "Porcentagem da Aloca&#231;&#227;o de Custo",
+            "example": 0.1
+          }
+        },
+        "description": ""
+      },
+      "Error_PurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "GET_Details_API_GET_OrderItemv1": {
+        "type": "object",
+        "properties": {
+          "orderItem": {
+            "$ref": "#/components/schemas/OrderItemv1"
+          },
+          "error": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": "Estrutura de retorno do item"
+      },
+      "GET_Details_API_GET_OrderItemv2": {
+        "type": "object",
+        "properties": {
+          "orderItem": {
+            "$ref": "#/components/schemas/GET_Details_OrderItem"
+          },
+          "error": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": "Estrutura de retorno do item"
+      },
+      "GET_Details_API_GET_OrderItemv4": {
+        "type": "object",
+        "properties": {
+          "orderItem": {
+            "$ref": "#/components/schemas/GET_Details_OrderItemv4"
+          },
+          "error": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": "Estrutura de retorno do item"
+      },
+      "GET_Details_OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item. Length=32",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do item. Length=1000",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do item. Length=4000",
+            "default": ""
+          },
+          "deliveryAddressExternalId": {
+            "type": "string",
+            "description": "C&#243;digo endere&#231;o de entrega do item. Length=50",
+            "default": ""
+          },
+          "deliveryAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de entrega do item  (Somente leitura). Length=4000 Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "paymentAddressExternalId": {
+            "type": "string",
+            "description": "C&#243;digo endere&#231;o de faturamento do item. Length=50",
+            "default": ""
+          },
+          "paymentAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de faturamento do item (Somente leitura). Length=4000 -  Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do item no pedido",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da linha de requisi&#231;&#227;o ( Quantity X UnitPrice)",
+            "example": 0.1
+          },
+          "deliveryDeadline": {
+            "type": "integer",
+            "description": "Prazo de entrega em dias",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentTypeDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do tipo de pagamento (Somente leitura). Length=100",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo de unidade de medida. Length=50",
+            "default": ""
+          },
+          "unitOfMeasureDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de unidade de medida (Somente leitura). Length=100",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da natureza de opera&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "natureOfOperationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da natureza de opera&#231;&#227;o (Somente leitura). Length=400",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo do contrato. Length=32",
+            "default": ""
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "C&#243;digo da categoria. Length=50",
+            "default": ""
+          },
+          "categoryDescription": {
+            "type": "string",
+            "description": "Nome da Categoria selecionada (Somente leitura). Length=500",
+            "default": ""
+          },
+          "cfopCode": {
+            "type": "string",
+            "description": "C&#243;digo do campo CFOP no item de pedido. Length=32",
+            "default": ""
+          },
+          "cfopDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do campo CFOP no item de pedido. (Somente leitura). Length=500",
+            "default": ""
+          },
+          "sourceMaterialCode": {
+            "type": "string",
+            "description": "Origem do material do item. Length=32",
+            "default": ""
+          },
+          "sourceMaterialDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da origem do material do item. (Somente leitura). Length=250",
+            "default": ""
+          },
+          "itemClassificationId": {
+            "type": "integer",
+            "description": "Tipo de produto (1 para Produto, 2 para servi&#231;o)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "orderGroupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item de pedido. Length=50",
+            "default": ""
+          },
+          "orderGroupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item de pedido. Length=200",
+            "default": ""
+          },
+          "orderGroupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo. Length=3000",
+            "default": ""
+          },
+          "orderGroupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega em dias",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "currencyISO": {
+            "type": "string",
+            "description": "Moeda padr&#227;o ISO. Length=15",
+            "default": ""
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data prevista de entrega do item de pedido.",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "itemStatus": {
+            "type": "string",
+            "description": "Status do Item. Length=50",
+            "default": ""
+          },
+          "PER": {
+            "type": "string",
+            "description": "Indica o valor a ser multiplicado pela quantidade para calculo do valor total de cada item. Length=38",
+            "default": ""
+          },
+          "vendorPartnumber": {
+            "type": "string",
+            "description": "C&#243;digo do item no catalogo do fornecedor. Length=50",
+            "default": ""
+          },
+          "evaluatedReceiptSettlement": {
+            "type": "boolean",
+            "description": "Indica se o item pode ser pago sem a necessidade de emiss&#227;o de uma nota fiscal ",
+            "example": false
+          },
+          "requisitionNumber": {
+            "type": "string",
+            "description": "N&#250;mero da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "requesterName": {
+            "type": "string",
+            "description": "Nome do requisitante. Length=250",
+            "default": ""
+          },
+          "requesterContact": {
+            "type": "string",
+            "description": "Contato do requisitante. Length=250",
+            "default": ""
+          },
+          "unloadingPoint": {
+            "type": "string",
+            "description": "Ponto de descarga. Length=50",
+            "default": ""
+          },
+          "manufacturerCode": {
+            "type": "string",
+            "description": "C&#243;digo do Fabricante do Item no pedido. Length=50",
+            "default": ""
+          },
+          "manufacturerName": {
+            "type": "string",
+            "description": "Nome do Fabricante do Item no pedido. Length=50",
+            "default": ""
+          },
+          "maintenanceOrder": {
+            "type": "string",
+            "description": "Ordem de Manuten&#231;&#227;o. Length=30",
+            "default": ""
+          },
+          "deposit": {
+            "type": "string",
+            "description": "C&#243;digo do Dep&#243;sito para entrega. Length=30",
+            "default": ""
+          },
+          "depositNumber": {
+            "type": "string",
+            "description": "N&#250;mero do Deposito. Length=30",
+            "default": ""
+          },
+          "equipment": {
+            "type": "string",
+            "description": "Equipamento.. Length=30",
+            "default": ""
+          },
+          "itemContractLine": {
+            "type": "string",
+            "description": "Linha do Item no contrato. Length=12",
+            "default": ""
+          },
+          "taxesOrdemItem": {
+            "$ref": "#/components/schemas/Struct_GET_TaxesOrderItemv2"
+          },
+          "originRFQ": {
+            "$ref": "#/components/schemas/OriginRFQ2"
+          },
+          "originRequisition": {
+            "$ref": "#/components/schemas/OriginRequisition_Item"
+          }
+        },
+        "description": ""
+      },
+      "GET_Details_OrderItemv4": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item. Length=32",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do item. Length=1000",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do item. Length=4000",
+            "default": ""
+          },
+          "deliveryAddressExternalId": {
+            "type": "string",
+            "description": "C&#243;digo endere&#231;o de entrega do item. Length=50",
+            "default": ""
+          },
+          "deliveryAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de entrega do item  (Somente leitura). Length=4000 Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "paymentAddressExternalId": {
+            "type": "string",
+            "description": "C&#243;digo endere&#231;o de faturamento do item. Length=50",
+            "default": ""
+          },
+          "paymentAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de faturamento do item (Somente leitura). Length=4000 -  Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do item no pedido",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da linha de requisi&#231;&#227;o ( Quantity X UnitPrice)",
+            "example": 0.1
+          },
+          "deliveryDeadline": {
+            "type": "integer",
+            "description": "Prazo de entrega em dias",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentTypeDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do tipo de pagamento (Somente leitura). Length=100",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo de unidade de medida. Length=50",
+            "default": ""
+          },
+          "unitOfMeasureDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de unidade de medida (Somente leitura). Length=100",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da natureza de opera&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "natureOfOperationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da natureza de opera&#231;&#227;o (Somente leitura). Length=400",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo do contrato. Length=32",
+            "default": ""
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "C&#243;digo da categoria. Length=50",
+            "default": ""
+          },
+          "categoryDescription": {
+            "type": "string",
+            "description": "Nome da Categoria selecionada (Somente leitura). Length=500",
+            "default": ""
+          },
+          "cfopCode": {
+            "type": "string",
+            "description": "C&#243;digo do campo CFOP no item de pedido. Length=32",
+            "default": ""
+          },
+          "cfopDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do campo CFOP no item de pedido. (Somente leitura). Length=500",
+            "default": ""
+          },
+          "sourceMaterialCode": {
+            "type": "string",
+            "description": "Origem do material do item. Length=32",
+            "default": ""
+          },
+          "sourceMaterialDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da origem do material do item. (Somente leitura). Length=250",
+            "default": ""
+          },
+          "itemClassificationId": {
+            "type": "integer",
+            "description": "Tipo de produto (1 para Produto, 2 para servi&#231;o)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "orderGroupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item de pedido. Length=50",
+            "default": ""
+          },
+          "orderGroupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item de pedido. Length=200",
+            "default": ""
+          },
+          "orderGroupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo. Length=3000",
+            "default": ""
+          },
+          "orderGroupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega em dias",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "currencyISO": {
+            "type": "string",
+            "description": "Moeda padr&#227;o ISO. Length=15",
+            "default": ""
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data prevista de entrega do item de pedido.",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "itemStatus": {
+            "type": "string",
+            "description": "Status do Item. Length=50",
+            "default": ""
+          },
+          "PER": {
+            "type": "string",
+            "description": "Indica o valor a ser multiplicado pela quantidade para calculo do valor total de cada item. Length=38",
+            "default": ""
+          },
+          "vendorPartnumber": {
+            "type": "string",
+            "description": "C&#243;digo do item no catalogo do fornecedor. Length=50",
+            "default": ""
+          },
+          "evaluatedReceiptSettlement": {
+            "type": "boolean",
+            "description": "Indica se o item pode ser pago sem a necessidade de emiss&#227;o de uma nota fiscal ",
+            "example": false
+          },
+          "requisitionNumber": {
+            "type": "string",
+            "description": "N&#250;mero da requisi&#231;&#227;o. Length=50",
+            "default": ""
+          },
+          "requesterName": {
+            "type": "string",
+            "description": "Nome do requisitante. Length=250",
+            "default": ""
+          },
+          "requesterContact": {
+            "type": "string",
+            "description": "Contato do requisitante. Length=250",
+            "default": ""
+          },
+          "unloadingPoint": {
+            "type": "string",
+            "description": "Ponto de descarga. Length=50",
+            "default": ""
+          },
+          "manufacturerCode": {
+            "type": "string",
+            "description": "C&#243;digo do Fabricante do Item no pedido. Length=50",
+            "default": ""
+          },
+          "manufacturerName": {
+            "type": "string",
+            "description": "Nome do Fabricante do Item no pedido. Length=50",
+            "default": ""
+          },
+          "maintenanceOrder": {
+            "type": "string",
+            "description": "Ordem de Manuten&#231;&#227;o. Length=30",
+            "default": ""
+          },
+          "deposit": {
+            "type": "string",
+            "description": "C&#243;digo do Dep&#243;sito para entrega. Length=30",
+            "default": ""
+          },
+          "depositNumber": {
+            "type": "string",
+            "description": "N&#250;mero do Deposito. Length=30",
+            "default": ""
+          },
+          "equipment": {
+            "type": "string",
+            "description": "Equipamento.. Length=30",
+            "default": ""
+          },
+          "itemContractLine": {
+            "type": "string",
+            "description": "Linha do Item no contrato. Length=12",
+            "default": ""
+          },
+          "taxesOrdemItem": {
+            "$ref": "#/components/schemas/Struct_GET_TaxesOrderItemv4"
+          },
+          "originRFQ": {
+            "$ref": "#/components/schemas/OriginRFQ2"
+          },
+          "originRequisition": {
+            "$ref": "#/components/schemas/OriginRequisition_Item"
+          }
+        },
+        "description": ""
+      },
+      "GET_HeadersByPurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "title": {
+            "type": "string",
+            "description": "T&#237;tulo do pedido. Length=200",
+            "default": ""
+          },
+          "priorityCode": {
+            "type": "string",
+            "description": "Prioridade do pedido. Length=50",
+            "default": ""
+          },
+          "isAddressByOrder": {
+            "type": "boolean",
+            "description": "Indica se o endereco e o mesmo para todos os itens (True) ou se cada item tem seu proprio endere&#231;o de entrega e faturamento,",
+            "example": false
+          },
+          "orderStatusCode": {
+            "type": "string",
+            "description": "Codigo do Status do pedido. Length=50",
+            "default": ""
+          },
+          "deliveryAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de entrega. Length=50",
+            "default": ""
+          },
+          "deliveryAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de entrega do pedido. Length=3000",
+            "default": ""
+          },
+          "paymentAddressExternalCode": {
+            "type": "string",
+            "description": "C&#243;digo do endere&#231;o de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de faturamento do pedido. Length=1500",
+            "default": ""
+          },
+          "supplierCompanyTaxNumber": {
+            "type": "string",
+            "description": "CNPJ do fornecedor. Length=50",
+            "default": ""
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Pre&#231;o total,",
+            "example": 0.1
+          },
+          "totalQtdItems": {
+            "type": "string",
+            "description": "Total de itens. Length=50",
+            "default": ""
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Usu&#225;rio que criou o pedido. Length=100",
+            "default": ""
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o,",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Us&#250;ario que atualizou o pedido. Length=100",
+            "default": ""
+          },
+          "updatedDate": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o,",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo da forma de pagamento. Length=50",
+            "default": ""
+          },
+          "paymentTypeDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do do tipo de pagamento. Length=3000",
+            "default": ""
+          },
+          "documentFormCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de documento do pedido. Length=30",
+            "default": ""
+          },
+          "incotermCode": {
+            "type": "string",
+            "description": "C&#243;digo de incoterm do pedido. Length=3",
+            "default": ""
+          },
+          "incotermDescription": {
+            "type": "string",
+            "description": "Descri&#231;ao  incoterm do pedido. Length=50",
+            "default": ""
+          },
+          "incotermExtraInfoCode": {
+            "type": "string",
+            "description": "C&#243;digo do incotermExtra do pedido. Length=3",
+            "default": ""
+          },
+          "incotermExtraInfoDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do do incotermExtra do pedido. Length=50",
+            "default": ""
+          },
+          "incotermLocation": {
+            "type": "string",
+            "description": "Localiza&#231;&#227;o do incoterm. Length=150",
+            "default": ""
+          },
+          "purchasingOrganizationCode": {
+            "type": "string",
+            "description": "C&#243;digo da organiza&#231;&#227;o de compra do pedido. Length=50",
+            "default": ""
+          },
+          "purchasingOrganizationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da organiza&#231;&#227;o de compra do pedido. Length=400",
+            "default": ""
+          },
+          "permissionGroupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo de compra. Length=20",
+            "default": ""
+          },
+          "permissionGroupName": {
+            "type": "string",
+            "description": "Nome do grupo de compra. Length=500",
+            "default": ""
+          },
+          "filialCode": {
+            "type": "string",
+            "description": "C&#243;digo da filial. Length=50",
+            "default": ""
+          },
+          "filialName": {
+            "type": "string",
+            "description": "Nome da filial. Length=150",
+            "default": ""
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          },
+          "createdDateERP": {
+            "type": "string",
+            "description": "Data de cria&#231;&#227;o do pedido no ERP,",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "referenceContract": {
+            "type": "string",
+            "description": "Contrato de refer&#234;ncia. Length=32",
+            "default": ""
+          },
+          "supplierRefCode": {
+            "type": "string",
+            "description": "C&#243;digo de refer&#234;ncia do fornecedor. Length=32",
+            "default": ""
+          },
+          "companyCurrencyISO": {
+            "type": "string",
+            "description": "C&#243;digo ISO da moeda a ser usada no pedido. Length=15",
+            "default": ""
+          },
+          "buyerCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do comprador. Length=50",
+            "default": ""
+          },
+          "buyerTaxNumber": {
+            "type": "string",
+            "description": "CNPJ do comprador. Length=50",
+            "default": ""
+          },
+          "buyerContact": {
+            "type": "string",
+            "description": "Contato do comprador. Length=250",
+            "default": ""
+          },
+          "rejectedReasonCode": {
+            "type": "string",
+            "description": "C&#243;digo do motivo da rejeicao. Length=50",
+            "default": ""
+          },
+          "rejectedReasonDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do motivo da rejeicao. Length=50",
+            "default": ""
+          },
+          "supplierCompanyName": {
+            "type": "string",
+            "description": "Nome do fornecedor. Length=150",
+            "default": ""
+          },
+          "supplierCompanyCountryCode": {
+            "type": "string",
+            "description": "C&#243;digo do pa&#237;s do fornecedor. Length=50",
+            "default": ""
+          },
+          "supplyConditions": {
+            "type": "string",
+            "description": "Condicoes  de fornecimento. Length=100000",
+            "default": ""
+          },
+          "costOfFreight": {
+            "type": "number",
+            "description": "Valor do frete do pedido.",
+            "example": 0.1
+          },
+          "partner": {
+            "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder_PartnerData"
+          },
+          "goodsSupplier": {
+            "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder_PartnerData"
+          }
+        },
+        "description": ""
+      },
+      "GET_HeadersByPurchaseOrder_ParterAddress": {
+        "required": [
+          "complement"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Logradouro. Length=1000",
+            "default": ""
+          },
+          "number": {
+            "type": "integer",
+            "description": "N&#250;mero",
+            "format": "int32",
+            "example": 0
+          },
+          "complement": {
+            "type": "string",
+            "description": "Complemento. Length=300",
+            "default": ""
+          },
+          "city": {
+            "type": "string",
+            "description": "Cidade. Length=100",
+            "default": ""
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "CEP. Length=50",
+            "default": ""
+          },
+          "state": {
+            "type": "string",
+            "description": "Estado. Length=100",
+            "default": ""
+          },
+          "country": {
+            "type": "string",
+            "description": "C&#243;digo do Pa&#237;s Ex:BR . Length=100",
+            "default": ""
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "Bairro. Length=200",
+            "default": ""
+          },
+          "building": {
+            "type": "string",
+            "description": "Pr&#233;dio. Length=100",
+            "default": ""
+          },
+          "room": {
+            "type": "string",
+            "description": "Sala. Length=100",
+            "default": ""
+          },
+          "floor": {
+            "type": "string",
+            "description": "Andar. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "GET_HeadersByPurchaseOrder_PartnerData": {
+        "type": "object",
+        "properties": {
+          "register": {
+            "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder_PartnerRegister"
+          },
+          "address": {
+            "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder_ParterAddress"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/GET_HeardersByPurchaseOrder_PartnerContact"
+          }
+        },
+        "description": ""
+      },
+      "GET_HeadersByPurchaseOrder_PartnerRegister": {
+        "type": "object",
+        "properties": {
+          "externalCode": {
+            "type": "string",
+            "description": "C&#243;digo Externo. Length=50",
+            "default": ""
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Raz&#227;o Social. Length=150",
+            "default": ""
+          },
+          "taxNumber": {
+            "type": "string",
+            "description": "N&#250;mero Fiscal. Length=50",
+            "default": ""
+          },
+          "sefazInscription": {
+            "type": "string",
+            "description": "Inscri&#231;&#227;o SEFAZ. Length=50",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "GET_HeadersByPurchaseOrder_Response": {
+        "type": "object",
+        "properties": {
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/GET_HeadersByPurchaseOrder"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError4"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GET_HeardersByPurchaseOrder_PartnerContact": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nome do Contato",
+            "default": ""
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Telefone do Contato",
+            "default": ""
+          },
+          "email": {
+            "type": "string",
+            "description": "Email do Contato",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "GET_PurchaseOrder_items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "description": "Lista dos itens",
+            "items": {
+              "$ref": "#/components/schemas/basicInformation_Items"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GET_PurchaseOrderByAttach": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "ErpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "ListAttach": {
+            "$ref": "#/components/schemas/ListAttach"
+          }
+        },
+        "description": ""
+      },
+      "ListAttach": {
+        "type": "object",
+        "properties": {
+          "Total": {
+            "type": "integer",
+            "description": "total de anexos",
+            "format": "int32",
+            "example": 0
+          },
+          "Attach": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttachItem"
+            }
+          }
+        },
+        "description": ""
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "totalRows": {
+            "type": "string",
+            "description": "Numero total de registro",
+            "default": ""
+          },
+          "offset": {
+            "type": "string",
+            "description": "Offset atual utilizado na busca",
+            "default": ""
+          },
+          "limit": {
+            "type": "string",
+            "description": "Limit atual utilizado na busca",
+            "default": ""
+          },
+          "first": {
+            "type": "string",
+            "description": "Path da primeira pagina da busca",
+            "default": ""
+          },
+          "previous": {
+            "type": "string",
+            "description": "Path da pagina anterior da busca",
+            "default": ""
+          },
+          "next": {
+            "type": "string",
+            "description": "Path da proxima pagina da busca",
+            "default": ""
+          },
+          "last": {
+            "type": "string",
+            "description": "Path da ultima pagina da busca",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "OrderItemv1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do item",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "code": {
+            "type": "string",
+            "description": "C&#243;digo do item",
+            "default": ""
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o curta do item",
+            "default": ""
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do item",
+            "default": ""
+          },
+          "deliveryAddressExternalId": {
+            "type": "string",
+            "description": "Identificador endere&#231;o de entrega do item",
+            "default": ""
+          },
+          "deliveryAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do Endere&#231;o de entrega do item  (Somente leitura) Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "paymentAddressExternalId": {
+            "type": "string",
+            "description": "Identificador endere&#231;o de faturamento do item",
+            "default": ""
+          },
+          "paymentAddressDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do endere&#231;o de faturamento do item (Somente leitura) -  Formato: STREET – ADDRESS – NEIGHBORHOOD - CITY - STATE – ZIP CODE | CNPJ: 99.999.999/9999-99",
+            "default": ""
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade do item no pedido",
+            "example": 0.1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Pre&#231;o unit&#225;rio",
+            "example": 0.1
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Valor total da linha do pedido ( Quantity X UnitPrice)",
+            "example": 0.1
+          },
+          "deliveryDeadline": {
+            "type": "integer",
+            "description": "Prazo de entrega em dias",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "paymentTypeCode": {
+            "type": "string",
+            "description": "C&#243;digo do tipo de pagamento",
+            "default": ""
+          },
+          "paymentTypeDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do tipo de pagamento (Somente leitura)",
+            "default": ""
+          },
+          "unitOfMeasureCode": {
+            "type": "string",
+            "description": "C&#243;digo de unidade de medida",
+            "default": ""
+          },
+          "unitOfMeasureDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o de unidade de medida (Somente leitura)",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "natureOfOperationCode": {
+            "type": "string",
+            "description": "C&#243;digo da natureza de opera&#231;&#227;o",
+            "default": ""
+          },
+          "natureOfOperationDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da natureza de opera&#231;&#227;o (Somente leitura)",
+            "default": ""
+          },
+          "contractCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do contrato. Length=32",
+            "default": ""
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Id Externo (Id em PB) da Categoria selecionada",
+            "default": ""
+          },
+          "categoryDescription": {
+            "type": "string",
+            "description": "Nome da Categoria selecionada (Somente leitura)",
+            "default": ""
+          },
+          "cfopCode": {
+            "type": "string",
+            "description": "C&#243;digo do campo CFOP no item de pedido.",
+            "default": ""
+          },
+          "cfopDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do campo CFOP no item de pedido. (Somente leitura)",
+            "default": ""
+          },
+          "sourceMaterialCode": {
+            "type": "string",
+            "description": "Origem do material do item.",
+            "default": ""
+          },
+          "sourceMaterialDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da origem do material do item. (Somente leitura)",
+            "default": ""
+          },
+          "itemClassificationId": {
+            "type": "integer",
+            "description": "Tipo de produto (1 para Produto, 2 para servi&#231;o)",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "orderGroupCode": {
+            "type": "string",
+            "description": "C&#243;digo do grupo do item de pedido",
+            "default": ""
+          },
+          "orderGroupDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o do grupo do item de pedido",
+            "default": ""
+          },
+          "orderGroupLongDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o longa do grupo",
+            "default": ""
+          },
+          "orderGroupDeliveryDeadline": {
+            "type": "string",
+            "description": "Prazo de entrega em dias",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "currencyISO": {
+            "type": "string",
+            "description": "Moeda padr&#227;o ISO",
+            "default": ""
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data prevista de entrega do item de pedido.",
+            "format": "date",
+            "example": "2014-12-31"
+          },
+          "itemStatus": {
+            "type": "string",
+            "description": "Status do Item",
+            "default": ""
+          },
+          "PER": {
+            "type": "string",
+            "description": "Indica o valor a ser multiplicado pela quantidade para calculo do valor total de cada item.",
+            "default": ""
+          },
+          "vendorPartnumber": {
+            "type": "string",
+            "description": "C&#243;digo do item no catalogo do fornecedor ",
+            "default": ""
+          },
+          "evaluatedReceiptSettlement": {
+            "type": "boolean",
+            "description": "Indica se o item pode ser pago sem a necessidade de emiss&#227;o de uma nota fiscal ",
+            "example": false
+          },
+          "requisitionNumber": {
+            "type": "string",
+            "description": "N&#250;mero da requisi&#231;&#227;o",
+            "default": ""
+          },
+          "requesterName": {
+            "type": "string",
+            "description": "Nome do requisitante",
+            "default": ""
+          },
+          "requesterContact": {
+            "type": "string",
+            "description": "Contato do requisitante",
+            "default": ""
+          },
+          "unloadingPoint": {
+            "type": "string",
+            "description": "Ponto de descarga",
+            "default": ""
+          },
+          "manufacturerCode": {
+            "type": "string",
+            "description": "C&#243;digo do Fabricante do Item no pedido. Tamanho=50",
+            "default": ""
+          },
+          "manufacturerName": {
+            "type": "string",
+            "description": "Nome do Fabricante do Item no pedido. Tamanho=50",
+            "default": ""
+          },
+          "maintenanceOrder": {
+            "type": "string",
+            "description": "Ordem de Manuten&#231;&#227;o. Tamanho=30",
+            "default": ""
+          },
+          "deposit": {
+            "type": "string",
+            "description": "C&#243;digo do Dep&#243;sito para entrega. Tamanho=30",
+            "default": ""
+          },
+          "depositNumber": {
+            "type": "string",
+            "description": "N&#250;mero do Deposito. Tamanho=30",
+            "default": ""
+          },
+          "equipment": {
+            "type": "string",
+            "description": "Equipamento. Tamanho=30",
+            "default": ""
+          },
+          "itemContractLine": {
+            "type": "string",
+            "description": "Linha do Item no contrato. Tamanho=12",
+            "default": ""
+          },
+          "taxesOrdemItem": {
+            "$ref": "#/components/schemas/Struct_GET_TaxesOrderItemv1"
+          },
+          "originRFQ": {
+            "$ref": "#/components/schemas/OriginRFQ2"
+          },
+          "originRequisition": {
+            "$ref": "#/components/schemas/OriginRequisition_Item"
+          }
+        },
+        "description": ""
+      },
+      "OriginRequisition_Item": {
+        "type": "object",
+        "properties": {
+          "requisitionId": {
+            "type": "integer",
+            "description": "Identificador da Requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "requisitionItemId": {
+            "type": "integer",
+            "description": "Identificador do item da requisi&#231;&#227;o",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "C&#243;digo ERP. Length=30",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "OriginRFQ2": {
+        "type": "object",
+        "properties": {
+          "RFQId": {
+            "type": "integer",
+            "description": "Identificador da RFQ",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "RFQItemId": {
+            "type": "integer",
+            "description": "Identificador do Item da RFQ",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "codeERP": {
+            "type": "string",
+            "description": "Code ERP. Length=30",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "PurchaseOrder": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "ErpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "ItemId": {
+            "type": "integer",
+            "description": "Identificador do item do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "LineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "ListAttach": {
+            "$ref": "#/components/schemas/ListAttach"
+          }
+        },
+        "description": ""
+      },
+      "PurchaseOrder_Attributes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttributePurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PurchaseOrder_AttributesByItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "itemID": {
+            "type": "integer",
+            "description": "Id do item,",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttributePurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PurchaseorderByCostAllocation": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "ErpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "ItemId": {
+            "type": "integer",
+            "description": "Identificador do item do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "LineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "CostAllocation": {
+            "type": "array",
+            "description": "Lista da aloca&#231;&#227;o de custos do item do pedido.",
+            "items": {
+              "$ref": "#/components/schemas/CostAllocationByItemId"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PurchraseorderByComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "ErpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "comments": {
+            "type": "array",
+            "description": "Lista de comentarios do pedido.",
+            "items": {
+              "$ref": "#/components/schemas/CommentsByPurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PurchraseorderByCommentByItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do pedido",
+            "format": "int64",
+            "example": 1234567891234567
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido. Length=30",
+            "default": ""
+          },
+          "itemID": {
+            "type": "string",
+            "description": "Identificador do item do pedido",
+            "default": ""
+          },
+          "groupERP": {
+            "type": "string",
+            "description": "Codigo do grupo do item",
+            "default": ""
+          },
+          "lineERP": {
+            "type": "string",
+            "description": "Linha ERP. Length=30",
+            "default": ""
+          },
+          "comments": {
+            "type": "array",
+            "description": "Lista de comentarios do pedido.",
+            "items": {
+              "$ref": "#/components/schemas/CommentsByPurchaseOrder"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PUT_Accepted_Response": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "$ref": "#/components/schemas/PutAcceptedResponse"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError5"
+            }
+          }
+        },
+        "description": ""
+      },
+      "PutAcceptedRequest": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Coment&#225;rio que ser&#225; inclu&#237;do no pedido.",
+            "default": ""
+          },
+          "username": {
+            "type": "string",
+            "description": "Usu&#225;rio que realizou a a&#231;&#227;o.",
+            "default": ""
+          },
+          "referenceCodeSupplier": {
+            "type": "string",
+            "description": "c&#243;digo de Refer&#234;ncia do fornecedor",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "PutAcceptedResponse": {
+        "type": "object",
+        "properties": {
+          "TransactionId": {
+            "type": "string",
+            "default": ""
+          },
+          "Id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1234567891234567
+          }
+        },
+        "description": ""
+      },
+      "Struct_GET_TaxesOrderItemv1": {
+        "type": "object",
+        "properties": {
+          "ICMS": {
+            "type": "number",
+            "description": "ICMS",
+            "example": 0.1
+          },
+          "baseICMS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMS",
+            "example": 0.1
+          },
+          "IPI": {
+            "type": "number",
+            "description": "IPI",
+            "example": 0.1
+          },
+          "baseIPI": {
+            "type": "number",
+            "description": "Base de c&#225;lculo IPI",
+            "example": 0.1
+          },
+          "NCM": {
+            "type": "string",
+            "description": "NCM. Length=10",
+            "default": ""
+          },
+          "taxReplacementCode": {
+            "type": "string",
+            "description": "C&#243;digo da substitui&#231;&#227;o tribut&#225;ria. (yes, no, not-informed). Length=50",
+            "default": ""
+          },
+          "typeOperation": {
+            "type": "string",
+            "description": "Informacao de tipo de operacao. Length=50",
+            "default": ""
+          },
+          "INSS": {
+            "type": "number",
+            "description": "INSS",
+            "example": 0.1
+          },
+          "ISS": {
+            "type": "number",
+            "description": "ISS",
+            "example": 0.1
+          },
+          "PIS": {
+            "type": "number",
+            "description": "PIS",
+            "example": 0.1
+          },
+          "COFINS": {
+            "type": "number",
+            "description": "COFINS",
+            "example": 0.1
+          },
+          "IVA_Code": {
+            "type": "string",
+            "description": "C&#243;digo do IVA. Length=50",
+            "default": ""
+          },
+          "totalTaxes": {
+            "type": "number",
+            "description": "Valor total dos impostos",
+            "example": 0.1
+          },
+          "taxDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o dos impostos. . Length=50",
+            "default": ""
+          },
+          "baseICMSST": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMSST",
+            "example": 0.1
+          },
+          "specialTaxRegime": {
+            "type": "string",
+            "description": "Regime tributa&#231;&#227;o especial. Length=50",
+            "default": ""
+          },
+          "costFreight": {
+            "type": "number",
+            "description": "Valor do frete",
+            "example": 0.1
+          },
+          "brandCode": {
+            "type": "string",
+            "description": "C&#243;digo da marca. Length=32",
+            "default": ""
+          },
+          "brandDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da marca. Length=100",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_GET_TaxesOrderItemv2": {
+        "type": "object",
+        "properties": {
+          "ICMS": {
+            "type": "number",
+            "description": "ICMS",
+            "example": 0.1
+          },
+          "baseICMS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMS",
+            "example": 0.1
+          },
+          "IPI": {
+            "type": "number",
+            "description": "IPI",
+            "example": 0.1
+          },
+          "baseIPI": {
+            "type": "number",
+            "description": "Base de c&#225;lculo IPI",
+            "example": 0.1
+          },
+          "NCM": {
+            "type": "string",
+            "description": "NCM. Length=10",
+            "default": ""
+          },
+          "taxReplacementCode": {
+            "type": "string",
+            "description": "C&#243;digo da substitui&#231;&#227;o tribut&#225;ria. (yes, no, not-informed). Length=50\n",
+            "default": ""
+          },
+          "typeOperation": {
+            "type": "string",
+            "description": "Informacao de tipo de operacao. Length=50",
+            "default": ""
+          },
+          "INSS": {
+            "type": "number",
+            "description": "INSS",
+            "example": 0.1
+          },
+          "ISS": {
+            "type": "number",
+            "description": "ISS",
+            "example": 0.1
+          },
+          "PIS": {
+            "type": "number",
+            "description": "PIS",
+            "example": 0.1
+          },
+          "COFINS": {
+            "type": "number",
+            "description": "COFINS",
+            "example": 0.1
+          },
+          "IVA_Code": {
+            "type": "string",
+            "description": "C&#243;digo do IVA. Length=50",
+            "default": ""
+          },
+          "totalTaxes": {
+            "type": "number",
+            "description": "Valor total dos impostos",
+            "example": 0.1
+          },
+          "taxDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o dos impostos. . Length=50",
+            "default": ""
+          },
+          "baseICMSST": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMSST",
+            "example": 0.1
+          },
+          "specialTaxRegime": {
+            "type": "string",
+            "description": "Regime tributa&#231;&#227;o especial. Length=50",
+            "default": ""
+          },
+          "costFreight": {
+            "type": "number",
+            "description": "Valor do frete",
+            "example": 0.1
+          },
+          "brandCode": {
+            "type": "string",
+            "description": "C&#243;digo da marca. Length=32",
+            "default": ""
+          },
+          "brandDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da marca. Length=100",
+            "default": ""
+          },
+          "PIS_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do PIS. Length=20",
+            "default": ""
+          },
+          "COFINS_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do COFINS. Length=20",
+            "default": ""
+          },
+          "IR_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do IR. Length=20",
+            "default": ""
+          },
+          "CSLL_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do CSLL. Length=20",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "Struct_GET_TaxesOrderItemv4": {
+        "required": [
+          "CBS",
+          "IBS"
+        ],
+        "type": "object",
+        "properties": {
+          "ICMS": {
+            "type": "number",
+            "description": "ICMS",
+            "example": 0.1
+          },
+          "baseICMS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMS",
+            "example": 0.1
+          },
+          "IPI": {
+            "type": "number",
+            "description": "IPI",
+            "example": 0.1
+          },
+          "baseIPI": {
+            "type": "number",
+            "description": "Base de c&#225;lculo IPI",
+            "example": 0.1
+          },
+          "NCM": {
+            "type": "string",
+            "description": "NCM. Length=10",
+            "default": ""
+          },
+          "taxReplacementCode": {
+            "type": "string",
+            "description": "C&#243;digo da substitui&#231;&#227;o tribut&#225;ria. (yes, no, not-informed). Length=50\n",
+            "default": ""
+          },
+          "typeOperation": {
+            "type": "string",
+            "description": "Informacao de tipo de operacao. Length=50",
+            "default": ""
+          },
+          "INSS": {
+            "type": "number",
+            "description": "INSS",
+            "example": 0.1
+          },
+          "ISS": {
+            "type": "number",
+            "description": "ISS",
+            "example": 0.1
+          },
+          "PIS": {
+            "type": "number",
+            "description": "PIS",
+            "example": 0.1
+          },
+          "COFINS": {
+            "type": "number",
+            "description": "COFINS",
+            "example": 0.1
+          },
+          "IVA_Code": {
+            "type": "string",
+            "description": "C&#243;digo do IVA. Length=50",
+            "default": ""
+          },
+          "totalTaxes": {
+            "type": "number",
+            "description": "Valor total dos impostos",
+            "example": 0.1
+          },
+          "taxDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o dos impostos. . Length=50",
+            "default": ""
+          },
+          "baseICMSST": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMSST",
+            "example": 0.1
+          },
+          "specialTaxRegime": {
+            "type": "string",
+            "description": "Regime tributa&#231;&#227;o especial. Length=50",
+            "default": ""
+          },
+          "costFreight": {
+            "type": "number",
+            "description": "Valor do frete",
+            "example": 0.1
+          },
+          "brandCode": {
+            "type": "string",
+            "description": "C&#243;digo da marca. Length=32",
+            "default": ""
+          },
+          "brandDescription": {
+            "type": "string",
+            "description": "Descri&#231;&#227;o da marca. Length=100",
+            "default": ""
+          },
+          "PIS_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do PIS. Length=20",
+            "default": ""
+          },
+          "COFINS_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do COFINS. Length=20",
+            "default": ""
+          },
+          "IR_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do IR. Length=20",
+            "default": ""
+          },
+          "CSLL_Retido": {
+            "type": "string",
+            "description": "Informa&#231;&#245;es sobre a reten&#231;&#227;o do CSLL. Length=20",
+            "default": ""
+          },
+          "CBS": {
+            "type": "number",
+            "description": "Imposto federal criado pela reforma tribut&#225;ria. Entra em vigor em 2026, substituindo gradualmente PIS e COFINS.",
+            "example": 0.1
+          },
+          "baseCBS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo CBS",
+            "example": 0.1
+          },
+          "IBS": {
+            "type": "number",
+            "description": "Imposto estadual/municipal criado pela reforma tribut&#225;ria. Entra em vigor em 2026, substituindo gradualmente ICMS e ISS. ",
+            "example": 0.1
+          },
+          "baseIBS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo IBS",
+            "example": 0.1
+          },
+          "IS": {
+            "type": "number",
+            "description": "Imposto federal sobre bens/servi&#231;os com efeitos nocivos criado pela reforma tribut&#225;ria. Entra em vigor em 2027.",
+            "example": 0.1
+          },
+          "baseIS": {
+            "type": "number",
+            "description": "Base de c&#225;lculo IS",
+            "example": 0.1
+          },
+          "ICMS_ST": {
+            "type": "number",
+            "description": "Imposto sobre circula&#231;&#227;o de mercadorias e servi&#231;os - substitui&#231;&#227;o tribut&#225;ria",
+            "example": 0.1
+          },
+          "baseICMS_ST": {
+            "type": "number",
+            "description": "Base de c&#225;lculo ICMS ST",
+            "example": 0.1
+          },
+          "hasIBSIncluded": {
+            "type": "boolean",
+            "description": "Indica se IBS &#233; incluso no pre&#231;o unit&#225;rio",
+            "example": false
+          },
+          "hasCBSIncluded": {
+            "type": "boolean",
+            "description": "Indica se CBS &#233; incluso no pre&#231;o unit&#225;rio",
+            "example": false
+          },
+          "hasISIncluded": {
+            "type": "boolean",
+            "description": "Indica se IS &#233; incluso no pre&#231;o unit&#225;rio",
+            "example": false
+          },
+          "hasICMS_STIncluded": {
+            "type": "boolean",
+            "description": "Indica se ICMS-ST &#233; incluso no pre&#231;o unit&#225;rio",
+            "example": false
+          },
+          "LC116": {
+            "type": "string",
+            "description": "C&#243;digo de servi&#231;o (LC 116/2003). C&#243;digo que identifica o servi&#231;o prestado, conforme a lista anexa &#224; lei complementar n.&#186; 116/2003.",
+            "default": ""
+          },
+          "discountPercentage": {
+            "type": "number",
+            "description": "Taxa percentual de desconto aplicada ao item",
+            "example": 0.1
+          }
+        },
+        "description": ""
+      },
+      "Struct_PurchaseOrder_Suppliers_v2": {
+        "type": "object",
+        "properties": {
+          "Metadata": {
+            "$ref": "#/components/schemas/structMetadata2"
+          },
+          "PurchaseOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/V2_GetPurchaseOrdersBySupplier_Item"
+            }
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "structError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structError4": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structError5": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo do erro",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do erro",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem do erro",
+            "default": ""
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Indica para qual objeto e referente (opcional)",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "structMetadata2": {
+        "type": "object",
+        "properties": {
+          "totalRows": {
+            "type": "string",
+            "description": "Numero total de registro",
+            "default": ""
+          },
+          "offset": {
+            "type": "string",
+            "description": "Offset atual utilizado na busca",
+            "default": ""
+          },
+          "limit": {
+            "type": "string",
+            "description": "Limit atual utilizado na busca",
+            "default": ""
+          },
+          "first": {
+            "type": "string",
+            "description": "Path da primeira pagina da busca",
+            "default": ""
+          },
+          "previous": {
+            "type": "string",
+            "description": "Path da pagina anterior da busca",
+            "default": ""
+          },
+          "next": {
+            "type": "string",
+            "description": "Path da proxima pagina da busca",
+            "default": ""
+          },
+          "last": {
+            "type": "string",
+            "description": "Path da ultima pagina da busca",
+            "default": ""
+          }
+        },
+        "description": ""
+      },
+      "V1_GetPurchaseOrdersBySupplier_Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do pedido.",
+            "format": "int32",
+            "example": 0
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido.",
+            "default": ""
+          },
+          "updateDate": {
+            "type": "string",
+            "description": "Data da ultima atualiza&#231;&#227;o do pedido.",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "description": ""
+      },
+      "V1_GetPurchaseOrdersBySupplier_Response": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/structMetadata2"
+          },
+          "purchaseOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/V1_GetPurchaseOrdersBySupplier_Item"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/structError"
+            }
+          }
+        },
+        "description": ""
+      },
+      "V2_GetPurchaseOrdersBySupplier_Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador do Pedido",
+            "format": "int32",
+            "example": 0
+          },
+          "erpCode": {
+            "type": "string",
+            "description": "C&#243;digo ERP do pedido",
+            "default": ""
+          },
+          "updateDate": {
+            "type": "string",
+            "description": "Data de atualiza&#231;&#227;o do pedido",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          },
+          "buyerTaxnumber": {
+            "type": "string",
+            "description": "CNPJ do comprador do pedido",
+            "default": ""
+          }
+        },
+        "description": "Estrutura reduzida de Pedidos"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}
