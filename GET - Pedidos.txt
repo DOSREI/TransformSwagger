@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: API Varejonline - Pedidos
+  version: 1.0.0
+  description: Endpoint para consulta e listagem de pedidos no Varejonline.
+servers:
+  - url: https://api.varejonline.com.br # substitua pela URL base oficial da API
+paths:
+  /pedidos:
+    get:
+      summary: Lista pedidos
+      description: Retorna uma lista paginada de pedidos com base nos filtros informados.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: inicio
+          in: query
+          required: false
+          description: Data/hora inicial para filtro (formato YYYY-MM-DDTHH:mm:ss)
+          schema:
+            type: string
+            format: date-time
+        - name: fim
+          in: query
+          required: false
+          description: Data/hora final para filtro (formato YYYY-MM-DDTHH:mm:ss)
+          schema:
+            type: string
+            format: date-time
+        - name: pagina
+          in: query
+          required: false
+          description: Número da página consultada
+          schema:
+            type: integer
+            default: 1
+        - name: quantidade
+          in: query
+          required: false
+          description: Quantidade de registros por página
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Lista de pedidos retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  itens:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 12345
+                        data:
+                          type: string
+                          format: date-time
+                          example: "2026-01-15T10:30:00Z"
+                        valorTotal:
+                          type: number
+                          format: float
+                          example: 250.50
+                        situacao:
+                          type: string
+                          example: "APROVADO"
+        '401':
+          description: Não autorizado (Token inválido ou ausente).
+        '400':
+          description: Requisição inválida / Parâmetros incorretos.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
