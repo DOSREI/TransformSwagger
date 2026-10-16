@@ -1,0 +1,1199 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MIT044 - Integração Protheus x 4Ind",
+    "version": "1.1.0",
+    "description": "APIs de entrada para inclusão, alteração e exclusão de Pedidos de Venda, Produtos e Solicitações de Compra no TOTVS Protheus. As APIs são dinâmicas: as propriedades apresentadas nesta documentação são exemplos e não representam uma lista fechada. Podem ser enviados outros campos das tabelas SC5, SC6, SB1, SB5, D1A e SC1, desde que existam no dicionário SX3, utilizem o prefixo correspondente e não sejam campos controlados internamente pela integração. Tipo, tamanho, casas decimais e conversão são validados conforme o SX3 do ambiente."
+  },
+  "servers": [
+    {
+      "url": "https://{host}:{port}/rest",
+      "description": "Servidor REST do Protheus",
+      "variables": {
+        "host": {
+          "default": "autentica218913.protheus.cloudtotvs.com.br",
+          "description": "Nome DNS ou endereço do servidor Protheus do ambiente"
+        },
+        "port": {
+          "default": "10878",
+          "description": "Porta HTTPS do serviço REST"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Obtenção do token de acesso do Protheus"
+    },
+    {
+      "name": "Pedidos de Venda",
+      "description": "Integração dinâmica das tabelas SC5 e SC6 pela MATA410"
+    },
+    {
+      "name": "Produtos",
+      "description": "Integração dinâmica das tabelas SB1, SB5 e D1A pelos modelos MATA010 e WMSA090"
+    },
+    {
+      "name": "Solicitações de Compra",
+      "description": "Integração dinâmica da tabela SC1 pela rotina automática MATA110"
+    }
+  ],
+  "paths": {
+    "/api/oauth2/v1/token": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Obter token de acesso",
+        "description": "Autentica um usuário do Protheus. No ambiente atual, grant_type, username e password são enviados como parâmetros de query. O access_token retornado deve ser utilizado como Bearer Token nas demais operações.",
+        "operationId": "obterToken",
+        "security": [],
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Obter token",
+            "source": "curl --request POST --get 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api/oauth2/v1/token' --data-urlencode 'grant_type=password' --data-urlencode 'username=USUARIO' --data-urlencode 'password=SENHA'"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "grant_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "password"
+              ],
+              "default": "password"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "usuario_protheus"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "password"
+            },
+            "example": "senha_do_usuario"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Token gerado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/RequisicaoInvalida"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          }
+        }
+      }
+    },
+    "/api4indpv/api/v1/4ind/pedidos-venda": {
+      "post": {
+        "tags": [
+          "Pedidos de Venda"
+        ],
+        "summary": "Incluir ou alterar pedidos de venda",
+        "description": "Recebe um array com um ou mais pedidos. A API é dinâmica e aceita qualquer campo válido da SC5 no cabeçalho e da SC6 nos itens, conforme o SX3, além dos exemplos documentados. A ausência de C5_NUM, ou seu envio vazio, identifica inclusão; C5_NUM preenchido identifica alteração. Na inclusão, C5_ZZIDEXT é obrigatório e evita duplicidade.",
+        "operationId": "gravarPedidosVenda",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Incluir pedido de venda",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indpv/api/v1/4ind/pedidos-venda' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"C5_ZZIDEXT\":\"PED-4IND-2026-001\",\"C5_TIPO\":\"N\",\"C5_CLIENTE\":\"000001\",\"C5_LOJACLI\":\"01\",\"C5_CONDPAG\":\"001\",\"itens\":[{\"C6_ITEM\":\"01\",\"C6_PRODUTO\":\"PA01\",\"C6_QTDVEN\":1,\"C6_PRCVEN\":10,\"C6_LOCAL\":\"01\",\"C6_TES\":\"501\"}]}]'"
+          },
+          {
+            "lang": "cURL",
+            "label": "Alterar pedido de venda",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indpv/api/v1/4ind/pedidos-venda' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"C5_NUM\":\"000022\",\"C5_MENNOTA\":\"PEDIDO ALTERADO VIA 4IND\",\"itens\":[{\"C6_ITEM\":\"01\",\"C6_QTDVEN\":2}]}]'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotePedidosVenda"
+              },
+              "examples": {
+                "inclusao": {
+                  "summary": "Inclusão de pedido",
+                  "value": [
+                    {
+                      "C5_ZZIDEXT": "PED-4IND-2026-001",
+                      "C5_TIPO": "N",
+                      "C5_CLIENTE": "000001",
+                      "C5_LOJACLI": "01",
+                      "C5_CONDPAG": "001",
+                      "C5_VEND1": "000001",
+                      "itens": [
+                        {
+                          "C6_ITEM": "01",
+                          "C6_PRODUTO": "PA01",
+                          "C6_QTDVEN": 1,
+                          "C6_PRCVEN": 10,
+                          "C6_LOCAL": "01",
+                          "C6_TES": "501"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alteracao": {
+                  "summary": "Alteração de pedido e exclusão de item",
+                  "value": [
+                    {
+                      "C5_NUM": "000022",
+                      "C5_MENNOTA": "PEDIDO ALTERADO VIA 4IND",
+                      "itens": [
+                        {
+                          "C6_ITEM": "01",
+                          "C6_QTDVEN": 2
+                        },
+                        {
+                          "C6_ITEM": "02",
+                          "DELETADO": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alteração concluída ou pedido externo já processado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Processamento do lote finalizado com sucesso no ERP.",
+                  "totalProcessados": 1,
+                  "totalSucessos": 1,
+                  "totalErros": 0,
+                  "resultados": [
+                    {
+                      "status": "success",
+                      "message": "Registro processado com sucesso no ERP.",
+                      "erros": [],
+                      "entidade": "PEDIDO_VENDA",
+                      "chave": "000022",
+                      "id_externo": "PED-4IND-2026-001"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "$ref": "#/components/responses/LoteIncluido"
+          },
+          "400": {
+            "$ref": "#/components/responses/ErroProcessamentoLote"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    },
+    "/api4indpv/api/v1/4ind/pedidos-venda/{pedido}": {
+      "delete": {
+        "tags": [
+          "Pedidos de Venda"
+        ],
+        "summary": "Excluir pedido de venda",
+        "description": "Exclui integralmente o pedido informado. O número deve preservar os zeros à esquerda.",
+        "operationId": "excluirPedidoVenda",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Excluir pedido de venda",
+            "source": "curl --request DELETE 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indpv/api/v1/4ind/pedidos-venda/000022' --header 'Authorization: Bearer SEU_TOKEN'"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pedido",
+            "in": "path",
+            "required": true,
+            "description": "Número do pedido no Protheus (C5_NUM)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "000022"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperacaoConcluida"
+          },
+          "400": {
+            "$ref": "#/components/responses/ErroProcessamentoLote"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    },
+    "/api4indprd/api/v1/4ind/produtos": {
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Incluir ou alterar produtos",
+        "description": "Recebe um array com um ou mais produtos. A API é dinâmica e aceita qualquer campo válido da SB1, SB5 ou D1A conforme o SX3, além dos exemplos documentados. B1_COD identifica o produto: quando não existe ocorre inclusão; quando já existe ocorre alteração. Campos B1_, B5_ e D1A_ podem ser enviados no mesmo objeto. A D1A é opcional e somente é processada quando houver campos D1A_.",
+        "operationId": "gravarProdutos",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Incluir produto",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indprd/api/v1/4ind/produtos' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"B1_COD\":\"000019\",\"B1_DESC\":\"PRODUTO INTEGRADO 4IND\",\"B1_TIPO\":\"PA\",\"B1_UM\":\"UN\",\"B1_LOCPAD\":\"01\",\"B1_POSIPI\":\"00000000\",\"B1_ORIGEM\":\"0\",\"B5_CEME\":\"DESCRICAO CIENTIFICA\",\"D1A_WSAAS\":true}]'"
+          },
+          {
+            "lang": "cURL",
+            "label": "Alterar produto",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indprd/api/v1/4ind/produtos' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"B1_COD\":\"000019\",\"B1_DESC\":\"PRODUTO INTEGRADO 4IND ALTERADO\",\"B1_PRV1\":375}]'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoteProdutos"
+              },
+              "examples": {
+                "inclusaoComD1A": {
+                  "summary": "Inclusão de produto com SB5 e D1A",
+                  "value": [
+                    {
+                      "B1_COD": "000019",
+                      "B1_DESC": "PRODUTO INTEGRADO 4IND",
+                      "B1_TIPO": "PA",
+                      "B1_UM": "UN",
+                      "B1_LOCPAD": "01",
+                      "B1_POSIPI": "00000000",
+                      "B1_ORIGEM": "0",
+                      "B1_PRV1": 350.5,
+                      "B5_CEME": "DESCRICAO CIENTIFICA",
+                      "D1A_WSAAS": true
+                    }
+                  ]
+                },
+                "alteracaoSemD1A": {
+                  "summary": "Alteração sem modificar a D1A",
+                  "value": [
+                    {
+                      "B1_COD": "000019",
+                      "B1_DESC": "PRODUTO INTEGRADO 4IND ALTERADO",
+                      "B1_PRV1": 375
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alteração concluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                }
+              }
+            }
+          },
+          "201": {
+            "$ref": "#/components/responses/LoteIncluido"
+          },
+          "400": {
+            "$ref": "#/components/responses/ErroProcessamentoLote"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    },
+    "/api4indprd/api/v1/4ind/produtos/{produto}": {
+      "delete": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Excluir produto",
+        "description": "Exclui o complemento D1A quando existente e, em seguida, exclui o produto pela MATA010. O código deve preservar os zeros à esquerda.",
+        "operationId": "excluirProduto",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Excluir produto",
+            "source": "curl --request DELETE 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indprd/api/v1/4ind/produtos/000019' --header 'Authorization: Bearer SEU_TOKEN'"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "produto",
+            "in": "path",
+            "required": true,
+            "description": "Código do produto no Protheus (B1_COD)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "000019"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperacaoConcluida"
+          },
+          "400": {
+            "$ref": "#/components/responses/ErroProcessamentoLote"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    },
+    "/api4indsc/api/v1/4ind/solicitacao-compras": {
+      "post": {
+        "tags": [
+          "Solicitações de Compra"
+        ],
+        "summary": "Incluir ou alterar solicitações de compra",
+        "description": "Recebe um array com uma ou mais solicitações de compra. A API é dinâmica e aceita qualquer campo válido da SC1 no cabeçalho e nos itens, conforme o SX3, além dos exemplos documentados. A ausência de C1_NUM, ou seu envio vazio, identifica inclusão; C1_NUM preenchido identifica alteração. Na inclusão, C1_SOLICIT é obrigatório no cabeçalho e C1_ITEM, C1_PRODUTO, C1_QUANT e C1_ZZIDEXT são obrigatórios em cada item. Todos os itens de uma inclusão devem possuir o mesmo C1_ZZIDEXT. O campo DELETADO pode ser utilizado somente nos itens de uma alteração. Quando todos os itens ativos forem excluídos sem inclusão de outro item, a solicitação será excluída integralmente.",
+        "operationId": "gravarSolicitacoesCompra",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Incluir solicitação de compra",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indsc/api/v1/4ind/solicitacao-compras' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"C1_SOLICIT\":\"4IND\",\"itens\":[{\"C1_ITEM\":\"01\",\"C1_PRODUTO\":\"PA01\",\"C1_QUANT\":1,\"C1_LOCAL\":\"01\",\"C1_ZZIDEXT\":\"SC-4IND-2026-001\"},{\"C1_ITEM\":\"02\",\"C1_PRODUTO\":\"PA01\",\"C1_QUANT\":1,\"C1_LOCAL\":\"01\",\"C1_ZZIDEXT\":\"SC-4IND-2026-001\"}]}]'"
+          },
+          {
+            "lang": "cURL",
+            "label": "Alterar item da solicitação de compra",
+            "source": "curl --request POST 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indsc/api/v1/4ind/solicitacao-compras' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '[{\"C1_NUM\":\"000009\",\"itens\":[{\"C1_ITEM\":\"01\",\"C1_PRODUTO\":\"PA01\",\"C1_QUANT\":5}]}]'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoteSolicitacoesCompra"
+              },
+              "examples": {
+                "inclusao": {
+                  "summary": "Inclusão de solicitação com dois itens",
+                  "value": [
+                    {
+                      "C1_SOLICIT": "4IND",
+                      "itens": [
+                        {
+                          "C1_ITEM": "01",
+                          "C1_PRODUTO": "PA01",
+                          "C1_QUANT": 1,
+                          "C1_LOCAL": "01",
+                          "C1_OBS": "SOLICITACAO ORIGINADA VIA 4IND",
+                          "C1_ZZIDEXT": "SC-4IND-2026-001"
+                        },
+                        {
+                          "C1_ITEM": "02",
+                          "C1_PRODUTO": "PA01",
+                          "C1_QUANT": 1,
+                          "C1_LOCAL": "01",
+                          "C1_OBS": "SOLICITACAO ORIGINADA VIA 4IND",
+                          "C1_ZZIDEXT": "SC-4IND-2026-001"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alteracao": {
+                  "summary": "Alteração de item existente",
+                  "value": [
+                    {
+                      "C1_NUM": "000009",
+                      "itens": [
+                        {
+                          "C1_ITEM": "01",
+                          "C1_PRODUTO": "PA01",
+                          "C1_QUANT": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "exclusaoItem": {
+                  "summary": "Exclusão de item durante a alteração",
+                  "value": [
+                    {
+                      "C1_NUM": "000009",
+                      "itens": [
+                        {
+                          "C1_ITEM": "02",
+                          "DELETADO": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alteração ou exclusão de itens concluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Processamento do lote finalizado com sucesso no ERP.",
+                  "totalProcessados": 1,
+                  "totalSucessos": 1,
+                  "totalErros": 0,
+                  "resultados": [
+                    {
+                      "status": "success",
+                      "message": "Registro processado com sucesso no ERP.",
+                      "erros": [],
+                      "entidade": "SOLICITACAO_COMPRA",
+                      "chave": "000009",
+                      "id_externo": "SC-4IND-2026-001"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Solicitação de compra incluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Processamento do lote finalizado com sucesso no ERP.",
+                  "totalProcessados": 1,
+                  "totalSucessos": 1,
+                  "totalErros": 0,
+                  "resultados": [
+                    {
+                      "status": "success",
+                      "message": "Registro processado com sucesso no ERP.",
+                      "erros": [],
+                      "entidade": "SOLICITACAO_COMPRA",
+                      "chave": "000010",
+                      "id_externo": "SC-4IND-2026-001"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação ou processamento. Em lotes, o status pode ser error ou partial_success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                },
+                "example": {
+                  "status": "error",
+                  "message": "Lote processado com inconsistências em 1 registro(s).",
+                  "totalProcessados": 1,
+                  "totalSucessos": 0,
+                  "totalErros": 1,
+                  "resultados": [
+                    {
+                      "status": "error",
+                      "message": "Falha na validação das regras de negócio do ERP.",
+                      "erros": "O campo C1_PRODUTO é obrigatório no item 1.",
+                      "entidade": "SOLICITACAO_COMPRA",
+                      "chave": "",
+                      "id_externo": "SC-4IND-2026-001"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    },
+    "/api4indsc/api/v1/4ind/solicitacao-compras/{solicitacao}": {
+      "delete": {
+        "tags": [
+          "Solicitações de Compra"
+        ],
+        "summary": "Excluir solicitação de compra",
+        "description": "Exclui integralmente a solicitação de compra pela operação 5 da MATA110. O número deve preservar os zeros à esquerda.",
+        "operationId": "excluirSolicitacaoCompra",
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Excluir solicitação de compra",
+            "source": "curl --request DELETE 'https://autentica218913.protheus.cloudtotvs.com.br:10878/rest/api4indsc/api/v1/4ind/solicitacao-compras/000009' --header 'Authorization: Bearer SEU_TOKEN'"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "solicitacao",
+            "in": "path",
+            "required": true,
+            "description": "Número da solicitação de compra no Protheus (C1_NUM)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "000009"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Solicitação de compra excluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaLote"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErroProcessamentoLote"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroInterno"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token retornado pelo endpoint /api/oauth2/v1/token"
+      }
+    },
+    "schemas": {
+      "RespostaToken": {
+        "type": "object",
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "example": 3600
+          },
+          "hasMFA": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "LotePedidosVenda": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/components/schemas/PedidoVenda"
+        }
+      },
+      "PedidoVenda": {
+        "type": "object",
+        "required": [
+          "itens"
+        ],
+        "description": "Objeto dinâmico de pedido. A seção properties contém somente os campos mais comuns e exemplos; qualquer outro campo C5_ existente no SX3 pode ser enviado. C5_FILIAL é controlado internamente. Para inclusão, C5_ZZIDEXT, C5_TIPO, C5_CLIENTE, C5_LOJACLI e C5_CONDPAG são obrigatórios.",
+        "properties": {
+          "C5_NUM": {
+            "type": "string",
+            "description": "Número do pedido. Ausente ou vazio indica inclusão; preenchido indica alteração."
+          },
+          "C5_ZZIDEXT": {
+            "type": "string",
+            "description": "Identificador externo obrigatório na inclusão e utilizado para impedir duplicidade."
+          },
+          "C5_TIPO": {
+            "type": "string"
+          },
+          "C5_CLIENTE": {
+            "type": "string"
+          },
+          "C5_LOJACLI": {
+            "type": "string"
+          },
+          "C5_CONDPAG": {
+            "type": "string"
+          },
+          "C5_VEND1": {
+            "type": "string"
+          },
+          "C5_MENNOTA": {
+            "type": "string"
+          },
+          "C5_ZZNSU": {
+            "type": "string"
+          },
+          "C5_ZZAUTOR": {
+            "type": "string"
+          },
+          "C5_ZZADMIN": {
+            "type": "string"
+          },
+          "C5_ZZBANDE": {
+            "type": "string"
+          },
+          "C5_ZZPARC": {
+            "type": "number"
+          },
+          "itens": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ItemPedidoVenda"
+            }
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC5",
+          "acceptedPrefix": "C5_",
+          "dictionary": "SX3",
+          "propertiesListIsExhaustive": false,
+          "internallyControlledFields": [
+            "C5_FILIAL"
+          ]
+        }
+      },
+      "ItemPedidoVenda": {
+        "type": "object",
+        "required": [
+          "C6_ITEM"
+        ],
+        "description": "Objeto dinâmico de item. A seção properties contém somente os campos mais comuns e exemplos; qualquer outro campo C6_ existente no SX3 pode ser enviado. C6_FILIAL e C6_NUM são controlados internamente. Na inclusão são obrigatórios C6_ITEM, C6_PRODUTO, C6_QTDVEN, C6_PRCVEN e C6_TES ou C6_OPER.",
+        "properties": {
+          "C6_ITEM": {
+            "type": "string"
+          },
+          "C6_PRODUTO": {
+            "type": "string"
+          },
+          "C6_QTDVEN": {
+            "type": "number"
+          },
+          "C6_PRCVEN": {
+            "type": "number"
+          },
+          "C6_VALOR": {
+            "type": "number"
+          },
+          "C6_LOCAL": {
+            "type": "string"
+          },
+          "C6_TES": {
+            "type": "string"
+          },
+          "C6_OPER": {
+            "type": "string"
+          },
+          "DELETADO": {
+            "type": "boolean",
+            "description": "Disponível somente na alteração. Quando true, exclui o item indicado por C6_ITEM."
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC6",
+          "acceptedPrefix": "C6_",
+          "dictionary": "SX3",
+          "propertiesListIsExhaustive": false,
+          "internallyControlledFields": [
+            "C6_FILIAL",
+            "C6_NUM"
+          ]
+        }
+      },
+      "LoteProdutos": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/components/schemas/Produto"
+        }
+      },
+      "Produto": {
+        "type": "object",
+        "required": [
+          "B1_COD"
+        ],
+        "description": "Objeto dinâmico. A seção properties contém somente os campos mais comuns e exemplos; qualquer outro campo B1_, B5_ ou D1A_ existente no SX3 pode ser enviado. B1_FILIAL, B5_FILIAL e D1A_FILIAL são controlados internamente. Na inclusão também são obrigatórios B1_DESC, B1_TIPO, B1_UM, B1_LOCPAD, B1_POSIPI e B1_ORIGEM.",
+        "properties": {
+          "B1_COD": {
+            "type": "string"
+          },
+          "B1_DESC": {
+            "type": "string"
+          },
+          "B1_TIPO": {
+            "type": "string"
+          },
+          "B1_UM": {
+            "type": "string"
+          },
+          "B1_LOCPAD": {
+            "type": "string"
+          },
+          "B1_POSIPI": {
+            "type": "string"
+          },
+          "B1_ORIGEM": {
+            "type": "string"
+          },
+          "B1_PRV1": {
+            "type": "number"
+          },
+          "B5_COD": {
+            "type": "string",
+            "description": "Quando enviado, deve ser igual a B1_COD."
+          },
+          "B5_CEME": {
+            "type": "string",
+            "description": "Campo obrigatório no ambiente atual quando a SB5 for processada."
+          },
+          "B5_ECDESCR": {
+            "type": "string"
+          },
+          "B5_PRV2": {
+            "type": "number"
+          },
+          "D1A_COD": {
+            "type": "string",
+            "description": "Vínculo com o produto. Quando enviado, deve ser igual a B1_COD."
+          },
+          "D1A_WSAAS": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "tables": [
+            "SB1",
+            "SB5",
+            "D1A"
+          ],
+          "acceptedPrefixes": [
+            "B1_",
+            "B5_",
+            "D1A_"
+          ],
+          "dictionary": "SX3",
+          "propertiesListIsExhaustive": false,
+          "internallyControlledFields": [
+            "B1_FILIAL",
+            "B5_FILIAL",
+            "D1A_FILIAL"
+          ]
+        }
+      },
+      "LoteSolicitacoesCompra": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/components/schemas/SolicitacaoCompra"
+        }
+      },
+      "SolicitacaoCompra": {
+        "type": "object",
+        "required": [
+          "itens"
+        ],
+        "description": "Objeto dinâmico de solicitação de compra. A seção properties contém somente os campos mais comuns e exemplos; qualquer outro campo C1_ existente no SX3 pode ser enviado no cabeçalho, exceto campos controlados ou reservados pela integração. C1_FILIAL é controlado internamente. C1_ZZIDEXT e DELETADO devem ser informados somente nos itens. Para inclusão, C1_SOLICIT é obrigatório. C1_EMISSAO recebe a data-base quando não for informado. C1_NUM ausente ou vazio identifica inclusão; preenchido identifica alteração.",
+        "properties": {
+          "C1_NUM": {
+            "type": "string",
+            "description": "Número da solicitação. Ausente ou vazio indica inclusão; preenchido indica alteração. Deve preservar os zeros à esquerda.",
+            "example": "000009"
+          },
+          "C1_SOLICIT": {
+            "type": "string",
+            "description": "Solicitante. Obrigatório no cabeçalho da inclusão.",
+            "example": "4IND"
+          },
+          "C1_EMISSAO": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de emissão. Quando omitida na inclusão, recebe a data-base do Protheus.",
+            "example": "2026-10-16"
+          },
+          "C1_OBS": {
+            "type": "string"
+          },
+          "itens": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ItemSolicitacaoCompra"
+            }
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC1",
+          "acceptedPrefix": "C1_",
+          "dictionary": "SX3",
+          "propertiesListIsExhaustive": false,
+          "internallyControlledFields": [
+            "C1_FILIAL"
+          ],
+          "itemOnlyFields": [
+            "C1_ZZIDEXT",
+            "DELETADO"
+          ]
+        }
+      },
+      "ItemSolicitacaoCompra": {
+        "type": "object",
+        "required": [
+          "C1_ITEM"
+        ],
+        "description": "Objeto dinâmico de item da solicitação. A seção properties contém somente os campos mais comuns e exemplos; qualquer outro campo C1_ existente no SX3 pode ser enviado. C1_FILIAL e C1_NUM são controlados internamente. C1_ITEM é sempre obrigatório. Para inclusão da solicitação ou de um novo item, também são obrigatórios C1_PRODUTO, C1_QUANT e C1_ZZIDEXT. Todos os itens de uma inclusão devem possuir o mesmo C1_ZZIDEXT. DELETADO está disponível somente em alterações.",
+        "properties": {
+          "C1_ITEM": {
+            "type": "string",
+            "description": "Número do item. Deve ser enviado como caractere e preservar os zeros à esquerda.",
+            "example": "01"
+          },
+          "C1_PRODUTO": {
+            "type": "string",
+            "description": "Código do produto. Obrigatório na inclusão de um novo item.",
+            "example": "PA01"
+          },
+          "C1_QUANT": {
+            "type": "number",
+            "description": "Quantidade solicitada. Obrigatória na inclusão de um novo item.",
+            "example": 1
+          },
+          "C1_LOCAL": {
+            "type": "string",
+            "description": "Armazém relacionado ao item.",
+            "example": "01"
+          },
+          "C1_DATPRF": {
+            "type": "string",
+            "format": "date",
+            "description": "Data prevista. Quando omitida na inclusão da solicitação ou de um novo item, recebe a data-base do Protheus.",
+            "example": "2026-10-16"
+          },
+          "C1_OBS": {
+            "type": "string"
+          },
+          "C1_ZZIDEXT": {
+            "type": "string",
+            "description": "Identificador externo obrigatório na inclusão de um novo item. Em uma inclusão, deve possuir o mesmo valor em todos os itens.",
+            "example": "SC-4IND-2026-001"
+          },
+          "DELETADO": {
+            "type": "boolean",
+            "description": "Disponível somente na alteração. Quando true, exclui o item indicado por C1_ITEM. Se todos os itens ativos forem excluídos sem inclusão de outro item, a solicitação será excluída integralmente."
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC1",
+          "acceptedPrefix": "C1_",
+          "dictionary": "SX3",
+          "propertiesListIsExhaustive": false,
+          "internallyControlledFields": [
+            "C1_FILIAL",
+            "C1_NUM"
+          ]
+        }
+      },
+      "RespostaLote": {
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "totalProcessados",
+          "totalSucessos",
+          "totalErros",
+          "resultados"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "partial_success",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "totalProcessados": {
+            "type": "integer"
+          },
+          "totalSucessos": {
+            "type": "integer"
+          },
+          "totalErros": {
+            "type": "integer"
+          },
+          "resultados": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResultadoItem"
+            }
+          }
+        }
+      },
+      "ResultadoItem": {
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "erros",
+          "entidade",
+          "chave",
+          "id_externo"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "erros": {
+            "description": "Array vazio no sucesso ou texto com a causa quando ocorre erro.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "entidade": {
+            "type": "string",
+            "enum": [
+              "PEDIDO_VENDA",
+              "PRODUTO",
+              "SOLICITACAO_COMPRA"
+            ]
+          },
+          "chave": {
+            "type": "string"
+          },
+          "id_externo": {
+            "type": "string"
+          }
+        }
+      },
+      "ErroHttp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "detailedMessage": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "LoteIncluido": {
+        "description": "Ao menos uma inclusão foi concluída e o lote não possui erros",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RespostaLote"
+            },
+            "example": {
+              "status": "success",
+              "message": "Processamento do lote finalizado com sucesso no ERP.",
+              "totalProcessados": 1,
+              "totalSucessos": 1,
+              "totalErros": 0,
+              "resultados": [
+                {
+                  "status": "success",
+                  "message": "Registro processado com sucesso no ERP.",
+                  "erros": [],
+                  "entidade": "PRODUTO",
+                  "chave": "000019",
+                  "id_externo": "000019"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OperacaoConcluida": {
+        "description": "Exclusão concluída com sucesso",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RespostaLote"
+            }
+          }
+        }
+      },
+      "ErroProcessamentoLote": {
+        "description": "Erro de validação ou processamento. Em lotes, o status pode ser error ou partial_success.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RespostaLote"
+            },
+            "example": {
+              "status": "error",
+              "message": "Lote processado com inconsistências em 1 registro(s).",
+              "totalProcessados": 1,
+              "totalSucessos": 0,
+              "totalErros": 1,
+              "resultados": [
+                {
+                  "status": "error",
+                  "message": "Falha na validação das regras de negócio do ERP.",
+                  "erros": "Campo obrigatório não informado.",
+                  "entidade": "PRODUTO",
+                  "chave": "000019",
+                  "id_externo": "000019"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "RequisicaoInvalida": {
+        "description": "Requisição inválida",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroHttp"
+            }
+          }
+        }
+      },
+      "NaoAutorizado": {
+        "description": "Token ausente, inválido ou expirado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroHttp"
+            }
+          }
+        }
+      },
+      "ErroInterno": {
+        "description": "Erro interno não tratado pelo serviço REST",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroHttp"
+            }
+          }
+        }
+      }
+    }
+  }
+}

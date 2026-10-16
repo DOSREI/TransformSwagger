@@ -1,0 +1,959 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MIT044 - Webhooks Protheus para iPaaS/4Ind",
+    "version": "1.0.0",
+    "description": "Contrato dos endpoints que deverão ser disponibilizados pelo iPaaS para receber eventos originados no TOTVS Protheus e encaminhá-los ao 4Ind. Neste documento, o Protheus atua como cliente HTTP e o iPaaS como servidor. As URLs permanecem provisórias até a definição pelo time do iPaaS. O registro das mensagens na ZZM é independente do envio HTTP: o payload é gravado como saída pendente e será transmitido posteriormente pelo Job responsável. A presença de um webhook neste contrato não significa que seu gatilho, Job ou envio HTTP já esteja implementado no Protheus; consulte a extensão x-protheus-status de cada operação."
+  },
+  "servers": [
+    {
+      "url": "https://{hostIpaas}",
+      "description": "Servidor receptor de webhooks do iPaaS - endereço a definir",
+      "variables": {
+        "hostIpaas": {
+          "default": "ipaas.exemplo.com.br",
+          "description": "Host de homologação ou produção informado pelo time do iPaaS"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Pedidos de Venda",
+      "description": "Follow-up de alterações manuais em pedidos de venda originados no 4Ind"
+    },
+    {
+      "name": "Notas Fiscais de Saída",
+      "description": "Eventos de autorização/faturamento e cancelamento de NF-e"
+    },
+    {
+      "name": "Compras",
+      "description": "Eventos futuros de pedidos de compra e recebimento de documentos de entrada"
+    },
+    {
+      "name": "Clientes",
+      "description": "Eventos futuros de alteração de dados de clientes"
+    }
+  ],
+  "paths": {
+    "/webhook/4ind/follow-up/pedidos-venda": {
+      "post": {
+        "tags": [
+          "Pedidos de Venda"
+        ],
+        "summary": "Receber alterações de pedido de venda",
+        "description": "Recebe somente os campos monitorados que foram efetivamente alterados no Protheus. C5_NUM e C5_ZZIDEXT identificam o pedido. Em itens, DELETADO=true indica que o item foi excluído. O endpoint está definido provisoriamente no fonte FollowupPV e poderá ser substituído quando o iPaaS informar a rota definitiva.",
+        "operationId": "receberFollowupPedidoVenda",
+        "x-contract-status": "provisional_endpoint",
+        "x-protheus-status": "payload_e_registro_pendente_na_ZZM_implementados; envio_HTTP_e_Job_pendentes",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Alteração manual de pedido originado no 4Ind após comparação do snapshot",
+          "entity": "FOLLOWUP_PV"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Alteração de cabeçalho e item",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/follow-up/pedidos-venda' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"C5_NUM\":\"000456\",\"C5_ZZIDEXT\":\"PED-4IND-2026-00123\",\"C5_MENNOTA\":\"PEDIDO ALTERADO NO PROTHEUS\",\"itens\":[{\"C6_ITEM\":\"01\",\"C6_QTDVEN\":2}]}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowupPedidoVenda"
+              },
+              "examples": {
+                "alteracao": {
+                  "summary": "Campos alterados no cabeçalho e no item",
+                  "value": {
+                    "C5_NUM": "000456",
+                    "C5_ZZIDEXT": "PED-4IND-2026-00123",
+                    "C5_MENNOTA": "PEDIDO ALTERADO NO PROTHEUS",
+                    "itens": [
+                      {
+                        "C6_ITEM": "01",
+                        "C6_QTDVEN": 2
+                      }
+                    ]
+                  }
+                },
+                "exclusaoItem": {
+                  "summary": "Item excluído no Protheus",
+                  "value": {
+                    "C5_NUM": "000456",
+                    "C5_ZZIDEXT": "PED-4IND-2026-00123",
+                    "itens": [
+                      {
+                        "C6_ITEM": "02",
+                        "DELETADO": true
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    },
+    "/webhook/4ind/notas-fiscais/faturamento": {
+      "post": {
+        "tags": [
+          "Notas Fiscais de Saída"
+        ],
+        "summary": "Receber autorização e faturamento de NF-e",
+        "description": "Notifica que uma NF-e vinculada a pedido originado no 4Ind foi autorizada. O XML e o DANFE são enviados codificados em Base64. A rota deverá ser confirmada pelo iPaaS.",
+        "operationId": "receberFaturamentoNFe",
+        "x-contract-status": "provisional_endpoint",
+        "x-protheus-status": "previsto_na_MIT044; gatilho_Job_e_envio_HTTP_pendentes",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Autorização da NF-e na SEFAZ",
+          "entity": "WEBHOOK_FAT"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "NF-e faturada",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/notas-fiscais/faturamento' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"evento\":\"NFE_FATURADA\",\"filial\":\"01\",\"pedido\":\"000456\",\"id_externo\":\"PED-4IND-2026-00123\",\"notaFiscal\":\"000012345\",\"serie\":\"1\",\"chaveNFe\":\"35260912345678000199550010000123451000123456\",\"dataEmissao\":\"2026-09-03\",\"horaEmissao\":\"10:30:00\",\"xmlBase64\":\"BASE64_XML\",\"danfePdfBase64\":\"BASE64_PDF\"}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NFeFaturada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    },
+    "/webhook/4ind/notas-fiscais/cancelamento": {
+      "post": {
+        "tags": [
+          "Notas Fiscais de Saída"
+        ],
+        "summary": "Receber cancelamento de NF-e",
+        "description": "Notifica o cancelamento fiscal homologado de uma NF-e vinculada a pedido originado no 4Ind. A rota deverá ser confirmada pelo iPaaS.",
+        "operationId": "receberCancelamentoNFe",
+        "x-contract-status": "provisional_endpoint",
+        "x-protheus-status": "previsto_na_MIT044; gatilho_Job_e_envio_HTTP_pendentes",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Cancelamento da NF-e homologado na SEFAZ",
+          "entity": "WEBHOOK_CAN"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "NF-e cancelada",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/notas-fiscais/cancelamento' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"evento\":\"NFE_CANCELADA\",\"filial\":\"01\",\"pedido\":\"000456\",\"id_externo\":\"PED-4IND-2026-00123\",\"notaFiscal\":\"000012345\",\"serie\":\"1\",\"chaveNFe\":\"35260912345678000199550010000123451000123456\",\"dataCancelamento\":\"2026-09-03\",\"horaCancelamento\":\"11:15:00\"}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NFeCancelada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    },
+    "/webhook/4ind/pedidos-compra": {
+      "post": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Receber inclusão, alteração ou exclusão de pedido de compra",
+        "description": "Envia dinamicamente os campos da SC7 relacionados a uma solicitação originada no 4Ind. DELETADO=true identifica exclusão do item. A rota deverá ser definida pelo iPaaS.",
+        "operationId": "receberFollowupPedidoCompra",
+        "x-contract-status": "pending_ipaas_definition",
+        "x-protheus-status": "GAP_futuro_nao_implementado",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Inclusão, alteração ou exclusão de pedido de compra vinculado a solicitação do 4Ind",
+          "entity": "PEDIDO_COMPRA"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Follow-up do pedido de compra",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/pedidos-compra' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"PEDIDO_COMPRA\":{\"C7_FILIAL\":\"01\",\"C7_ZZIDEXT\":\"SC-4IND-7788\",\"C7_NUM\":\"000789\",\"C7_ITEM\":\"01\",\"C7_NUMSC\":\"000321\",\"C7_ITEMSC\":\"01\",\"C7_FORNECE\":\"000050\",\"C7_LOJA\":\"01\",\"C7_PRODUTO\":\"PROD00100\",\"C7_QUANT\":10,\"C7_DATPRF\":\"2026-09-20\"}}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PedidoCompraEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    },
+    "/webhook/4ind/notas-fiscais-entrada": {
+      "post": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Receber movimentação de nota fiscal de entrada",
+        "description": "Notifica a gravação/classificação ou exclusão de documento de entrada vinculado a pedido de compra e solicitação originada no 4Ind. A MIT044 ainda não define um campo explícito para diferenciar inclusão e exclusão; essa definição deverá ser concluída com o iPaaS.",
+        "operationId": "receberNotaFiscalEntrada",
+        "x-contract-status": "pending_ipaas_definition",
+        "x-protheus-status": "GAP_futuro_nao_implementado",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Gravação, classificação ou exclusão do documento de entrada vinculado ao 4Ind",
+          "entity": "NOTA_FISCAL_ENTRADA"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Recebimento de nota fiscal de entrada",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/notas-fiscais-entrada' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"NOTA_FISCAL\":{\"filial\":\"01\",\"id_externo\":\"SC-4IND-7788\",\"numeroSC\":\"000789\",\"itemSC\":\"01\",\"numeroPedidoCompra\":\"000321\",\"itemPedidoCompra\":\"01\",\"numeroNF\":\"00008899\",\"serie\":\"1\",\"chaveNFe\":\"35260900005000000199550010000088991000088991\",\"dataEmissaoNF\":\"2026-09-02\",\"dataRecebimento\":\"2026-09-03\",\"quantidadeRecebidaNF\":10,\"quantidadeTotalPedido\":15,\"quantidadeTotalSC\":10,\"saldoAbertoSC\":0,\"saldoAbertoPedido\":5}}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotaFiscalEntradaEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    },
+    "/webhook/4ind/clientes/follow-up": {
+      "post": {
+        "tags": [
+          "Clientes"
+        ],
+        "summary": "Receber alterações de cliente",
+        "description": "Envia a chave do cliente e somente os dados alterados no Protheus, como o limite de crédito. A rota deverá ser definida pelo iPaaS.",
+        "operationId": "receberFollowupCliente",
+        "x-contract-status": "pending_ipaas_definition",
+        "x-protheus-status": "GAP_futuro_nao_implementado",
+        "x-origin": {
+          "system": "TOTVS Protheus",
+          "trigger": "Alteração de cliente pelo ponto de entrada CRMA980",
+          "entity": "CLIENTE"
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "Alteração do limite de crédito",
+            "source": "curl --request POST 'https://ipaas.exemplo.com.br/webhook/4ind/clientes/follow-up' --header 'Authorization: Bearer SEU_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"A1_COD\":\"000001\",\"A1_LOJA\":\"01\",\"A1_LC\":15000}'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowupCliente"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WebhookRecebido"
+          },
+          "202": {
+            "$ref": "#/components/responses/WebhookAceito"
+          },
+          "400": {
+            "$ref": "#/components/responses/PayloadInvalido"
+          },
+          "401": {
+            "$ref": "#/components/responses/NaoAutorizado"
+          },
+          "409": {
+            "$ref": "#/components/responses/EventoDuplicado"
+          },
+          "429": {
+            "$ref": "#/components/responses/LimiteExcedido"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErroIpaas"
+          },
+          "503": {
+            "$ref": "#/components/responses/IpaasIndisponivel"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token Bearer fornecido pelo iPaaS e configurado no Protheus. O valor não deve ser incluído nesta documentação."
+      }
+    },
+    "schemas": {
+      "FollowupPedidoVenda": {
+        "type": "object",
+        "required": [
+          "C5_NUM",
+          "C5_ZZIDEXT"
+        ],
+        "description": "Payload dinâmico. Além das chaves do pedido, contém somente os campos C5_ monitorados que foram alterados. O array itens é enviado apenas quando houver inclusão, alteração ou exclusão de itens monitorados.",
+        "properties": {
+          "C5_NUM": {
+            "type": "string",
+            "description": "Número do pedido no Protheus, preservando zeros à esquerda.",
+            "example": "000456"
+          },
+          "C5_ZZIDEXT": {
+            "type": "string",
+            "description": "Identificador original do pedido no 4Ind.",
+            "example": "PED-4IND-2026-00123"
+          },
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemFollowupPedidoVenda"
+            }
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC5",
+          "acceptedPrefix": "C5_",
+          "onlyFieldsOriginallyReceivedFrom4Ind": true,
+          "onlyChangedFields": true
+        }
+      },
+      "ItemFollowupPedidoVenda": {
+        "type": "object",
+        "required": [
+          "C6_ITEM"
+        ],
+        "description": "Item dinâmico contendo C6_ITEM e somente os campos C6_ monitorados que foram alterados. Para item excluído, envia C6_ITEM e DELETADO=true.",
+        "properties": {
+          "C6_ITEM": {
+            "type": "string",
+            "example": "01"
+          },
+          "DELETADO": {
+            "type": "boolean",
+            "description": "Quando true, informa que o item foi excluído no Protheus."
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC6",
+          "acceptedPrefix": "C6_",
+          "onlyFieldsOriginallyReceivedFrom4Ind": true,
+          "onlyChangedFields": true
+        }
+      },
+      "NFeFaturada": {
+        "type": "object",
+        "required": [
+          "evento",
+          "filial",
+          "pedido",
+          "id_externo",
+          "notaFiscal",
+          "serie",
+          "chaveNFe",
+          "dataEmissao",
+          "horaEmissao",
+          "xmlBase64",
+          "danfePdfBase64"
+        ],
+        "properties": {
+          "evento": {
+            "type": "string",
+            "enum": [
+              "NFE_FATURADA"
+            ]
+          },
+          "filial": {
+            "type": "string",
+            "example": "01"
+          },
+          "pedido": {
+            "type": "string",
+            "example": "000456"
+          },
+          "id_externo": {
+            "type": "string",
+            "example": "PED-4IND-2026-00123"
+          },
+          "notaFiscal": {
+            "type": "string",
+            "example": "000012345"
+          },
+          "serie": {
+            "type": "string",
+            "example": "1"
+          },
+          "chaveNFe": {
+            "type": "string",
+            "minLength": 44,
+            "maxLength": 44,
+            "example": "35260912345678000199550010000123451000123456"
+          },
+          "dataEmissao": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-03"
+          },
+          "horaEmissao": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$",
+            "example": "10:30:00"
+          },
+          "xmlBase64": {
+            "type": "string",
+            "format": "byte",
+            "description": "Conteúdo integral do XML autorizado da NF-e em Base64."
+          },
+          "danfePdfBase64": {
+            "type": "string",
+            "format": "byte",
+            "description": "DANFE em PDF codificado em Base64."
+          }
+        },
+        "additionalProperties": false
+      },
+      "NFeCancelada": {
+        "type": "object",
+        "required": [
+          "evento",
+          "filial",
+          "pedido",
+          "id_externo",
+          "notaFiscal",
+          "serie",
+          "chaveNFe",
+          "dataCancelamento",
+          "horaCancelamento"
+        ],
+        "properties": {
+          "evento": {
+            "type": "string",
+            "enum": [
+              "NFE_CANCELADA"
+            ]
+          },
+          "filial": {
+            "type": "string",
+            "example": "01"
+          },
+          "pedido": {
+            "type": "string",
+            "example": "000456"
+          },
+          "id_externo": {
+            "type": "string",
+            "example": "PED-4IND-2026-00123"
+          },
+          "notaFiscal": {
+            "type": "string",
+            "example": "000012345"
+          },
+          "serie": {
+            "type": "string",
+            "example": "1"
+          },
+          "chaveNFe": {
+            "type": "string",
+            "minLength": 44,
+            "maxLength": 44,
+            "example": "35260912345678000199550010000123451000123456"
+          },
+          "dataCancelamento": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-03"
+          },
+          "horaCancelamento": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$",
+            "example": "11:15:00"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PedidoCompraEnvelope": {
+        "type": "object",
+        "required": [
+          "PEDIDO_COMPRA"
+        ],
+        "properties": {
+          "PEDIDO_COMPRA": {
+            "$ref": "#/components/schemas/PedidoCompra"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PedidoCompra": {
+        "type": "object",
+        "required": [
+          "C7_ZZIDEXT",
+          "C7_NUM",
+          "C7_ITEM"
+        ],
+        "description": "Objeto dinâmico da SC7. A MIT044 determina o envio dos campos existentes no pedido de compra; a relação apresentada é apenas um exemplo.",
+        "properties": {
+          "C7_FILIAL": {
+            "type": "string",
+            "example": "01"
+          },
+          "C7_ZZIDEXT": {
+            "type": "string",
+            "example": "SC-4IND-7788"
+          },
+          "C7_NUM": {
+            "type": "string",
+            "example": "000789"
+          },
+          "C7_ITEM": {
+            "type": "string",
+            "example": "01"
+          },
+          "C7_NUMSC": {
+            "type": "string",
+            "example": "000321"
+          },
+          "C7_ITEMSC": {
+            "type": "string",
+            "example": "01"
+          },
+          "C7_FORNECE": {
+            "type": "string",
+            "example": "000050"
+          },
+          "C7_LOJA": {
+            "type": "string",
+            "example": "01"
+          },
+          "C7_PRODUTO": {
+            "type": "string",
+            "example": "PROD00100"
+          },
+          "C7_QUANT": {
+            "type": "number",
+            "example": 10
+          },
+          "C7_DATPRF": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-20"
+          },
+          "DELETADO": {
+            "type": "boolean",
+            "description": "Quando true, informa a exclusão do item do pedido de compra."
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SC7",
+          "acceptedPrefix": "C7_",
+          "propertiesListIsExhaustive": false
+        }
+      },
+      "NotaFiscalEntradaEnvelope": {
+        "type": "object",
+        "required": [
+          "NOTA_FISCAL"
+        ],
+        "properties": {
+          "NOTA_FISCAL": {
+            "$ref": "#/components/schemas/NotaFiscalEntrada"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotaFiscalEntrada": {
+        "type": "object",
+        "required": [
+          "filial",
+          "id_externo",
+          "numeroNF",
+          "serie",
+          "dataRecebimento"
+        ],
+        "properties": {
+          "filial": {
+            "type": "string",
+            "example": "01"
+          },
+          "id_externo": {
+            "type": "string",
+            "example": "SC-4IND-7788"
+          },
+          "numeroSC": {
+            "type": "string",
+            "example": "000789"
+          },
+          "itemSC": {
+            "type": "string",
+            "example": "01"
+          },
+          "numeroPedidoCompra": {
+            "type": "string",
+            "example": "000321"
+          },
+          "itemPedidoCompra": {
+            "type": "string",
+            "example": "01"
+          },
+          "numeroNF": {
+            "type": "string",
+            "example": "00008899"
+          },
+          "serie": {
+            "type": "string",
+            "example": "1"
+          },
+          "chaveNFe": {
+            "type": "string",
+            "example": "35260900005000000199550010000088991000088991"
+          },
+          "dataEmissaoNF": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-02"
+          },
+          "dataRecebimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-03"
+          },
+          "quantidadeRecebidaNF": {
+            "type": "number",
+            "example": 10
+          },
+          "quantidadeTotalPedido": {
+            "type": "number",
+            "example": 15
+          },
+          "quantidadeTotalSC": {
+            "type": "number",
+            "example": 10
+          },
+          "saldoAbertoSC": {
+            "type": "number",
+            "example": 0
+          },
+          "saldoAbertoPedido": {
+            "type": "number",
+            "example": 5
+          }
+        },
+        "additionalProperties": false
+      },
+      "FollowupCliente": {
+        "type": "object",
+        "required": [
+          "A1_COD",
+          "A1_LOJA"
+        ],
+        "description": "Payload dinâmico contendo a chave do cliente e os campos da SA1 alterados no Protheus.",
+        "properties": {
+          "A1_COD": {
+            "type": "string",
+            "example": "000001"
+          },
+          "A1_LOJA": {
+            "type": "string",
+            "example": "01"
+          },
+          "A1_LC": {
+            "type": "number",
+            "example": 15000
+          }
+        },
+        "additionalProperties": true,
+        "x-dynamic-fields": {
+          "enabled": true,
+          "table": "SA1",
+          "acceptedPrefix": "A1_",
+          "onlyChangedFields": true
+        }
+      },
+      "RespostaWebhook": {
+        "type": "object",
+        "description": "Estrutura sugerida para confirmação do iPaaS. O formato definitivo deverá ser validado com o time responsável pelo endpoint.",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "accepted"
+          },
+          "message": {
+            "type": "string",
+            "example": "Evento recebido pelo iPaaS."
+          },
+          "id": {
+            "type": "string",
+            "description": "Identificador atribuído pelo iPaaS ao recebimento, quando disponível."
+          }
+        },
+        "additionalProperties": true
+      },
+      "ErroWebhook": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "responses": {
+      "WebhookRecebido": {
+        "description": "Evento processado ou recebido com sucesso pelo iPaaS",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RespostaWebhook"
+            }
+          }
+        }
+      },
+      "WebhookAceito": {
+        "description": "Evento aceito pelo iPaaS para processamento assíncrono",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RespostaWebhook"
+            }
+          }
+        }
+      },
+      "PayloadInvalido": {
+        "description": "Payload inválido ou regra obrigatória não atendida",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      },
+      "NaoAutorizado": {
+        "description": "Token ausente, inválido ou expirado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      },
+      "EventoDuplicado": {
+        "description": "Evento já recebido anteriormente pelo iPaaS. O tratamento idempotente deverá ser confirmado com o time do iPaaS.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      },
+      "LimiteExcedido": {
+        "description": "Limite de requisições do iPaaS excedido",
+        "headers": {
+          "Retry-After": {
+            "description": "Tempo sugerido pelo iPaaS antes de uma nova tentativa, quando informado.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      },
+      "ErroIpaas": {
+        "description": "Erro interno no processamento do iPaaS",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      },
+      "IpaasIndisponivel": {
+        "description": "Serviço do iPaaS temporariamente indisponível",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErroWebhook"
+            }
+          }
+        }
+      }
+    }
+  }
+}
